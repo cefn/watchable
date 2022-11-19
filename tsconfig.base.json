@@ -14,7 +14,14 @@
     "skipLibCheck": true,
     "skipDefaultLibCheck": true,
     "baseUrl": ".",
-    "paths": {}
+    "paths": {
+      "@lauf/lock": ["packages/lock/src/index.ts"],
+      "@lauf/queue": ["packages/queue/src/index.ts"],
+      "@lauf/store": ["packages/store/src/index.ts"],
+      "@lauf/store-edit": ["packages/store-edit/src/index.ts"],
+      "@lauf/store-follow": ["packages/store-follow/src/index.ts"],
+      "@lauf/store-react": ["packages/store-react/src/index.ts"]
+    }
   },
   "exclude": ["node_modules", "tmp"]
 }
