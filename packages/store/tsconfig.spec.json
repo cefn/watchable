@@ -1,9 +1,16 @@
 {
   "extends": "./tsconfig.json",
+  // "composite": true,
   "compilerOptions": {
     "outDir": "../../dist/out-tsc",
     "module": "commonjs",
     "types": ["jest", "node"]
   },
-  "include": ["jest.config.ts", "**/*.test.ts", "**/*.spec.ts", "**/*.d.ts"]
+  "include": [
+    "test/**/*.ts", // CH added a pattern for test-specific imports
+    "jest.config.ts",
+    "**/*.test.ts",
+    "**/*.spec.ts",
+    "**/*.d.ts"
+  ]
 }
