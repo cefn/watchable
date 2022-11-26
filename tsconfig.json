@@ -1,0 +1,15 @@
+{
+  "extends": "./tsconfig.build.json",
+  "compilerOptions": {
+    "module": "ES2022",
+    "moduleResolution": "node",
+    "target": "ES2017",
+    /** CEFN: Monorepo config **/
+    "baseUrl": ".",
+    "paths": {
+      "@lauf/*": ["packages/*/src"]
+    },
+    "declaration": false,
+    "noEmit": true /* Do not emit outputs. */
+  }
+}

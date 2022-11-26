@@ -1,0 +1,118 @@
+{
+  "name": "@lauf/queue",
+  "version": "1.1.1",
+  "description": "In-memory MessageQueue with compile-time-immutable state.",
+  "homepage": "https://github.com/cefn/watchable/tree/main/modules/store#readme",
+  "bugs": {
+    "url": "https://github.com/cefn/watchable/issues",
+    "email": "watchable@cefn.com"
+  },
+  "repository": "github:cefn/watchable",
+  "license": "MIT",
+  "author": "Cefn Hoile <github.com@cefn.com> (https://cefn.com)",
+  "type": "module",
+  "main": "src/index.ts",
+  "files": [
+    "README.md",
+    "dist"
+  ],
+  "scripts": {
+    "build": "wireit",
+    "check": "wireit",
+    "lint": "wireit",
+    "test": "wireit"
+  },
+  "eslintConfig": {
+    "rules": {
+      "no-param-reassign": [
+        "error",
+        {
+          "props": true,
+          "ignorePropertyModificationsFor": [
+            "draft"
+          ]
+        }
+      ],
+      "no-restricted-syntax": [
+        "error",
+        "ForInStatement",
+        "LabeledStatement",
+        "WithStatement"
+      ],
+      "no-void": [
+        "error",
+        {
+          "allowAsStatement": true
+        }
+      ],
+      "@typescript-eslint/explicit-function-return-type": "off",
+      "@typescript-eslint/explicit-module-boundary-types": "off",
+      "@typescript-eslint/no-empty-interface": [
+        "error",
+        {
+          "allowSingleExtends": true
+        }
+      ],
+      "@typescript-eslint/no-unused-vars": [
+        "error",
+        {
+          "varsIgnorePattern": "^_"
+        }
+      ],
+      "import/prefer-default-export": "off",
+      "react/prop-types": "off"
+    },
+    "ignorePatterns": [
+      "dist/**"
+    ]
+  },
+  "devDependencies": {
+    "typescript": "^4.9.3"
+  },
+  "publishConfig": {
+    "access": "public",
+    "main": "dist/index.js",
+    "typings": "dist/index.d.ts"
+  },
+  "wireit": {
+    "test": {
+      "command": "jest",
+      "files": [
+        "src/**/*",
+        "test/**/*",
+        "tsconfig.json",
+        "jest.config.cjs",
+        "../../jest.config.base.cjs"
+      ],
+      "output": [
+        "./coverage"
+      ]
+    },
+    "check": {
+      "command": "tsc --noEmit",
+      "files": [
+        "src/**/*.ts",
+        "test/**/*.ts"
+      ],
+      "output": []
+    },
+    "lint": {
+      "command": "eslint",
+      "files": [
+        "**/*"
+      ],
+      "output": []
+    },
+    "build": {
+      "command": "rimraf dist && node ./esbuild.cjs && tsc --declaration --emitDeclarationOnly --outDir dist --project ./tsconfig.build.json",
+      "files": [
+        "src/**/*",
+        "tsconfig.json",
+        "esbuild.cjs"
+      ],
+      "output": [
+        "./dist"
+      ]
+    }
+  }
+}

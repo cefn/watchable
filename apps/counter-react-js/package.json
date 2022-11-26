@@ -1,0 +1,97 @@
+{
+  "name": "counter-react-js",
+  "version": "0.0.0",
+  "private": true,
+  "homepage": "https://github.com/cefn/watchable/tree/main/modules/store#readme",
+  "bugs": {
+    "url": "https://github.com/cefn/watchable/issues",
+    "email": "watchable@cefn.com"
+  },
+  "repository": "github:cefn/watchable",
+  "license": "MIT",
+  "author": "Cefn Hoile <github.com@cefn.com> (https://cefn.com)",
+  "type": "module",
+  "scripts": {
+    "build": "wireit",
+    "check": "wireit",
+    "dev": "vite",
+    "lint": "wireit",
+    "preview": "vite preview"
+  },
+  "eslintConfig": {
+    "rules": {
+      "no-param-reassign": [
+        "error",
+        {
+          "props": true,
+          "ignorePropertyModificationsFor": [
+            "draft"
+          ]
+        }
+      ],
+      "no-restricted-syntax": [
+        "error",
+        "ForInStatement",
+        "LabeledStatement",
+        "WithStatement"
+      ],
+      "no-void": [
+        "error",
+        {
+          "allowAsStatement": true
+        }
+      ],
+      "@typescript-eslint/explicit-function-return-type": "off",
+      "@typescript-eslint/explicit-module-boundary-types": "off",
+      "@typescript-eslint/no-empty-interface": [
+        "error",
+        {
+          "allowSingleExtends": true
+        }
+      ],
+      "@typescript-eslint/no-unused-vars": [
+        "error",
+        {
+          "varsIgnorePattern": "^_"
+        }
+      ],
+      "import/prefer-default-export": "off",
+      "react/prop-types": "off"
+    },
+    "ignorePatterns": [
+      "dist/**"
+    ]
+  },
+  "dependencies": {
+    "@lauf/store": "^1.1.1",
+    "@lauf/store-react": "^1.1.1",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0"
+  },
+  "devDependencies": {
+    "@types/react": "^18.0.24",
+    "@types/react-dom": "^18.0.8",
+    "@vitejs/plugin-react": "^2.2.0",
+    "typescript": "^4.9.3",
+    "vite": "^3.2.3"
+  },
+  "wireit": {
+    "lint": {
+      "command": "eslint",
+      "files": [
+        "**/*"
+      ],
+      "output": []
+    },
+    "build": {
+      "command": "vite build",
+      "files": [
+        "src/**/*",
+        "vite.config.js"
+      ],
+      "output": [
+        "./dist"
+      ]
+    }
+  }
+}
