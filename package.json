@@ -1,0 +1,14 @@
+{
+  "name": "watchable-monorepo",
+  "version": "1.0.0",
+  "description": "Monorepo for @watchable packages",
+  "repository": "https://github.com/cefn/watchable",
+  "private": true,
+  "scripts": {},
+  "author": "Cefn Hoile <github.com@cefn.com> (https://cefn.com)",
+  "license": "MIT",
+  "workspaces": [
+    "packages/*",
+    "apps/*"
+  ]
+}
