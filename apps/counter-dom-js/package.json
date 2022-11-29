@@ -1,6 +1,6 @@
 {
   "name": "counter-dom-js",
-  "version": "1.0.0",
+  "version": "1.0.1-alpha.0",
   "private": true,
   "description": "",
   "homepage": "https://github.com/cefn/watchable/tree/main/modules/store#readme",
@@ -64,8 +64,8 @@
     ]
   },
   "dependencies": {
-    "@lauf/store": "^1.1.1",
-    "@lauf/store-follow": "^1.1.1"
+    "@lauf/store": "^1.2.0-alpha.0",
+    "@lauf/store-follow": "^2.0.0-alpha.0"
   },
   "devDependencies": {
     "vite": "^3.2.4"

@@ -20,7 +20,13 @@
     "packages:sort": "npm exec sort-package-json package.json {apps,packages}/*/package.json",
     "packages:validate": "tsx tooling/validate/cli.ts",
     "packages:validate:fix": "npm run packages:validate -- --fix",
-    "change": "changeset"
+    "changeset:create": "changeset",
+    "changeset:version": "changeset version",
+    "changeset:commit": "git add .changeset && git commit -m 'Prerelease changeset' .changeset",
+    "changeset:publish": "changeset publish",
+    "prerelease:enter": "changeset pre enter alpha",
+    "prerelease:exit": "changeset pre exit alpha",
+    "prerelease": "run-s changeset:create prerelease:enter changeset:version changeset:commit changeset:publish prerelease:exit"
   },
   "devDependencies": {
     "@changesets/cli": "^2.25.2",
