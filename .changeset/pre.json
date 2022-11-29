@@ -11,5 +11,7 @@
     "@lauf/store-follow": "1.1.1",
     "@lauf/store-react": "1.1.1"
   },
-  "changesets": []
+  "changesets": [
+    "friendly-pianos-vanish"
+  ]
 }
