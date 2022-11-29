@@ -11,7 +11,7 @@
   "license": "MIT",
   "author": "Cefn Hoile <github.com@cefn.com> (https://cefn.com)",
   "type": "module",
-  "main": "src/index.js",
+  "main": "dist/index.js",
   "files": [
     "README.md",
     "dist"
@@ -89,9 +89,6 @@
       ],
       "output": [
         "./coverage"
-      ],
-      "dependencies": [
-        "../../packages/store:test"
       ]
     },
     "check": {
