@@ -68,7 +68,8 @@
     "@lauf/store-follow": "^1.1.2-alpha.0"
   },
   "devDependencies": {
-    "vite": "^3.2.4"
+    "vite": "^3.2.4",
+    "wireit": "^0.8.0"
   },
   "wireit": {
     "lint": {

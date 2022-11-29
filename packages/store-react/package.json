@@ -71,7 +71,8 @@
     "@testing-library/react": "^13.4.0",
     "@testing-library/user-event": "^14.4.3",
     "@types/react": "^18.0.25",
-    "typescript": "^4.9.3"
+    "typescript": "^4.9.3",
+    "wireit": "^0.8.0"
   },
   "peerDependencies": {
     "@lauf/store": "^1.1.2-alpha.2",
@@ -94,6 +95,9 @@
       ],
       "output": [
         "./coverage"
+      ],
+      "dependencies": [
+        "../../packages/store:test"
       ]
     },
     "check": {

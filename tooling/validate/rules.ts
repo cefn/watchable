@@ -21,6 +21,7 @@ export const PACKAGE_JSON_RULES = {
     { "counter-dom-js": undefined },
     "^4.9.3"
   ),
+  "devDependencies.wireit": "^0.8.0",
   "scripts.test": byNonNull(
     byPackageType({
       packages: "wireit",

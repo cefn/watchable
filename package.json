@@ -21,15 +21,15 @@
     "packages:validate": "tsx tooling/validate/cli.ts",
     "packages:validate:fix": "npm run packages:validate -- --fix",
     "git:ensureclean": "git diff-index --quiet HEAD || (echo 'Git has uncommitted changes: EXITING' && false)",
+    "git:commit:release": "git add . && git commit -m 'Release changeset' && git push --tags",
     "changeset:create": "changeset",
     "changeset:version": "changeset version",
-    "changeset:commit:release": "git add . && git commit -m 'Release changeset'",
     "changeset:publish": "changeset publish",
     "prerelease:enter": "changeset pre enter alpha",
     "prerelease:exit": "changeset pre exit alpha",
-    "publish": "run-s changeset:create changeset:version changeset:commit:release build changeset:publish",
-    "publish:prerelease": "run-s git:ensureclean prerelease:enter publish prerelease:exit",
-    "publish:release": "run-s git:ensureclean publish"
+    "publish": "run-s changeset:create changeset:version build changeset:publish",
+    "publish:prerelease": "run-s git:ensureclean prerelease:enter publish prerelease:exit git:commit:release",
+    "publish:release": "run-s git:ensureclean publish git:commit:release"
   },
   "devDependencies": {
     "@changesets/cli": "^2.25.2",
