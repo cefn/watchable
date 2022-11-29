@@ -1,5 +1,13 @@
 # @lauf/store-follow
 
+## 1.1.2-alpha.2
+
+### Patch Changes
+
+- Ensuring main is correct
+- Updated dependencies
+  - @lauf/store@1.1.2-alpha.2
+
 ## 1.1.2-alpha.1
 
 ### Patch Changes

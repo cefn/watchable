@@ -1,5 +1,11 @@
 # @lauf/queue
 
+## 1.1.2-alpha.2
+
+### Patch Changes
+
+- Ensuring main is correct
+
 ## 1.1.2-alpha.1
 
 ### Patch Changes
