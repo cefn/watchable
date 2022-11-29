@@ -64,8 +64,8 @@
     ]
   },
   "dependencies": {
-    "@lauf/store": "^1.2.0-alpha.0",
-    "@lauf/store-follow": "^2.0.0-alpha.0"
+    "@lauf/store": "^1.1.1",
+    "@lauf/store-follow": "^1.1.1"
   },
   "devDependencies": {
     "vite": "^3.2.4"
