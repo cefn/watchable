@@ -20,7 +20,7 @@ module.exports = {
       entryPoints: [path.resolve(modulePath, "src/index.ts")],
       outdir: path.resolve(modulePath, "dist"),
       format: "cjs",
-      minify: true,
+      minify: false,
       sourcemap: true,
       bundle: true,
       target: ["es6"],
