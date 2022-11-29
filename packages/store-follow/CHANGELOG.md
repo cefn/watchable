@@ -1,5 +1,13 @@
 # @lauf/store-follow
 
+## 1.1.2-alpha.6
+
+### Patch Changes
+
+- Reintroduce publishConfig metadata
+- Updated dependencies
+  - @lauf/store@1.1.2-alpha.6
+
 ## 1.1.2-alpha.5
 
 ### Patch Changes

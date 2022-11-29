@@ -1,6 +1,6 @@
 {
   "name": "@lauf/queue",
-  "version": "1.1.2-alpha.5",
+  "version": "1.1.2-alpha.6",
   "description": "In-memory MessageQueue with compile-time-immutable state.",
   "homepage": "https://github.com/cefn/watchable/tree/main/modules/store#readme",
   "bugs": {
