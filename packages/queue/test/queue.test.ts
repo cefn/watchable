@@ -2,7 +2,7 @@ import { createQueue } from "../src";
 
 describe("BasicMessageQueue behaviour", () => {
   test("Create a BasicMessageQueue", () => {
-    const queue = createQueue();
+    createQueue();
   });
 
   test("Receive from BasicMessageQueue in same order as sent", async () => {
@@ -41,10 +41,10 @@ describe("BasicMessageQueue behaviour", () => {
     const maxItems = Number.MAX_SAFE_INTEGER;
     const maxConsumers = 2;
     const queue = createQueue<string>(maxItems, maxConsumers);
-    queue.receive();
-    queue.receive();
+    void queue.receive();
+    void queue.receive();
     expect(() => {
-      queue.receive();
+      void queue.receive();
     }).toThrow();
   });
 });

@@ -5,9 +5,9 @@ import {
   listPackageJsonIssues,
   listPackageJsonPaths,
   loadPackageMeta,
-} from "./checkJson";
-import { AbsolutePath, PackageMeta, ErrorReport } from "./types";
-import { listPackageSkeletonIssues } from "./checkSkeleton";
+} from "./listRuleIssues";
+import { AbsolutePath, PackageMeta, ErrorReport } from "../types";
+import { listPackageSkeletonIssues } from "./listSkeletonIssues";
 
 export async function traverseIssues(
   fixRequested: boolean

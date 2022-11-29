@@ -1,15 +1,11 @@
 import { readdirSync, readFileSync } from "fs";
 import { dirname } from "path";
-import {
-  AbsolutePath,
-  PackageSkeletonIssue,
-  PackageMeta,
-  getPackageType,
-} from "./types";
+import { getPackageType } from "./rules/packages";
+import { AbsolutePath, PackageSkeletonIssue, PackageMeta } from "../types";
 import { getToolingPath, resolveAbsolute } from "./util";
 
 export function* listPackageSkeletonIssues(packageMeta: PackageMeta) {
-  const roots = ["shared", getPackageType(packageMeta)]; // e.g. ["shared", "apps"] or ["shared", "packages"]
+  const roots = ["shared", getPackageType(packageMeta)] as const; // e.g. ["shared", "apps"] or ["shared", "packages"]
   for (const root of roots) {
     const referencePath = resolveAbsolute(
       getToolingPath(),

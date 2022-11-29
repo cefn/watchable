@@ -7,7 +7,7 @@ import {
   set as lodashSet,
   unset as lodashUnset,
 } from "lodash-es";
-import { isMember, typedObjectEntries } from "./util";
+import { typedObjectEntries } from "./util";
 import {
   PackageMeta,
   PackageJsonIssue,
@@ -15,9 +15,8 @@ import {
   ValuePath,
   ValueRule,
   AbsolutePath,
-} from "./types";
-``;
-import { PACKAGE_JSON_RULES } from "../rules";
+} from "../types";
+import { PACKAGE_JSON_RULES } from "../ruleConfig";
 
 /** Traverse monorepo to find package.json files */
 export async function listPackageJsonPaths() {
@@ -57,23 +56,32 @@ function* listRuleIssues(
   valueRule: ValueRule
 ): Generator<PackageJsonIssue> {
   const { packageJson } = packageMeta;
-  const actualValue = lodashGet(packageJson, valuePath) as Value;
+  const actualValue = lodashGet(packageJson, valuePath) as Value | undefined;
 
   // handle RegExp rules which generate no expected value
   if (valueRule instanceof RegExp && typeof actualValue === "string") {
-    if (!actualValue.match(valueRule)) {
+    if (!valueRule.test(actualValue)) {
       yield {
-        message: `Value ${actualValue} doesn't match ${valueRule}`,
+        message: `Value ${actualValue} doesn't match ${valueRule.toString()}`,
         path: valuePath,
-        //fix: omitted. RegExp pattern rules have no automatic fix
+        // fix: omitted. RegExp pattern rules have no automatic fix
       };
     }
     return;
   }
 
-  // get expectedValue from valueRule literal, or treat valueRule as a factory
-  const expectedValue: Value =
-    typeof valueRule === "function" ? valueRule(packageMeta) : valueRule;
+  // call factory until resulting value rule is not itself a factory
+  let currentValueRule = valueRule;
+  let countIterations = 0;
+  const maxIterations = 10;
+  while (typeof currentValueRule === "function") {
+    // avoid infinite loop
+    if (countIterations++ > maxIterations)
+      throw new Error(`returned ValueFunction > ${maxIterations} times`);
+    // use factory to calculate next rule
+    currentValueRule = currentValueRule(packageMeta);
+  }
+  const expectedValue = currentValueRule;
 
   // null value means leave unchanged
   if (expectedValue === null) {

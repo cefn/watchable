@@ -19,7 +19,7 @@ module.exports = {
     build({
       entryPoints: [path.resolve(modulePath, "src/index.ts")],
       outdir: path.resolve(modulePath, "dist"),
-      format: "cjs",
+      format: "esm",
       minify: false,
       sourcemap: true,
       bundle: true,

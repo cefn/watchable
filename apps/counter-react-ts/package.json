@@ -1,6 +1,6 @@
 {
   "name": "counter-react-ts",
-  "version": "0.0.0",
+  "version": "0.0.1-alpha.1",
   "private": true,
   "homepage": "https://github.com/cefn/watchable/tree/main/modules/store#readme",
   "bugs": {
@@ -16,66 +16,22 @@
     "dev:bundle": "run-s build preview",
     "build": "wireit",
     "preview": "vite preview",
-    "check": "wireit",
-    "test": "wireit",
     "test:unit": "jest test/jest/**.test.ts",
     "test:dev": "SERVER=http://localhost:5173 run-p --race dev test:server",
     "test:dev:bundle": "SERVER=http://localhost:4173 run-p --race dev:bundle test:server",
     "test:server": "wait-on --config waitOnConfig.json ${SERVER} && playwright test",
+    "test": "wireit",
     "lint": "wireit"
   },
-  "eslintConfig": {
-    "rules": {
-      "no-param-reassign": [
-        "error",
-        {
-          "props": true,
-          "ignorePropertyModificationsFor": [
-            "draft"
-          ]
-        }
-      ],
-      "no-restricted-syntax": [
-        "error",
-        "ForInStatement",
-        "LabeledStatement",
-        "WithStatement"
-      ],
-      "no-void": [
-        "error",
-        {
-          "allowAsStatement": true
-        }
-      ],
-      "@typescript-eslint/explicit-function-return-type": "off",
-      "@typescript-eslint/explicit-module-boundary-types": "off",
-      "@typescript-eslint/no-empty-interface": [
-        "error",
-        {
-          "allowSingleExtends": true
-        }
-      ],
-      "@typescript-eslint/no-unused-vars": [
-        "error",
-        {
-          "varsIgnorePattern": "^_"
-        }
-      ],
-      "import/prefer-default-export": "off",
-      "react/prop-types": "off"
-    },
-    "ignorePatterns": [
-      "dist/**"
-    ]
-  },
   "dependencies": {
-    "@lauf/store": "^1.1.1",
-    "@lauf/store-react": "^1.1.1",
+    "@lauf/store": "^1.1.2-alpha.0",
+    "@lauf/store-react": "^1.1.2-alpha.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0"
   },
   "devDependencies": {
     "@playwright/test": "^1.28.1",
+    "@types/jest": "^29.5.0",
     "@types/react": "^18.0.24",
     "@types/react-dom": "^18.0.8",
     "@vitejs/plugin-legacy": "^2.3.1",
@@ -84,10 +40,33 @@
     "playwright-chromium": "^1.28.1",
     "typescript": "^4.9.3",
     "vite": "^3.2.3",
-    "wait-on": "^6.0.1"
+    "wait-on": "^6.0.1",
+    "wireit": "^0.8.0"
   },
   "wireit": {
+    "build": {
+      "dependencies": [
+        "../../packages/store:build",
+        "../../packages/store-react:build"
+      ],
+      "command": "tsc && vite build",
+      "files": [
+        "src/**/*",
+        "tsconfig.build.json",
+        "../../tsconfig.base.json",
+        "esbuild.cjs",
+        "../../esbuild.base.cjs"
+      ],
+      "output": [
+        "./dist"
+      ]
+    },
     "test": {
+      "dependencies": [
+        "build",
+        "../../packages/store:build",
+        "../../packages/store-react:build"
+      ],
       "command": "run-s test:unit test:dev:bundle",
       "files": [
         "src/**/*",
@@ -104,36 +83,19 @@
         "dist",
         "coverage",
         "playwright-report"
-      ],
-      "dependencies": [
-        "../../packages/store:test",
-        "../../packages/store-react:test"
       ]
     },
-    "check": {
-      "command": "tsc --noEmit",
-      "files": [
-        "src/**/*.ts",
-        "test/**/*.ts"
-      ],
-      "output": []
-    },
     "lint": {
-      "command": "eslint",
+      "command": "eslint -c .eslintrc.cjs .",
       "files": [
-        "**/*"
+        "**/*.js",
+        "**/*.jsx",
+        "**/*.ts",
+        "**/*.jsx"
       ],
-      "output": []
-    },
-    "build": {
-      "command": "tsc && vite build",
-      "files": [
-        "src/**/*",
-        "tsconfig.json",
-        "esbuild.cjs"
-      ],
-      "output": [
-        "./dist"
+      "output": [],
+      "dependencies": [
+        "build"
       ]
     }
   }

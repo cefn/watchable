@@ -1,6 +1,6 @@
 import { resolve, dirname } from "path";
 import { fileURLToPath } from "url";
-import { AbsolutePath } from "./types";
+import { AbsolutePath } from "../types";
 
 export function typedObjectEntries<Obj extends object>(obj: Obj) {
   type Entry = keyof Obj extends keyof Obj
@@ -9,7 +9,7 @@ export function typedObjectEntries<Obj extends object>(obj: Obj) {
   return Object.entries(obj) as Entry[];
 }
 
-export function isMember<Arr extends ReadonlyArray<unknown>>(
+export function isMember<Arr extends readonly unknown[]>(
   arr: Arr,
   candidate: unknown
 ): candidate is Arr[number] {
@@ -21,7 +21,7 @@ export function resolveAbsolute(parentPath: AbsolutePath, childPath: string) {
 }
 
 export function getToolingPath() {
-  const __filename = fileURLToPath(import.meta.url);
-  const __dirname = dirname(__filename);
-  return resolve(__dirname, "../../") as AbsolutePath;
+  const filePath = fileURLToPath(import.meta.url);
+  const dirPath = dirname(filePath);
+  return resolve(dirPath, "../../") as AbsolutePath;
 }
