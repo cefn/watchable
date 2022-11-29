@@ -1,6 +1,6 @@
 {
   "name": "@lauf/store-edit",
-  "version": "1.1.2-alpha.2",
+  "version": "1.1.2-alpha.3",
   "description": "Intuitive editing of @lauf/store state, (using Immer drafts)",
   "homepage": "https://github.com/cefn/watchable/tree/main/modules/store#readme",
   "bugs": {
@@ -71,7 +71,7 @@
     "wireit": "^0.8.0"
   },
   "peerDependencies": {
-    "@lauf/store": "^1.1.2-alpha.2",
+    "@lauf/store": "^1.1.2-alpha.3",
     "immer": "^9.0.16"
   },
   "publishConfig": {

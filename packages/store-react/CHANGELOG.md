@@ -1,5 +1,13 @@
 # @lauf/store-react
 
+## 1.1.2-alpha.3
+
+### Patch Changes
+
+- Try and minify
+- Updated dependencies
+  - @lauf/store@1.1.2-alpha.3
+
 ## 1.1.2-alpha.2
 
 ### Patch Changes

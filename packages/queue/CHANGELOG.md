@@ -1,5 +1,11 @@
 # @lauf/queue
 
+## 1.1.2-alpha.3
+
+### Patch Changes
+
+- Try and minify
+
 ## 1.1.2-alpha.2
 
 ### Patch Changes

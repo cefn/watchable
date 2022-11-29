@@ -1,6 +1,6 @@
 {
   "name": "@lauf/store-follow",
-  "version": "1.1.2-alpha.2",
+  "version": "1.1.2-alpha.3",
   "description": "Await @lauf/store state changes and trigger business logic",
   "homepage": "https://github.com/cefn/watchable/tree/main/modules/store#readme",
   "bugs": {
@@ -71,7 +71,7 @@
     "wireit": "^0.8.0"
   },
   "peerDependencies": {
-    "@lauf/store": "^1.1.2-alpha.2"
+    "@lauf/store": "^1.1.2-alpha.3"
   },
   "publishConfig": {
     "access": "public",
