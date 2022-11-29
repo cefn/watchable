@@ -142,12 +142,16 @@ export const PACKAGE_JSON_RULES = {
     apps: undefined,
     packages: "dist/index.js",
   }),
+  types: byPackageType({
+    apps: undefined,
+    packages: "dist/index.d.ts",
+  }),
   publishConfig: byPackageType({
     apps: undefined,
     packages: {
       access: "public",
       main: "dist/index.js",
-      typings: "dist/index.d.ts",
+      types: "dist/index.d.ts",
     },
   }),
   private: byPackageType({

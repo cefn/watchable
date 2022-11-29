@@ -1,5 +1,17 @@
 # @lauf/queue
 
+## 1.1.2-alpha.5
+
+### Patch Changes
+
+- Test alternative main field dist/index.js
+
+## 1.1.2-alpha.4
+
+### Patch Changes
+
+- Refresh esbuild with minification
+
 ## 1.1.2-alpha.3
 
 ### Patch Changes

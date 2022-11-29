@@ -1,6 +1,6 @@
 {
   "name": "@lauf/store-follow",
-  "version": "1.1.2-alpha.3",
+  "version": "1.1.2-alpha.5",
   "description": "Await @lauf/store state changes and trigger business logic",
   "homepage": "https://github.com/cefn/watchable/tree/main/modules/store#readme",
   "bugs": {
@@ -12,6 +12,7 @@
   "author": "Cefn Hoile <github.com@cefn.com> (https://cefn.com)",
   "type": "module",
   "main": "dist/index.js",
+  "types": "dist/index.d.ts",
   "files": [
     "README.md",
     "dist"
@@ -71,12 +72,7 @@
     "wireit": "^0.8.0"
   },
   "peerDependencies": {
-    "@lauf/store": "^1.1.2-alpha.3"
-  },
-  "publishConfig": {
-    "access": "public",
-    "main": "dist/index.js",
-    "typings": "dist/index.d.ts"
+    "@lauf/store": "^1.1.2-alpha.5"
   },
   "wireit": {
     "test": {
@@ -119,5 +115,10 @@
         "./dist"
       ]
     }
+  },
+  "publishConfig": {
+    "access": "public",
+    "main": "dist/index.js",
+    "types": "dist/index.d.ts"
   }
 }

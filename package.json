@@ -97,7 +97,6 @@
     },
     "build": {
       "dependencies": [
-        "./apps/counter-react-ts:build",
         "./packages/queue:build",
         "./packages/store:build",
         "./packages/store-edit:build",

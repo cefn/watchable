@@ -1,5 +1,21 @@
 # @lauf/store-edit
 
+## 1.1.2-alpha.5
+
+### Patch Changes
+
+- Test alternative main field dist/index.js
+- Updated dependencies
+  - @lauf/store@1.1.2-alpha.5
+
+## 1.1.2-alpha.4
+
+### Patch Changes
+
+- Refresh esbuild with minification
+- Updated dependencies
+  - @lauf/store@1.1.2-alpha.4
+
 ## 1.1.2-alpha.3
 
 ### Patch Changes
