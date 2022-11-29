@@ -5,15 +5,16 @@
     "counter-dom-js": "1.0.1-alpha.1",
     "counter-react-js": "0.0.1-alpha.1",
     "counter-react-ts": "0.0.1-alpha.1",
-    "@lauf/queue": "1.1.2-alpha.6",
-    "@lauf/store": "1.1.2-alpha.6",
-    "@lauf/store-edit": "1.1.2-alpha.6",
-    "@lauf/store-follow": "1.1.2-alpha.6",
-    "@lauf/store-react": "1.1.2-alpha.6"
+    "@lauf/queue": "1.1.2-alpha.7",
+    "@lauf/store": "1.1.2-alpha.7",
+    "@lauf/store-edit": "1.1.2-alpha.7",
+    "@lauf/store-follow": "1.1.2-alpha.7",
+    "@lauf/store-react": "1.1.2-alpha.7"
   },
   "changesets": [
     "blue-yaks-run",
     "eleven-shoes-agree",
+    "gentle-pumas-chew",
     "mighty-deers-crash",
     "nine-doors-refuse",
     "ninety-knives-vanish",

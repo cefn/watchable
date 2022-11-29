@@ -1,5 +1,11 @@
 # @lauf/queue
 
+## 1.1.2-alpha.8
+
+### Patch Changes
+
+- Trying without minification
+
 ## 1.1.2-alpha.7
 
 ### Patch Changes
