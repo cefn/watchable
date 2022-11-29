@@ -55,7 +55,12 @@ export const PACKAGE_JSON_RULES = {
       packages: {
         command:
           "rimraf dist && node ./esbuild.cjs && tsc --declaration --emitDeclarationOnly --outDir dist --project ./tsconfig.build.json",
-        files: ["src/**/*", "tsconfig.json", "esbuild.cjs"],
+        files: [
+          "src/**/*",
+          "tsconfig.json",
+          "esbuild.cjs",
+          "../../esbuild.base.cjs",
+        ],
         output: ["./dist"],
       },
       apps: null, // pass
@@ -75,7 +80,12 @@ export const PACKAGE_JSON_RULES = {
       },
       {
         command: "tsc && vite build",
-        files: ["src/**/*", "tsconfig.json", "esbuild.cjs"],
+        files: [
+          "src/**/*",
+          "tsconfig.json",
+          "esbuild.cjs",
+          "../../esbuild.base.cjs",
+        ],
         output: ["./dist"],
       }
     )

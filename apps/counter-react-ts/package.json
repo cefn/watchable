@@ -131,7 +131,8 @@
       "files": [
         "src/**/*",
         "tsconfig.json",
-        "esbuild.cjs"
+        "esbuild.cjs",
+        "../../esbuild.base.cjs"
       ],
       "output": [
         "./dist"
