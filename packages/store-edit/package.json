@@ -70,7 +70,7 @@
     "typescript": "^4.9.3"
   },
   "peerDependencies": {
-    "@lauf/store": "^1.1.1",
+    "@lauf/store": "^1.2.0-alpha.1",
     "immer": "^9.0.16"
   },
   "publishConfig": {

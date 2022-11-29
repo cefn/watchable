@@ -20,7 +20,16 @@
     "packages:sort": "npm exec sort-package-json package.json {apps,packages}/*/package.json",
     "packages:validate": "tsx tooling/validate/cli.ts",
     "packages:validate:fix": "npm run packages:validate -- --fix",
-    "change": "changeset"
+    "git:ensureclean": "git diff-index --quiet HEAD || (echo 'Git has uncommitted changes: EXITING' && false)",
+    "changeset:create": "changeset",
+    "changeset:version": "changeset version",
+    "changeset:commit:release": "git add . && git commit -m 'Release changeset'",
+    "changeset:publish": "changeset publish",
+    "prerelease:enter": "changeset pre enter alpha",
+    "prerelease:exit": "changeset pre exit alpha",
+    "publish": "run-s changeset:create changeset:version changeset:commit:release build changeset:publish",
+    "publish:prerelease": "run-s git:ensureclean prerelease:enter publish prerelease:exit",
+    "publish:release": "run-s git:ensureclean publish"
   },
   "devDependencies": {
     "@changesets/cli": "^2.25.2",
