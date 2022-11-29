@@ -1,6 +1,6 @@
 {
   "name": "@lauf/store",
-  "version": "1.1.2-alpha.6",
+  "version": "1.1.2-alpha.7",
   "description": "Store with compile-time-immutable state.",
   "homepage": "https://github.com/cefn/watchable/tree/main/modules/store#readme",
   "bugs": {

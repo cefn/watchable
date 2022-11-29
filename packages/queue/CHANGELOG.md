@@ -1,5 +1,11 @@
 # @lauf/queue
 
+## 1.1.2-alpha.7
+
+### Patch Changes
+
+- Resolve missing module header
+
 ## 1.1.2-alpha.6
 
 ### Patch Changes

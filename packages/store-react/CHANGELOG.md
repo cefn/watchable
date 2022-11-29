@@ -1,5 +1,13 @@
 # @lauf/store-react
 
+## 1.1.2-alpha.7
+
+### Patch Changes
+
+- Resolve missing module header
+- Updated dependencies
+  - @lauf/store@1.1.2-alpha.7
+
 ## 1.1.2-alpha.6
 
 ### Patch Changes
