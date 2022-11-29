@@ -129,7 +129,7 @@ export const PACKAGE_JSON_RULES = {
   },
   main: byPackageType({
     apps: undefined,
-    packages: "src/index.ts",
+    packages: "src/index.js",
   }),
   publishConfig: byPackageType({
     apps: undefined,
