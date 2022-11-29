@@ -20,7 +20,7 @@
     "packages:sort": "npm exec sort-package-json package.json {apps,packages}/*/package.json",
     "packages:validate": "tsx tooling/validate/cli.ts",
     "packages:validate:fix": "npm run packages:validate -- --fix",
-    "git:ensureclean": "(git diff-index --quiet HEAD && git branch -r --contains HEAD) || (echo 'Git has uncommitted or unpushed changes: EXITING' && false)",
+    "git:ensureclean": "(git diff-index --quiet HEAD && git log --exit-code @..@{u}) || (echo 'Git has uncommitted or unpushed changes: EXITING' && false)",
     "git:commit:release": "git add . && git commit -m 'Release changeset' && git push --tags",
     "changeset:create": "changeset",
     "changeset:version": "changeset version",
