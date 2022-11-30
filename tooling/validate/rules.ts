@@ -55,7 +55,8 @@ export const PACKAGE_JSON_RULES = {
     const factory = byNonNull(
       byPackageType({
         packages: {
-          command: "rimraf dist && tsc --project ./tsconfig.build.json",
+          command:
+            "rimraf dist && node ./esbuild.cjs && tsc --project ./tsconfig.build.json",
           files: [
             "src/**/*",
             "tsconfig.json",
