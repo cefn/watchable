@@ -57,7 +57,7 @@ function* listRuleIssues(
   valueRule: ValueRule
 ): Generator<PackageJsonIssue> {
   const { packageJson } = packageMeta;
-  const actualValue = lodashGet(packageJson, valuePath) as Value;
+  const actualValue = lodashGet(packageJson, valuePath) as Value | undefined;
 
   // handle RegExp rules which generate no expected value
   if (valueRule instanceof RegExp && typeof actualValue === "string") {

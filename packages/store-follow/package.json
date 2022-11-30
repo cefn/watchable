@@ -72,8 +72,13 @@
     "wireit": "^0.8.0"
   },
   "peerDependencies": {
-    "@lauf/store": "^1.1.2-alpha.8",
-    "@lauf/queue": "^1.1.2-alpha.8"
+    "@lauf/queue": "^1.1.2-alpha.8",
+    "@lauf/store": "^1.1.2-alpha.8"
+  },
+  "publishConfig": {
+    "access": "public",
+    "main": "dist/index.js",
+    "types": "dist/index.d.ts"
   },
   "wireit": {
     "test": {
@@ -87,6 +92,10 @@
       ],
       "output": [
         "./coverage"
+      ],
+      "dependencies": [
+        "../../packages/queue:test",
+        "../../packages/store:test"
       ]
     },
     "check": {
@@ -116,12 +125,11 @@
       ],
       "output": [
         "./dist"
+      ],
+      "dependencies": [
+        "../../packages/queue:build",
+        "../../packages/store:build"
       ]
     }
-  },
-  "publishConfig": {
-    "access": "public",
-    "main": "dist/index.js",
-    "types": "dist/index.d.ts"
   }
 }

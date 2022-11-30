@@ -75,6 +75,11 @@
     "@lauf/store": "^1.1.2-alpha.8",
     "immer": "^9.0.16"
   },
+  "publishConfig": {
+    "access": "public",
+    "main": "dist/index.js",
+    "types": "dist/index.d.ts"
+  },
   "wireit": {
     "test": {
       "command": "jest",
@@ -118,10 +123,5 @@
         "./dist"
       ]
     }
-  },
-  "publishConfig": {
-    "access": "public",
-    "main": "dist/index.js",
-    "types": "dist/index.d.ts"
   }
 }

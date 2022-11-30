@@ -55,7 +55,7 @@ export const PACKAGE_JSON_RULES = {
     byPackageType({
       packages: {
         command:
-          "rimraf dist && node ./esbuild.cjs && tsc ----project ./tsconfig.build.json",
+          "rimraf dist && node ./esbuild.cjs && tsc --project ./tsconfig.build.json",
         files: [
           "src/**/*",
           "tsconfig.json",
@@ -255,8 +255,8 @@ function getUpstreamNames({ packageJson }: PackageMeta) {
       ...dependencies,
       ...peerDependencies,
     };
-    for (const dependency of Object.keys(deps)) {
-      const [scope, name] = dependency.split("/");
+    for (const scopedName of Object.keys(deps)) {
+      const [scope, name] = scopedName.split("/");
       if (name && scope === SCOPE) {
         // depend on upstream test
         upstreamNames.push(name);
