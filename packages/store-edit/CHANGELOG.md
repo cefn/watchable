@@ -1,5 +1,13 @@
 # @lauf/store-edit
 
+## 1.1.2-alpha.9
+
+### Patch Changes
+
+- Tsc transpiled to ESM
+- Updated dependencies
+  - @lauf/store@1.1.2-alpha.9
+
 ## 1.1.2-alpha.8
 
 ### Patch Changes
