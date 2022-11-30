@@ -8,7 +8,7 @@ import {
 } from "./lib/types";
 
 export const PACKAGE_JSON_RULES = {
-  type: "module",
+  type: "commonjs",
   license: "MIT",
   author: "Cefn Hoile <github.com@cefn.com> (https://cefn.com)",
   repository: "github:cefn/watchable",
@@ -19,7 +19,7 @@ export const PACKAGE_JSON_RULES = {
   },
   "devDependencies.typescript": byPackageName(
     { "counter-dom-js": undefined },
-    "^4.9.3"
+    "^4.8.4"
   ),
   "devDependencies.wireit": "^0.8.0",
   "scripts.test": byNonNull(
@@ -54,10 +54,12 @@ export const PACKAGE_JSON_RULES = {
     byPackageType({
       packages: {
         command:
-          "rimraf dist && node ./esbuild.cjs && tsc --declaration --emitDeclarationOnly --outDir dist --project ./tsconfig.build.json",
+          "rimraf dist && node ./esbuild.cjs && tsc --project ./tsconfig.build.json",
         files: [
           "src/**/*",
           "tsconfig.json",
+          "tsconfig.build.json",
+          "../../tsconfig.base.json",
           "esbuild.cjs",
           "../../esbuild.base.cjs",
         ],
@@ -82,7 +84,8 @@ export const PACKAGE_JSON_RULES = {
         command: "tsc && vite build",
         files: [
           "src/**/*",
-          "tsconfig.json",
+          "tsconfig.build.json",
+          "../../tsconfig.base.json",
           "esbuild.cjs",
           "../../esbuild.base.cjs",
         ],

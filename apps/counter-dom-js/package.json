@@ -11,7 +11,7 @@
   "repository": "github:cefn/watchable",
   "license": "MIT",
   "author": "Cefn Hoile <github.com@cefn.com> (https://cefn.com)",
-  "type": "module",
+  "type": "commonjs",
   "scripts": {
     "build": "wireit",
     "check": "wireit",
