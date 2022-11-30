@@ -88,6 +88,9 @@
       ],
       "output": [
         "./coverage"
+      ],
+      "dependencies": [
+        "build"
       ]
     },
     "check": {

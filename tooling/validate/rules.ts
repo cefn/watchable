@@ -111,28 +111,63 @@ export const PACKAGE_JSON_RULES = {
   },
 
   /** Note: The wireit.test.dependencies stanza is populated later.  */
-  "wireit.test": byNonNull(
-    byPackageType({
-      packages: {
-        command: "jest",
-        files: [
-          "src/**/*",
-          "test/**/*",
-          "tsconfig.json",
-          "jest.config.cjs",
-          "../../jest.config.base.cjs",
-        ],
-        output: ["./coverage"],
-      },
-      apps: null, // pass
-    }),
-    byPackageName(
-      {
-        "counter-react-ts": null, // special case - leave alone
-      },
-      undefined // delete
-    )
-  ),
+  "wireit.test": (packageMeta) => {
+    const factory = byNonNull(
+      byPackageType({
+        packages: {
+          command: "jest",
+          files: [
+            "src/**/*",
+            "test/**/*",
+            "tsconfig.json",
+            "jest.config.cjs",
+            "../../jest.config.base.cjs",
+          ],
+          output: ["./coverage"],
+          dependencies: ["build"],
+        },
+        apps: null, // pass
+      }),
+      byPackageName(
+        {
+          "counter-react-ts": {
+            command: "run-s test:unit test:dev:bundle",
+            files: [
+              "src/**/*",
+              "test/**/*",
+              "index.html",
+              "playwright.config.ts",
+              "tsconfig.json",
+              "vite.config.ts",
+              "waitOnConfig.json",
+              "jest.config.cjs",
+              "../../jest.config.base.cjs",
+            ],
+            output: ["dist", "coverage", "playwright-report"],
+          },
+        },
+        undefined // delete
+      )
+    );
+
+    const value = factory(packageMeta);
+    if (value && typeof value === "object") {
+      const upstreamNames = getUpstreamNames(packageMeta);
+      // test always depends on its own build
+      const dependencies = ["build"];
+      // test also depends on any upstream builds
+      if (upstreamNames) {
+        dependencies.concat(
+          ...upstreamNames.map((name) => `../../packages/${name}:build`)
+        );
+      }
+      return {
+        ...value,
+        dependencies,
+      };
+    }
+    return value;
+  },
   main: byPackageType({
     apps: undefined,
     packages: "dist/index.js",

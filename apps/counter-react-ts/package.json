@@ -107,8 +107,7 @@
         "playwright-report"
       ],
       "dependencies": [
-        "../../packages/store:test",
-        "../../packages/store-react:test"
+        "build"
       ]
     },
     "check": {
