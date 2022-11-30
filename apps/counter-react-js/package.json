@@ -10,7 +10,7 @@
   "repository": "github:cefn/watchable",
   "license": "MIT",
   "author": "Cefn Hoile <github.com@cefn.com> (https://cefn.com)",
-  "type": "commonjs",
+  "type": "module",
   "scripts": {
     "build": "wireit",
     "check": "wireit",
@@ -72,7 +72,7 @@
     "@types/react": "^18.0.24",
     "@types/react-dom": "^18.0.8",
     "@vitejs/plugin-react": "^2.2.0",
-    "typescript": "^4.8.4",
+    "typescript": "^4.9.3",
     "vite": "^3.2.3",
     "wireit": "^0.8.0"
   },

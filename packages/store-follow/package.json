@@ -10,7 +10,7 @@
   "repository": "github:cefn/watchable",
   "license": "MIT",
   "author": "Cefn Hoile <github.com@cefn.com> (https://cefn.com)",
-  "type": "commonjs",
+  "type": "module",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "files": [
@@ -68,7 +68,7 @@
     ]
   },
   "devDependencies": {
-    "typescript": "^4.8.4",
+    "typescript": "^4.9.3",
     "wireit": "^0.8.0"
   },
   "peerDependencies": {
