@@ -1,5 +1,13 @@
 # @lauf/store-edit
 
+## 1.1.2-alpha.10
+
+### Patch Changes
+
+- Reverting to esbuild
+- Updated dependencies
+  - @lauf/store@1.1.2-alpha.10
+
 ## 1.1.2-alpha.9
 
 ### Patch Changes

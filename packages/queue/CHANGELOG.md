@@ -1,5 +1,11 @@
 # @lauf/queue
 
+## 1.1.2-alpha.10
+
+### Patch Changes
+
+- Reverting to esbuild
+
 ## 1.1.2-alpha.9
 
 ### Patch Changes
