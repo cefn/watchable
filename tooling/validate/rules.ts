@@ -5,6 +5,7 @@ import {
   getPackageType,
   PackageType,
   SCOPE,
+  PackageMeta,
 } from "./lib/types";
 
 export const PACKAGE_JSON_RULES = {
@@ -54,7 +55,7 @@ export const PACKAGE_JSON_RULES = {
     byPackageType({
       packages: {
         command:
-          "rimraf dist && node ./esbuild.cjs && tsc --project ./tsconfig.build.json",
+          "rimraf dist && node ./esbuild.cjs && tsc ----project ./tsconfig.build.json",
         files: [
           "src/**/*",
           "tsconfig.json",
@@ -117,29 +118,20 @@ export const PACKAGE_JSON_RULES = {
     )
   ),
   /** Note: The wireit.test stanza was populated earlier */
-  "wireit.test.dependencies": ({ packageJson }) => {
-    const upstreamScripts = [];
-    type OptionalJson = {
-      dependencies?: {};
-      peerDependencies?: {};
-      wireit?: {};
-    };
-    const { dependencies, peerDependencies, wireit } =
-      packageJson as OptionalJson;
-    if (wireit && "test" in wireit) {
-      const deps = {
-        ...dependencies,
-        ...peerDependencies,
-      };
-      for (const dependency of Object.keys(deps)) {
-        const [scope, name] = dependency.split("/");
-        if (scope === SCOPE) {
-          // depend on upstream test
-          upstreamScripts.push(`../../packages/${name}:test`);
-        }
-      }
+  "wireit.test.dependencies": (packageMeta) => {
+    const upstreamNames = getUpstreamNames(packageMeta);
+    if (!upstreamNames) {
+      return undefined;
     }
-    return upstreamScripts.length ? upstreamScripts : null;
+    return upstreamNames.map((name) => `../../packages/${name}:test`);
+  },
+  /** Note: The wireit.test stanza was populated earlier */
+  "wireit.build.dependencies": (packageMeta) => {
+    const upstreamNames = getUpstreamNames(packageMeta);
+    if (!upstreamNames) {
+      return undefined;
+    }
+    return upstreamNames.map((name) => `../../packages/${name}:build`);
   },
   main: byPackageType({
     apps: undefined,
@@ -247,4 +239,29 @@ function byNonNull(
     // value should not be overwritten
     return null;
   };
+}
+
+function getUpstreamNames({ packageJson }: PackageMeta) {
+  const upstreamNames: string[] = [];
+  type OptionalJson = {
+    dependencies?: {};
+    peerDependencies?: {};
+    wireit?: {};
+  };
+  const { dependencies, peerDependencies, wireit } =
+    packageJson as OptionalJson;
+  if (wireit && "test" in wireit) {
+    const deps = {
+      ...dependencies,
+      ...peerDependencies,
+    };
+    for (const dependency of Object.keys(deps)) {
+      const [scope, name] = dependency.split("/");
+      if (name && scope === SCOPE) {
+        // depend on upstream test
+        upstreamNames.push(name);
+      }
+    }
+  }
+  return upstreamNames.length ? upstreamNames : null;
 }
