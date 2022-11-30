@@ -121,6 +121,9 @@
       ],
       "output": [
         "./dist"
+      ],
+      "dependencies": [
+        "../../packages/store:build"
       ]
     }
   }

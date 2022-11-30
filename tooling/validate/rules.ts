@@ -51,49 +51,65 @@ export const PACKAGE_JSON_RULES = {
     files: ["**/*"],
     output: [],
   },
-  "wireit.build": byNonNull(
-    byPackageType({
-      packages: {
-        command:
-          "rimraf dist && node ./esbuild.cjs && tsc --project ./tsconfig.build.json",
-        files: [
-          "src/**/*",
-          "tsconfig.json",
-          "tsconfig.build.json",
-          "../../tsconfig.base.json",
-          "esbuild.cjs",
-          "../../esbuild.base.cjs",
-        ],
-        output: ["./dist"],
-      },
-      apps: null, // pass
-    }),
-    byPackageName(
-      {
-        "counter-dom-js": {
-          command: "vite build",
-          files: ["src/**/*"],
+  "wireit.build": (packageMeta: PackageMeta) => {
+    const factory = byNonNull(
+      byPackageType({
+        packages: {
+          command:
+            "rimraf dist && node ./esbuild.cjs && tsc --project ./tsconfig.build.json",
+          files: [
+            "src/**/*",
+            "tsconfig.json",
+            "tsconfig.build.json",
+            "../../tsconfig.base.json",
+            "esbuild.cjs",
+            "../../esbuild.base.cjs",
+          ],
           output: ["./dist"],
         },
-        "counter-react-js": {
-          command: "vite build",
-          files: ["src/**/*", "vite.config.js"],
-          output: ["./dist"],
+        apps: null, // pass
+      }),
+      byPackageName(
+        {
+          "counter-dom-js": {
+            command: "vite build",
+            files: ["src/**/*"],
+            output: ["./dist"],
+          },
+          "counter-react-js": {
+            command: "vite build",
+            files: ["src/**/*", "vite.config.js"],
+            output: ["./dist"],
+          },
         },
-      },
-      {
-        command: "tsc && vite build",
-        files: [
-          "src/**/*",
-          "tsconfig.build.json",
-          "../../tsconfig.base.json",
-          "esbuild.cjs",
-          "../../esbuild.base.cjs",
-        ],
-        output: ["./dist"],
+        {
+          command: "tsc && vite build",
+          files: [
+            "src/**/*",
+            "tsconfig.build.json",
+            "../../tsconfig.base.json",
+            "esbuild.cjs",
+            "../../esbuild.base.cjs",
+          ],
+          output: ["./dist"],
+        }
+      )
+    );
+    const value = factory(packageMeta);
+    if (value && typeof value === "object") {
+      const upstreamNames = getUpstreamNames(packageMeta);
+      if (upstreamNames) {
+        return {
+          ...value,
+          dependencies: upstreamNames.map(
+            (name) => `../../packages/${name}:build`
+          ),
+        };
       }
-    )
-  ),
+    }
+    return value;
+  },
+
   /** Note: The wireit.test.dependencies stanza is populated later.  */
   "wireit.test": byNonNull(
     byPackageType({
@@ -117,22 +133,6 @@ export const PACKAGE_JSON_RULES = {
       undefined // delete
     )
   ),
-  /** Note: The wireit.test stanza was populated earlier */
-  "wireit.test.dependencies": (packageMeta) => {
-    const upstreamNames = getUpstreamNames(packageMeta);
-    if (!upstreamNames) {
-      return undefined;
-    }
-    return upstreamNames.map((name) => `../../packages/${name}:test`);
-  },
-  /** Note: The wireit.test stanza was populated earlier */
-  "wireit.build.dependencies": (packageMeta) => {
-    const upstreamNames = getUpstreamNames(packageMeta);
-    if (!upstreamNames) {
-      return undefined;
-    }
-    return upstreamNames.map((name) => `../../packages/${name}:build`);
-  },
   main: byPackageType({
     apps: undefined,
     packages: "dist/index.js",
