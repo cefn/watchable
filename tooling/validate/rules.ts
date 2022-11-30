@@ -55,8 +55,7 @@ export const PACKAGE_JSON_RULES = {
     const factory = byNonNull(
       byPackageType({
         packages: {
-          command:
-            "rimraf dist && node ./esbuild.cjs && tsc --project ./tsconfig.build.json",
+          command: "rimraf dist && tsc --project ./tsconfig.build.json",
           files: [
             "src/**/*",
             "tsconfig.json",
@@ -250,17 +249,15 @@ function getUpstreamNames({ packageJson }: PackageMeta) {
   };
   const { dependencies, peerDependencies, wireit } =
     packageJson as OptionalJson;
-  if (wireit && "test" in wireit) {
-    const deps = {
-      ...dependencies,
-      ...peerDependencies,
-    };
-    for (const scopedName of Object.keys(deps)) {
-      const [scope, name] = scopedName.split("/");
-      if (name && scope === SCOPE) {
-        // depend on upstream test
-        upstreamNames.push(name);
-      }
+  const deps = {
+    ...dependencies,
+    ...peerDependencies,
+  };
+  for (const scopedName of Object.keys(deps)) {
+    const [scope, name] = scopedName.split("/");
+    if (name && scope === SCOPE) {
+      // depend on upstream test
+      upstreamNames.push(name);
     }
   }
   return upstreamNames.length ? upstreamNames : null;

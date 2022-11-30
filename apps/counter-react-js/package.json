@@ -92,6 +92,10 @@
       ],
       "output": [
         "./dist"
+      ],
+      "dependencies": [
+        "../../packages/store:build",
+        "../../packages/store-react:build"
       ]
     }
   }

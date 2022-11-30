@@ -86,6 +86,10 @@
       ],
       "output": [
         "./dist"
+      ],
+      "dependencies": [
+        "../../packages/store:build",
+        "../../packages/store-follow:build"
       ]
     }
   }
