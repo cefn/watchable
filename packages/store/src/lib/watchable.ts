@@ -1,4 +1,4 @@
-import { Watchable, Watcher } from "../types/watchable";
+import type { Watchable, Watcher } from "../types/watchable";
 
 export class DefaultWatchable<Value> implements Watchable<Value> {
   protected watchers: ReadonlyArray<Watcher<Value>>;

@@ -1,5 +1,5 @@
-import { MessageQueue } from "@lauf/queue";
-import { Immutable } from "@lauf/store";
+import type { MessageQueue } from "@lauf/queue";
+import type { Immutable } from "@lauf/store";
 
 /** Function to process a queue of values including an initial starting value, leading to
  * a final `Ending` result.

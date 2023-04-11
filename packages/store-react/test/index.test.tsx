@@ -6,15 +6,17 @@ import React from "react";
 import { useRootState, useSelected, useStore } from "../src";
 import { render, waitFor, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { createStore, Immutable, Selector, Store } from "@lauf/store";
 import { act } from "react-dom/test-utils";
+
+import type { Immutable, Selector, Store, RootState } from "@lauf/store";
+import { createStore } from "@lauf/store";
 
 /** A promise of the next state change in a store. Watchers are notified in
  * order of subscription, so notifications to any previously-subscribed watchers
  * happen before this is resolved. */
 
 /** Wait until after the next write to a Store. */
-async function nextStateWritten<T extends {}>(store: Store<T>) {
+async function nextStateWritten<T extends RootState>(store: Store<T>) {
   return await new Promise<Immutable<T>>((resolve) => {
     const unwatch = store.watch((state) => {
       resolve(state);
@@ -25,14 +27,14 @@ async function nextStateWritten<T extends {}>(store: Store<T>) {
 
 /** Wait for the event loop after the next write to finish (allowing
  * change to propagate). */
-async function nextStatePropagated<T extends {}>(store: Store<T>) {
+async function nextStatePropagated<T extends RootState>(store: Store<T>) {
   const state = await nextStateWritten(store); // wait for async operations to be triggered
   await new Promise((resolve) => setTimeout(resolve, 0)); // wait for change to propagate
   return state;
 }
 
 /** Complete propagation of a state write within a testing-library `waitFor` guard */
-async function promiseWritePropagated<T extends {}>(
+async function promiseWritePropagated<T extends RootState>(
   store: Store<T>,
   state: Immutable<T>
 ) {

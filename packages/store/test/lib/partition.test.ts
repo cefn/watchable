@@ -1,6 +1,7 @@
 import type { Immutable, RootState, Watcher } from "../../src/types";
+import type { StoreFactory } from "../storeSuite";
 import { createStore, createStorePartition } from "../../src/lib";
-import { createStoreSuite, StoreFactory } from "../storeSuite";
+import { createStoreSuite } from "../storeSuite";
 import { createDeferred } from "../util";
 
 /** TEST PARTITIONS AS A GENERAL STORE */

@@ -24,5 +24,9 @@ void followSelector(
   }
 );
 
-incrementButton.onclick = () => increment(store);
-decrementButton.onclick = () => decrement(store);
+incrementButton.onclick = () => {
+  increment(store);
+};
+decrementButton.onclick = () => {
+  decrement(store);
+};
