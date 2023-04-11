@@ -1,4 +1,4 @@
-import { createStore, Immutable, Store } from "@lauf/store";
+import { createStore, Immutable } from "@lauf/store";
 import { followSelector } from "@lauf/store-follow";
 
 import { manyTicks } from "./util";
@@ -40,10 +40,10 @@ describe("followSelector behaviour", () => {
     const notified: Location[] = [];
 
     const store = createStore(INITIAL_STATE);
-    followSelector(
+    void followSelector(
       store,
       (state) => state.far,
-      async (far, controls) => {
+      async (far, _controls) => {
         notified.push(far);
       }
     );
@@ -69,10 +69,10 @@ describe("followSelector behaviour", () => {
     const notified: Location[] = [];
 
     const store = createStore(INITIAL_STATE);
-    followSelector(
+    void followSelector(
       store,
       (state) => state.far,
-      async (far, controls) => {
+      async (far, _controls) => {
         notified.push(far);
       }
     );
@@ -126,7 +126,7 @@ describe("followSelector behaviour", () => {
       store,
       (state) => state.far,
       async () => {
-        return changeCount++ as unknown as void; //force non-void return value to test logic
+        return changeCount++ as unknown as undefined; // force non-void return value to test logic
       }
     );
 
@@ -144,15 +144,15 @@ describe("followSelector behaviour", () => {
     // follower has handled all changes
     expect(changeCount).toBe(3);
 
-    //promiseEnding not resolved yet - followSelector still running
+    // promiseEnding not resolved yet - followSelector still running
     const winner = await Promise.race([promiseEnding, Promise.resolve()]);
     expect(typeof winner === "undefined");
   });
 
   test("follower can access lastSelected()", async () => {
     const store = createStore(INITIAL_STATE);
-    const lastSelectedValues: (Location | undefined)[] = [];
-    followSelector<AppState, Location, "exampleEnding">(
+    const lastSelectedValues: Array<Location | undefined> = [];
+    void followSelector<AppState, Location, "exampleEnding">(
       store,
       (state) => state.far,
       async (far, controls) => {

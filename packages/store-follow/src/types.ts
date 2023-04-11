@@ -13,15 +13,16 @@ export type QueueHandler<Selected, Ending> = (
 export type Follower<Selected, Ending> = (
   selected: Immutable<Selected>,
   controlHandle: Controls<Selected, Ending>
+  // eslint-disable-next-line @typescript-eslint/no-invalid-void-type
 ) => Promise<void | ExitStatus>;
 
 /** A control object for a [[Follower]] function to signal
  * exit behaviour, retrieve references.
  */
-export type Controls<Selected, Ending> = {
+export interface Controls<Selected, Ending> {
   lastSelected: () => Immutable<Selected> | undefined;
   exit: (ending: Ending) => ExitStatus;
-};
+}
 
 /** A type used as a special return value. */
 export type ExitStatus = ["exit"];

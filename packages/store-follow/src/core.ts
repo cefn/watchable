@@ -23,7 +23,7 @@ export async function withSelectorQueue<
   handleQueue: QueueHandler<Immutable<Selected>, Ending>
 ): Promise<Ending> {
   const queue = createQueue<Immutable<Selected>>();
-  //Could be hoisted as a 'SelectorWatchable'
+  // Could be hoisted as a 'SelectorWatchable'
   let prevSelected: Immutable<Selected> = selector(store.read());
   const selectedNotifier = (value: Immutable<State>) => {
     const nextSelected = selector(value);
@@ -83,6 +83,7 @@ export async function followSelector<State extends RootState, Selected, Ending>(
       while (true) {
         const ending = await follower(selected, controls);
         if (ending === exitStatus) {
+          // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
           return result!;
         }
         lastSelected = selected;

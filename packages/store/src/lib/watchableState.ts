@@ -1,9 +1,10 @@
-import { WatchableState, Watcher } from "../types";
+import type { WatchableState, Watcher } from "../types";
 import { DefaultWatchable } from "./watchable";
 
 export class DefaultWatchableState<State>
   extends DefaultWatchable<State>
-  implements WatchableState<State> {
+  implements WatchableState<State>
+{
   protected value!: State;
   constructor(value: State, watchers?: ReadonlyArray<Watcher<State>>) {
     super(watchers);

@@ -2,7 +2,7 @@ import type { MessageQueue, Watcher } from "./types";
 
 class DefaultMessageQueue<Message> implements MessageQueue<Message> {
   // items passed to send when no receiver was waiting for callback
-  messages: ReadonlyArray<Message> = [];
+  messages: readonly Message[] = [];
   // callbacks passed to receive when no item was waiting to send
   receivers: ReadonlyArray<Watcher<Message>> = [];
   // TODO offer ops to at least count, possibly manipulate, message list
@@ -10,12 +10,13 @@ class DefaultMessageQueue<Message> implements MessageQueue<Message> {
     readonly maxMessages = Number.MAX_SAFE_INTEGER,
     readonly maxReceivers = Number.MAX_SAFE_INTEGER
   ) {}
+
   // TODO make async, await Promise.resolve() to push event into next
   // tick, await receiver
   send = (message: Message) => {
-    if (this.receivers.length) {
-      let receiver: Watcher<Message>;
-      [receiver, ...this.receivers] = this.receivers as [Watcher<Message>];
+    if (this.receivers.length > 0) {
+      const [receiver, ...rest] = this.receivers as [Watcher<Message>];
+      this.receivers = rest;
       receiver(message);
       return true;
     }
@@ -26,11 +27,15 @@ class DefaultMessageQueue<Message> implements MessageQueue<Message> {
       return false;
     }
   };
+
   // TODO add a boolean option here for non-blocking?
+  // CH following eslint rule breaks tests by changing async behaviour
+  // consider making async and rewriting tests
+  // eslint-disable-next-line @typescript-eslint/promise-function-async
   receive = () => {
-    if (this.messages.length) {
-      let message: Message;
-      [message, ...this.messages] = this.messages as [Message];
+    if (this.messages.length > 0) {
+      const [message, ...rest] = this.messages as [Message];
+      this.messages = rest;
       return Promise.resolve(message);
     } else if (this.receivers.length < this.maxReceivers) {
       return new Promise<Message>((resolve) => {

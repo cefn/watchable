@@ -7,7 +7,7 @@
     /** CEFN: Monorepo config **/
     "baseUrl": ".",
     "paths": {
-      "@lauf/*": ["packages/*/src"]
+      "@lauf/*": ["modules/*/src"]
     },
     "declaration": false,
     "noEmit": true /* Do not emit outputs. */

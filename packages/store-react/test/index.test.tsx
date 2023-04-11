@@ -14,8 +14,8 @@ import { act } from "react-dom/test-utils";
  * happen before this is resolved. */
 
 /** Wait until after the next write to a Store. */
-function nextStateWritten<T extends {}>(store: Store<T>) {
-  return new Promise<Immutable<T>>((resolve) => {
+async function nextStateWritten<T extends {}>(store: Store<T>) {
+  return await new Promise<Immutable<T>>((resolve) => {
     const unwatch = store.watch((state) => {
       resolve(state);
       unwatch();
@@ -268,7 +268,7 @@ describe("store-react :", () => {
       // write some state rendered in Branch
       rootRenderSpy.mockClear();
       branchRenderSpy.mockClear();
-      userEvent.click(screen.getByText("Set Mars"));
+      await userEvent.click(screen.getByText("Set Mars"));
       await screen.findByText("This is planet mars");
       await new Promise((resolve) => setTimeout(resolve, 50));
       expect(rootRenderSpy).toHaveBeenCalledTimes(0); // root not re-rendered
@@ -277,7 +277,7 @@ describe("store-react :", () => {
       // write some state not rendered Anywhere
       rootRenderSpy.mockClear();
       branchRenderSpy.mockClear();
-      userEvent.click(screen.getByText("Secure Amulet"));
+      await userEvent.click(screen.getByText("Secure Amulet"));
       await new Promise((resolve) => setTimeout(resolve, 50));
       expect(rootRenderSpy).toHaveBeenCalledTimes(0); // root not re-rendered
       expect(branchRenderSpy).toHaveBeenCalledTimes(0); // branch not re-rendered

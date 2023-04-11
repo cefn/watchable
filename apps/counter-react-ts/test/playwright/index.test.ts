@@ -2,7 +2,7 @@ import { test, expect } from "@playwright/test";
 const { describe, beforeEach } = test;
 
 const server = process.env.SERVER;
-if (!server) {
+if (!(typeof server === "string")) {
   throw new Error(
     "Please set SERVER environment variable. Playwright requires an address to test. "
   );

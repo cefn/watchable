@@ -13,23 +13,38 @@
   ],
   "scripts": {
     "qa": "wireit",
-    "check": "wireit",
-    "lint": "wireit",
-    "test": "wireit",
-    "build": "wireit",
+    "qa:clean": "find . -iname '.wireit' -type d | xargs -I{} rm -rf {}",
+    "qa:watch": "npm run qa --watch",
     "packages:sort": "npm exec sort-package-json package.json {apps,packages}/*/package.json",
     "packages:validate": "tsx tooling/validate/cli.ts",
     "packages:validate:fix": "npm run packages:validate -- --fix",
-    "change": "changeset"
+    "git:ensureclean": "(git diff-index --quiet HEAD && git log --exit-code @..@{u}) || (echo 'Git has uncommitted or unpushed changes: EXITING' && false)",
+    "git:commit:release": "git add . && git commit -m 'Release changeset' && git push --tags",
+    "changeset:create": "changeset",
+    "changeset:version": "changeset version",
+    "changeset:publish": "changeset publish",
+    "prerelease:enter": "changeset pre enter alpha",
+    "prerelease:exit": "changeset pre exit alpha",
+    "publish": "run-s changeset:create changeset:version build changeset:publish",
+    "publish:prerelease": "run-s git:ensureclean prerelease:enter publish prerelease:exit git:commit:release",
+    "publish:release": "run-s git:ensureclean publish git:commit:release"
   },
   "devDependencies": {
     "@changesets/cli": "^2.25.2",
     "@types/jest": "^29.2.3",
     "@types/json-stable-stringify": "^1.0.34",
     "@types/lodash-es": "^4.17.6",
+    "@typescript-eslint/eslint-plugin": "^5.45.0",
     "chalk": "^5.1.2",
     "esbuild": "^0.15.16",
     "eslint": "^8.28.0",
+    "eslint-config-prettier": "^8.5.0",
+    "eslint-config-standard-with-typescript": "^23.0.0",
+    "eslint-plugin-import": "^2.26.0",
+    "eslint-plugin-jest": "^27.1.6",
+    "eslint-plugin-n": "^15.5.1",
+    "eslint-plugin-promise": "^6.1.1",
+    "eslint-plugin-react": "^7.31.11",
     "jest": "^29.3.1",
     "jest-environment-jsdom": "^29.3.1",
     "lodash-es": "^4.17.21",
@@ -38,42 +53,34 @@
     "rimraf": "^3.0.2",
     "sort-package-json": "^2.1.0",
     "ts-jest": "^29.0.3",
-    "tsx": "^3.12.1",
+    "tsx": "^3.12.6",
     "typescript": "^4.9.3",
-    "wireit": "^0.8.0",
+    "wireit": "^0.9.5",
     "zx": "^7.1.1"
   },
   "engines": {
-    "node": "~18.12.1",
-    "npm": "~9.1.1"
+    "node": "^18.12.1",
+    "npm": "^9.1.1"
   },
   "wireit": {
     "qa": {
       "dependencies": [
-        "check",
-        "lint",
+        "build",
         "test",
-        "build"
+        "lint",
+        "packages:validate"
       ]
     },
-    "check": {
+    "build": {
       "dependencies": [
-        "./apps/counter-react-ts:check",
-        "./packages/queue:check",
-        "./packages/store:check",
-        "./packages/store-edit:check",
-        "./packages/store-follow:check",
-        "./packages/store-react:check"
-      ]
-    },
-    "lint": {
-      "dependencies": [
-        "./apps/counter-react-ts:lint",
-        "./packages/queue:lint",
-        "./packages/store:lint",
-        "./packages/store-edit:lint",
-        "./packages/store-follow:lint",
-        "./packages/store-react:lint"
+        "./apps/counter-dom-js:build",
+        "./apps/counter-react-js:build",
+        "./apps/counter-react-ts:build",
+        "./packages/queue:build",
+        "./packages/store:build",
+        "./packages/store-edit:build",
+        "./packages/store-follow:build",
+        "./packages/store-react:build"
       ]
     },
     "test": {
@@ -86,14 +93,16 @@
         "./packages/store-react:test"
       ]
     },
-    "build": {
+    "lint": {
       "dependencies": [
-        "./apps/counter-react-ts:build",
-        "./packages/queue:build",
-        "./packages/store:build",
-        "./packages/store-edit:build",
-        "./packages/store-follow:build",
-        "./packages/store-react:build"
+        "./apps/counter-dom-js:lint",
+        "./apps/counter-react-js:lint",
+        "./apps/counter-react-ts:lint",
+        "./packages/queue:lint",
+        "./packages/store:lint",
+        "./packages/store-edit:lint",
+        "./packages/store-follow:lint",
+        "./packages/store-react:lint"
       ]
     }
   }

@@ -1,6 +1,6 @@
 {
   "name": "counter-dom-js",
-  "version": "1.0.0",
+  "version": "1.0.1-alpha.1",
   "private": true,
   "description": "",
   "homepage": "https://github.com/cefn/watchable/tree/main/modules/store#readme",
@@ -14,77 +14,43 @@
   "type": "module",
   "scripts": {
     "build": "wireit",
-    "check": "wireit",
     "dev": "vite",
-    "lint": "wireit",
-    "preview": "vite preview"
-  },
-  "eslintConfig": {
-    "rules": {
-      "no-param-reassign": [
-        "error",
-        {
-          "props": true,
-          "ignorePropertyModificationsFor": [
-            "draft"
-          ]
-        }
-      ],
-      "no-restricted-syntax": [
-        "error",
-        "ForInStatement",
-        "LabeledStatement",
-        "WithStatement"
-      ],
-      "no-void": [
-        "error",
-        {
-          "allowAsStatement": true
-        }
-      ],
-      "@typescript-eslint/explicit-function-return-type": "off",
-      "@typescript-eslint/explicit-module-boundary-types": "off",
-      "@typescript-eslint/no-empty-interface": [
-        "error",
-        {
-          "allowSingleExtends": true
-        }
-      ],
-      "@typescript-eslint/no-unused-vars": [
-        "error",
-        {
-          "varsIgnorePattern": "^_"
-        }
-      ],
-      "import/prefer-default-export": "off",
-      "react/prop-types": "off"
-    },
-    "ignorePatterns": [
-      "dist/**"
-    ]
+    "preview": "vite preview",
+    "lint": "wireit"
   },
   "dependencies": {
-    "@lauf/store": "^1.1.1",
-    "@lauf/store-follow": "^1.1.1"
+    "@lauf/store": "^1.1.2-alpha.0",
+    "@lauf/store-follow": "^1.1.2-alpha.0"
   },
   "devDependencies": {
-    "vite": "^3.2.4"
+    "vite": "^3.2.4",
+    "wireit": "^0.8.0"
   },
   "wireit": {
-    "lint": {
-      "command": "eslint",
-      "files": [
-        "**/*"
-      ],
-      "output": []
-    },
     "build": {
+      "dependencies": [
+        "../../packages/store:build",
+        "../../packages/store-follow:build"
+      ],
       "command": "vite build",
       "files": [
         "src/**/*"
       ],
       "output": [
         "./dist"
+      ]
+    },
+    "lint": {
+      "command": "eslint -c .eslintrc.cjs .",
+      "files": [
+        "**/*.js",
+        "**/*.jsx",
+        "**/*.ts",
+        "**/*.jsx"
+      ],
+      "output": [],
+      "dependencies": [
+        "build"
       ]
     }
   }

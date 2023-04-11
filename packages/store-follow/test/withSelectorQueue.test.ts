@@ -1,4 +1,4 @@
-import { createStore, Immutable, Store } from "@lauf/store";
+import { createStore, Immutable } from "@lauf/store";
 import { withSelectorQueue } from "@lauf/store-follow";
 
 import { manyTicks } from "./util";
@@ -18,22 +18,6 @@ const INITIAL_STATE: Immutable<AppState> = {
   far: { name: "Sydney", distance: 10000 },
 };
 
-function setNear(store: Store<AppState>, near: Location) {
-  const state = store.read();
-  store.write({
-    ...state,
-    near,
-  });
-}
-
-const timbuktu = {
-  name: "Timbuktu",
-  distance: 2000,
-};
-const beijing = {
-  name: "Beijing",
-  distance: 4000,
-};
 const manchester = {
   name: "Manchester",
   distance: 100,
@@ -49,7 +33,7 @@ describe("withSelectorQueue behaviour", () => {
 
     const notified: Location[] = [];
 
-    withSelectorQueue(
+    void withSelectorQueue(
       store,
       (state) => state.near,
       async (queue, initialValue) => {
@@ -81,7 +65,7 @@ describe("withSelectorQueue behaviour", () => {
 
     const notified: Location[] = [];
 
-    withSelectorQueue(
+    void withSelectorQueue(
       store,
       (state) => state.near,
       async (queue, initialValue) => {

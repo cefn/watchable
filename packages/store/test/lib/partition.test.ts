@@ -1,7 +1,7 @@
-import type { Immutable, RootState, Watcher } from '../../src/types';
-import { createStore, createStorePartition } from '../../src/lib';
-import { createStoreSuite, StoreFactory } from '../storeSuite';
-import { createDeferred } from '../util';
+import type { Immutable, RootState, Watcher } from "../../src/types";
+import { createStore, createStorePartition } from "../../src/lib";
+import { createStoreSuite, StoreFactory } from "../storeSuite";
+import { createDeferred } from "../util";
 
 /** TEST PARTITIONS AS A GENERAL STORE */
 
@@ -15,7 +15,7 @@ const partitionedMapStoreFactory: StoreFactory = <ChildState extends RootState>(
   }
   const parentState: Immutable<ParentState> = { foo: childState } as const;
   const parentStore = createStore<ParentState>(parentState);
-  const childStore = createStorePartition(parentStore, 'foo', watchers);
+  const childStore = createStorePartition(parentStore, "foo", watchers);
   return childStore;
 };
 
@@ -33,35 +33,35 @@ const partitionedListStoreFactory: StoreFactory = <
   return childStore;
 };
 
-createStoreSuite('Partitioned Object Store', partitionedMapStoreFactory);
-createStoreSuite('Partitioned Array Store', partitionedListStoreFactory);
+createStoreSuite("Partitioned Object Store", partitionedMapStoreFactory);
+createStoreSuite("Partitioned Array Store", partitionedListStoreFactory);
 
 /** TEST PARTITIONS INTERACTIONS WITH THEIR PARENT */
 
-describe('Parent Stores and Child Store Partitions', () => {
+describe("Parent Stores and Child Store Partitions", () => {
   interface ParentState {
     partition: {
-      roses: 'red' | 'white';
+      roses: "red" | "white";
     };
     other: {
-      violets: 'blue' | 'purple';
+      violets: "blue" | "purple";
     };
   }
 
-  type ChildState = ParentState['partition'];
+  type ChildState = ParentState["partition"];
 
   function createPartitionedStores() {
     const parentStore = createStore<ParentState>({
-      partition: { roses: 'red' },
-      other: { violets: 'blue' },
+      partition: { roses: "red" },
+      other: { violets: "blue" },
     });
-    const childStore = createStorePartition(parentStore, 'partition');
+    const childStore = createStorePartition(parentStore, "partition");
     return {
       parentStore,
       childStore,
     };
   }
-  test('Child watchers notified of parent store assignments inside partition', async () => {
+  test("Child watchers notified of parent store assignments inside partition", async () => {
     const { deferred, deferredResolve } = createDeferred<ChildState>();
     const { parentStore, childStore } = createPartitionedStores();
     childStore.watch(deferredResolve);
@@ -70,14 +70,14 @@ describe('Parent Stores and Child Store Partitions', () => {
     parentStore.write({
       ...parentState,
       partition: {
-        ...parentState['partition'],
-        roses: 'white',
+        ...parentState.partition,
+        roses: "white",
       },
     });
     expect(await deferred).toBe(childStore.read());
   });
 
-  test('Child watchers not notified of parent store assignments outside partition', async () => {
+  test("Child watchers not notified of parent store assignments outside partition", async () => {
     const watcher = jest.fn();
     const { parentStore, childStore } = createPartitionedStores();
     childStore.watch(watcher);
@@ -86,15 +86,15 @@ describe('Parent Stores and Child Store Partitions', () => {
     parentStore.write({
       ...parentState,
       other: {
-        ...parentState['other'],
-        violets: 'purple',
+        ...parentState.other,
+        violets: "purple",
       },
     });
     await new Promise((resolve) => setTimeout(resolve, 10));
     expect(watcher).toHaveBeenCalledTimes(0);
   });
 
-  test('Parent watchers notified of child store assignments inside partition', async () => {
+  test("Parent watchers notified of child store assignments inside partition", async () => {
     const { deferred, deferredResolve } = createDeferred<ParentState>();
     const { parentStore, childStore } = createPartitionedStores();
     parentStore.watch(deferredResolve);
@@ -102,20 +102,20 @@ describe('Parent Stores and Child Store Partitions', () => {
     const childState = childStore.read();
     childStore.write({
       ...childState,
-      roses: 'white',
+      roses: "white",
     });
     expect(await deferred).toBe(parentStore.read());
   });
 
-  test('Parent watchers notified if child store overwrites partition', async () => {
+  test("Parent watchers notified if child store overwrites partition", async () => {
     const { deferred, deferredResolve } = createDeferred<ParentState>();
     const { parentStore, childStore } = createPartitionedStores();
     parentStore.watch(deferredResolve);
-    childStore.write({ roses: 'white' });
+    childStore.write({ roses: "white" });
     expect(await deferred).toBe(parentStore.read());
   });
 
-  test('Child path and Parent path results correspond', () => {
+  test("Child path and Parent path results correspond", () => {
     const { parentStore, childStore } = createPartitionedStores();
     expect(childStore.read().roses).toBe(parentStore.read().partition.roses);
   });

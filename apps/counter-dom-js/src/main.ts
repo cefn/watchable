@@ -16,11 +16,11 @@ const counterDisplay = getDomElement("#counter");
 const incrementButton = getDomElement("#increment");
 const decrementButton = getDomElement("#decrement");
 
-followSelector(
+void followSelector(
   store,
   (state) => state.counter,
   async (counter) => {
-    counterDisplay.innerText = `Counter is ${counter.toString()}`;
+    counterDisplay.innerText = `Counter is ${counter}`;
   }
 );
 
