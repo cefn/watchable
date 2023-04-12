@@ -1,3 +1,4 @@
+import * as jsonDiff from "json-diff";
 import { isDeepStrictEqual } from "util";
 import { resolve } from "path";
 import { readFileSync } from "fs";
@@ -8,7 +9,7 @@ import {
   unset as lodashUnset,
 } from "lodash-es";
 import { typedObjectEntries } from "./util";
-import {
+import type {
   PackageMeta,
   PackageJsonIssue,
   Value,
@@ -102,10 +103,9 @@ function* listRuleIssues(
 
   // treat all other cases as expecting equality
   if (!isDeepStrictEqual(actualValue, expectedValue)) {
+    const diffString = jsonDiff.diffString(expectedValue, actualValue);
     yield {
-      message: `EXPECTED ${JSON.stringify(
-        expectedValue
-      )} FOUND ${JSON.stringify(actualValue)}`,
+      message: `DIFFERS FROM RULE\n${diffString}`,
       path: valuePath,
       fix: ({ packageJson }) =>
         lodashSet(packageJson, valuePath, expectedValue),

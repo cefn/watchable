@@ -4,7 +4,7 @@ import {
   byPackageType,
 } from "./lib/rules/factories";
 import { getUpstreamBuildDependencies } from "./lib/rules/packages";
-import { PackageJsonSpec } from "./types";
+import type { PackageJsonSpec } from "./types";
 
 export const PACKAGE_JSON_RULES = {
   type: "module",
@@ -26,6 +26,8 @@ export const PACKAGE_JSON_RULES = {
     apps: byPackageName(
       {
         "counter-react-ts": "wireit",
+        "counter-react-ts-context": "wireit",
+        "counter-react-ts-edit": "wireit",
       },
       undefined // delete
     ),
@@ -77,44 +79,61 @@ export const PACKAGE_JSON_RULES = {
       }),
     });
   },
-  /** Note: The wireit.test.dependencies stanza is populated later.  */
+  /** Populate test dependencies according to package dependencies. E.g
+   * store-follow will only be tested when the store tests pass.
+   * Note: The wireit.test.dependencies stanza is populated later.  */
   "wireit.test": (packageMeta) => {
     const upstreamBuilds = getUpstreamBuildDependencies(packageMeta);
     const common = {
       dependencies: ["build", ...(upstreamBuilds ?? [])],
     };
+
+    const tsPackages = {
+      ...common,
+      command: "jest",
+      files: [
+        "src/**/*",
+        "test/**/*",
+        "tsconfig.json",
+        "jest.config.cjs",
+        "../../jest.config.base.cjs",
+      ],
+      output: ["./coverage"],
+      dependencies: ["build"],
+    };
+
+    const tsAppsNoUnitTests = {
+      ...common,
+      command: "run-s test:dev:bundle",
+      files: [
+        "src/**/*",
+        "test/**/*",
+        "index.html",
+        "playwright.config.ts",
+        "tsconfig.json",
+        "vite.config.ts",
+        "waitOnConfig.json",
+      ],
+      output: ["dist", "coverage", "playwright-report"],
+    };
+
+    const tsAppsWithUnitTests = {
+      ...tsAppsNoUnitTests,
+      command: "run-s test:unit test:dev:bundle",
+      files: [
+        ...tsAppsNoUnitTests.files,
+        "jest.config.cjs",
+        "../../jest.config.base.cjs",
+      ],
+    };
+
     return byPackageType({
-      packages: {
-        ...common,
-        command: "jest",
-        files: [
-          "src/**/*",
-          "test/**/*",
-          "tsconfig.json",
-          "jest.config.cjs",
-          "../../jest.config.base.cjs",
-        ],
-        output: ["./coverage"],
-        dependencies: ["build"],
-      },
+      packages: tsPackages,
       apps: byPackageName(
         {
-          "counter-react-ts": {
-            ...common,
-            command: "run-s test:unit test:dev:bundle",
-            files: [
-              "src/**/*",
-              "test/**/*",
-              "index.html",
-              "playwright.config.ts",
-              "tsconfig.json",
-              "vite.config.ts",
-              "waitOnConfig.json",
-              "jest.config.cjs",
-              "../../jest.config.base.cjs",
-            ],
-            output: ["dist", "coverage", "playwright-report"],
-          },
+          "counter-react-ts": tsAppsWithUnitTests,
+          "counter-react-ts-context": tsAppsWithUnitTests,
+          "counter-react-ts-edit": tsAppsNoUnitTests,
         },
         undefined // delete
       ),

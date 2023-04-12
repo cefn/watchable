@@ -9,12 +9,12 @@ interface Location {
   distance: number;
 }
 
-interface AppState {
+interface CounterState {
   near: Location;
   far: Location;
 }
 
-const INITIAL_STATE: Immutable<AppState> = {
+const INITIAL_STATE: Immutable<CounterState> = {
   near: { name: "London", distance: 100 },
   far: { name: "Sydney", distance: 10000 },
 };

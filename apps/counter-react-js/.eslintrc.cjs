@@ -4,4 +4,7 @@ module.exports = {
   parserOptions: {
     ...rootConfig.parserOptions,
   },
+  rules: {
+    "react/prop-types": "off",
+  },
 };
