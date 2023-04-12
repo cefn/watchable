@@ -1,4 +1,4 @@
-import { Immutable, Store } from "@lauf/store";
+import type { Immutable, Store } from "@lauf/store";
 
 export interface AppState {
   counter: number;

@@ -21,14 +21,15 @@
     "@lauf/store": "^1.1.2-alpha.0",
     "@lauf/store-react": "^1.1.2-alpha.0",
     "react": "^18.2.0",
-    "react-dom": "^18.2.0"
+    "react-dom": "^18.2.0",
+    "vite-plugin-react": "^4.0.1"
   },
   "devDependencies": {
     "@types/react": "^18.0.24",
     "@types/react-dom": "^18.0.8",
-    "@vitejs/plugin-react": "^2.2.0",
-    "vite": "^3.2.3",
-    "wireit": "^0.8.0"
+    "@vitejs/plugin-react": "^3.1.0",
+    "vite": "^4.2.1",
+    "wireit": "^0.9.5"
   },
   "wireit": {
     "build": {

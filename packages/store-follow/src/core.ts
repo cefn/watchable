@@ -1,6 +1,7 @@
+import type { Immutable, RootState, Selector, Store } from "@lauf/store";
+import type { Controls, Follower, QueueHandler, ExitStatus } from "./types";
+
 import { createQueue } from "@lauf/queue";
-import { Immutable, RootState, Selector, Store } from "@lauf/store";
-import { Controls, Follower, QueueHandler, ExitStatus } from "./types";
 
 /**
  * Configures a [[MessageQueue]] that will receive messages with every new value

@@ -3,13 +3,8 @@
  *
  * @module @lauf/store-react
  */
-import {
-  createStore,
-  Store,
-  Selector,
-  Immutable,
-  RootState,
-} from "@lauf/store";
+import type { Store, Selector, Immutable, RootState } from "@lauf/store";
+import { createStore } from "@lauf/store";
 import { useState, useEffect } from "react";
 
 /** When the component is first mounted, this hook creates and returns a a new

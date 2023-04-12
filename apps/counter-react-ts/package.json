@@ -30,18 +30,18 @@
     "react-dom": "^18.2.0"
   },
   "devDependencies": {
-    "@playwright/test": "^1.28.1",
+    "@playwright/test": "^1.32.3",
     "@types/jest": "^29.5.0",
-    "@types/react": "^18.0.24",
-    "@types/react-dom": "^18.0.8",
-    "@vitejs/plugin-legacy": "^2.3.1",
-    "@vitejs/plugin-react": "^2.2.0",
+    "@types/react": "^18.0.34",
+    "@types/react-dom": "^18.0.11",
+    "@vitejs/plugin-legacy": "^4.0.2",
+    "@vitejs/plugin-react": "^3.1.0",
     "npm-run-all": "^4.1.5",
-    "playwright-chromium": "^1.28.1",
-    "typescript": "^4.9.3",
-    "vite": "^3.2.3",
-    "wait-on": "^6.0.1",
-    "wireit": "^0.8.0"
+    "playwright-chromium": "^1.32.3",
+    "typescript": "^5.0.4",
+    "vite": "^4.2.1",
+    "wait-on": "^7.0.1",
+    "wireit": "^0.9.5"
   },
   "wireit": {
     "build": {

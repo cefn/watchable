@@ -1,6 +1,6 @@
-import { Immutable, RootState, Store } from "@lauf/store";
+import type { Immutable, RootState, Store } from "@lauf/store";
+import type { Editor } from "./types";
 import produce from "immer";
-import { Editor } from "./types";
 
 /** Accepts an [[Editor]] function which will be passed a `draft` of the current
  * state. The function can manipulate the draft state using normal javascript

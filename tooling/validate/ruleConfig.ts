@@ -17,10 +17,10 @@ export const PACKAGE_JSON_RULES = {
     email: "watchable@cefn.com",
   },
   "devDependencies.typescript": byPackageLanguage({
-    ts: "^4.9.3",
+    ts: "^5.0.4",
     js: undefined,
   }),
-  "devDependencies.wireit": "^0.8.0",
+  "devDependencies.wireit": "^0.9.5",
   "scripts.test": byPackageType({
     packages: "wireit",
     apps: byPackageName(

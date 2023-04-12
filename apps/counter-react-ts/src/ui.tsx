@@ -1,7 +1,8 @@
 import React from "react";
-import { Store } from "@lauf/store";
+import type { Store } from "@lauf/store";
 import { useSelected, useStore } from "@lauf/store-react";
-import { AppState, INITIAL_STATE, decrement, increment } from "./logic";
+import type { AppState } from "./logic";
+import { INITIAL_STATE, decrement, increment } from "./logic";
 
 interface StoreProps {
   store: Store<AppState>;
@@ -13,11 +14,23 @@ export const Display = ({ store }: StoreProps) => {
 };
 
 export const IncreaseButton = ({ store }: StoreProps) => (
-  <button onClick={() => increment(store)}>Increase</button>
+  <button
+    onClick={() => {
+      increment(store);
+    }}
+  >
+    Increase
+  </button>
 );
 
 export const DecreaseButton = ({ store }: StoreProps) => (
-  <button onClick={() => decrement(store)}>Decrease</button>
+  <button
+    onClick={() => {
+      decrement(store);
+    }}
+  >
+    Decrease
+  </button>
 );
 
 export const App = () => {
