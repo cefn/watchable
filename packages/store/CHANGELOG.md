@@ -1,5 +1,13 @@
 # @lauf/store
 
+## 1.3.0-alpha.1
+
+### Patch Changes
+
+- Test publishing after repo move and wireit integration
+- d820877: Test running alpha release
+- d820877: Test alternative main field dist/index.js
+
 ## 1.1.2-alpha.10
 
 ### Patch Changes
