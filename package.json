@@ -25,7 +25,7 @@
     "changeset:publish": "changeset publish",
     "prerelease:enter": "changeset pre enter alpha",
     "prerelease:exit": "changeset pre exit alpha",
-    "publish": "run-s changeset:create changeset:version build changeset:publish",
+    "publish": "run-s changeset:create changeset:version qa changeset:publish",
     "publish:prerelease": "run-s git:ensureclean prerelease:enter publish prerelease:exit git:commit:release",
     "publish:release": "run-s git:ensureclean publish git:commit:release"
   },
