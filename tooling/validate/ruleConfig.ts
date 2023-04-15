@@ -4,7 +4,7 @@ import {
   byPackageType,
 } from "./lib/rules/factories";
 import { getUpstreamBuildDependencies } from "./lib/rules/packages";
-import { PackageJsonSpec } from "./types";
+import type { PackageJsonSpec } from "./types";
 
 export const PACKAGE_JSON_RULES = {
   type: "module",
@@ -26,6 +26,8 @@ export const PACKAGE_JSON_RULES = {
     apps: byPackageName(
       {
         "counter-react-ts": "wireit",
+        "counter-react-ts-context": "wireit",
+        "counter-react-ts-edit": "wireit",
       },
       undefined // delete
     ),
@@ -83,38 +85,45 @@ export const PACKAGE_JSON_RULES = {
     const common = {
       dependencies: ["build", ...(upstreamBuilds ?? [])],
     };
+
+    const wireitTestPackages = {
+      ...common,
+      command: "jest",
+      files: [
+        "src/**/*",
+        "test/**/*",
+        "tsconfig.json",
+        "jest.config.cjs",
+        "../../jest.config.base.cjs",
+      ],
+      output: ["./coverage"],
+      dependencies: ["build"],
+    };
+
+    const wireitTestTypescriptApps = {
+      ...common,
+      command: "run-s test:unit test:dev:bundle",
+      files: [
+        "src/**/*",
+        "test/**/*",
+        "index.html",
+        "playwright.config.ts",
+        "tsconfig.json",
+        "vite.config.ts",
+        "waitOnConfig.json",
+        "jest.config.cjs",
+        "../../jest.config.base.cjs",
+      ],
+      output: ["dist", "coverage", "playwright-report"],
+    };
+
     return byPackageType({
-      packages: {
-        ...common,
-        command: "jest",
-        files: [
-          "src/**/*",
-          "test/**/*",
-          "tsconfig.json",
-          "jest.config.cjs",
-          "../../jest.config.base.cjs",
-        ],
-        output: ["./coverage"],
-        dependencies: ["build"],
-      },
+      packages: wireitTestPackages,
       apps: byPackageName(
         {
-          "counter-react-ts": {
-            ...common,
-            command: "run-s test:unit test:dev:bundle",
-            files: [
-              "src/**/*",
-              "test/**/*",
-              "index.html",
-              "playwright.config.ts",
-              "tsconfig.json",
-              "vite.config.ts",
-              "waitOnConfig.json",
-              "jest.config.cjs",
-              "../../jest.config.base.cjs",
-            ],
-            output: ["dist", "coverage", "playwright-report"],
-          },
+          "counter-react-ts": wireitTestTypescriptApps,
+          "counter-react-ts-context": wireitTestTypescriptApps,
+          "counter-react-ts-edit": wireitTestTypescriptApps,
         },
         undefined // delete
       ),

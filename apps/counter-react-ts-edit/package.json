@@ -48,7 +48,8 @@
     "build": {
       "dependencies": [
         "../../packages/store:build",
-        "../../packages/store-react:build"
+        "../../packages/store-react:build",
+        "../../packages/store-edit:build"
       ],
       "command": "tsc && vite build",
       "files": [
@@ -66,7 +67,8 @@
       "dependencies": [
         "build",
         "../../packages/store:build",
-        "../../packages/store-react:build"
+        "../../packages/store-react:build",
+        "../../packages/store-edit:build"
       ],
       "command": "run-s test:unit test:dev:bundle",
       "files": [
