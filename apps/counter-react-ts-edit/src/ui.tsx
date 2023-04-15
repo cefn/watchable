@@ -2,7 +2,8 @@ import React from "react";
 import type { Store } from "@lauf/store";
 import { useSelected, useStore } from "@lauf/store-react";
 import type { CounterState } from "./logic";
-import { INITIAL_STATE, decrement, increment } from "./logic";
+import { INITIAL_STATE } from "./logic";
+import { edit } from "@lauf/store-edit";
 
 interface StoreProps {
   store: Store<CounterState>;
@@ -16,7 +17,9 @@ export const Display = ({ store }: StoreProps) => {
 export const IncreaseButton = ({ store }: StoreProps) => (
   <button
     onClick={() => {
-      increment(store);
+      edit(store, (draft) => {
+        draft.counter += 1;
+      });
     }}
   >
     Increase
@@ -26,7 +29,9 @@ export const IncreaseButton = ({ store }: StoreProps) => (
 export const DecreaseButton = ({ store }: StoreProps) => (
   <button
     onClick={() => {
-      decrement(store);
+      edit(store, (draft) => {
+        draft.counter -= 1;
+      });
     }}
   >
     Decrease

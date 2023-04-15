@@ -9,12 +9,12 @@ interface Location {
   distance: number;
 }
 
-interface AppState {
+interface CounterState {
   near: Location;
   far: Location;
 }
 
-const INITIAL_STATE: Immutable<AppState> = {
+const INITIAL_STATE: Immutable<CounterState> = {
   near: { name: "London", distance: 100 },
   far: { name: "Sydney", distance: 10000 },
 };
@@ -95,7 +95,11 @@ describe("followSelector behaviour", () => {
 
   test("follower can exit using control object", async () => {
     const store = createStore(INITIAL_STATE);
-    const promiseEnding = followSelector<AppState, Location, "exampleEnding">(
+    const promiseEnding = followSelector<
+      CounterState,
+      Location,
+      "exampleEnding"
+    >(
       store,
       (state) => state.far,
       async (far, controls) => {
@@ -123,7 +127,11 @@ describe("followSelector behaviour", () => {
   test("follower returning ordinary value doesn't terminate", async () => {
     const store = createStore(INITIAL_STATE);
     let changeCount = 0;
-    const promiseEnding = followSelector<AppState, Location, "exampleEnding">(
+    const promiseEnding = followSelector<
+      CounterState,
+      Location,
+      "exampleEnding"
+    >(
       store,
       (state) => state.far,
       async () => {
@@ -153,7 +161,7 @@ describe("followSelector behaviour", () => {
   test("follower can access lastSelected()", async () => {
     const store = createStore(INITIAL_STATE);
     const lastSelectedValues: Array<Location | undefined> = [];
-    void followSelector<AppState, Location, "exampleEnding">(
+    void followSelector<CounterState, Location, "exampleEnding">(
       store,
       (state) => state.far,
       async (far, controls) => {
@@ -185,7 +193,7 @@ describe("followSelector behaviour", () => {
     const store = createStore(INITIAL_STATE);
     let error;
     try {
-      await followSelector<AppState, Location, "exampleEnding">(
+      await followSelector<CounterState, Location, "exampleEnding">(
         store,
         (state) => state.far,
         async () => {

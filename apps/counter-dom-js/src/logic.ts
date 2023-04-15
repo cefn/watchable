@@ -1,14 +1,14 @@
 import type { Immutable, Store } from "@lauf/store";
 
-export interface AppState {
+export interface CounterState {
   counter: number;
 }
 
-export const INITIAL_STATE: Immutable<AppState> = {
+export const INITIAL_STATE: Immutable<CounterState> = {
   counter: 0,
 };
 
-export function increment(store: Store<AppState>) {
+export function increment(store: Store<CounterState>) {
   const state = store.read();
   const { counter } = state;
   store.write({
@@ -17,7 +17,7 @@ export function increment(store: Store<AppState>) {
   });
 }
 
-export function decrement(store: Store<AppState>) {
+export function decrement(store: Store<CounterState>) {
   const state = store.read();
   const { counter } = state;
   store.write({
