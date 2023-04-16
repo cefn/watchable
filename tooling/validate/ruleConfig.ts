@@ -86,7 +86,7 @@ export const PACKAGE_JSON_RULES = {
       dependencies: ["build", ...(upstreamBuilds ?? [])],
     };
 
-    const wireitTestPackages = {
+    const forPackages = {
       ...common,
       command: "jest",
       files: [
@@ -100,9 +100,9 @@ export const PACKAGE_JSON_RULES = {
       dependencies: ["build"],
     };
 
-    const wireitTestTypescriptApps = {
+    const forTsAppsNoUnitTests = {
       ...common,
-      command: "run-s test:unit test:dev:bundle",
+      command: "run-s test:dev:bundle",
       files: [
         "src/**/*",
         "test/**/*",
@@ -111,19 +111,27 @@ export const PACKAGE_JSON_RULES = {
         "tsconfig.json",
         "vite.config.ts",
         "waitOnConfig.json",
-        "jest.config.cjs",
-        "../../jest.config.base.cjs",
       ],
       output: ["dist", "coverage", "playwright-report"],
     };
 
+    const forTsAppsWithUnitTests = {
+      ...forTsAppsNoUnitTests,
+      command: "run-s test:unit test:dev:bundle",
+      files: [
+        ...forTsAppsNoUnitTests.files,
+        "jest.config.cjs",
+        "../../jest.config.base.cjs",
+      ],
+    };
+
     return byPackageType({
-      packages: wireitTestPackages,
+      packages: forPackages,
       apps: byPackageName(
         {
-          "counter-react-ts": wireitTestTypescriptApps,
-          "counter-react-ts-context": wireitTestTypescriptApps,
-          "counter-react-ts-edit": wireitTestTypescriptApps,
+          "counter-react-ts": forTsAppsWithUnitTests,
+          "counter-react-ts-context": forTsAppsWithUnitTests,
+          "counter-react-ts-edit": forTsAppsNoUnitTests,
         },
         undefined // delete
       ),

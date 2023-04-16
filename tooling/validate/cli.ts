@@ -1,6 +1,6 @@
 import chalk from "chalk";
 import { parseArgs } from "node:util";
-import { traverseIssues } from "./lib/traverse";
+import { traverseIssues } from "./lib/traverseIssues";
 
 // read --fix or -f arg
 const args = process.argv.slice(2);
