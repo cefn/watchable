@@ -10,15 +10,12 @@ const { name, dependencies, peerDependencies } =
     peerDependencies?: Record<string, string>;
   };
 
-/** Establish scope of local package. */
-const [scope] = name.split("/");
-
 /** Treat anything in same scope as being
  * explicit external dep (don't bundle) */
 const external = Object.keys({
   ...dependencies,
   ...peerDependencies,
-}).filter((packageName) => packageName.split("/")[0] === scope);
+});
 
 export default defineConfig({
   build: {
