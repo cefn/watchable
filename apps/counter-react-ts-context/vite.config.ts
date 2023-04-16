@@ -7,7 +7,7 @@ export default defineConfig({
   plugins: [
     react(),
     legacy({
-      targets: ["defaults", "not IE 11"],
+      targets: ["defaults"],
     }),
   ],
   clearScreen: false,

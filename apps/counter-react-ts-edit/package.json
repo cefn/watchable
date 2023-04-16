@@ -52,10 +52,9 @@
       "command": "tsc && vite build",
       "files": [
         "src/**/*",
+        "vite.config.js",
         "tsconfig.build.json",
-        "../../tsconfig.base.json",
-        "esbuild.cjs",
-        "../../esbuild.base.cjs"
+        "../../tsconfig.base.json"
       ],
       "output": [
         "./dist"
