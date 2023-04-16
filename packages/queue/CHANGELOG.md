@@ -1,5 +1,14 @@
 # @lauf/queue
 
+## 1.3.0
+
+### Patch Changes
+
+- 80692ad: Test publishing after repo move and wireit integration
+- Version released with esm only.
+- d820877: Test running alpha release
+- d820877: Test alternative main field dist/index.js
+
 ## 1.3.0-alpha.1
 
 ### Patch Changes
