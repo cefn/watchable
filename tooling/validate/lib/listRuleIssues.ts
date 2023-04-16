@@ -105,7 +105,7 @@ function* listRuleIssues(
   if (!isDeepStrictEqual(actualValue, expectedValue)) {
     const diffString = jsonDiff.diffString(expectedValue, actualValue);
     yield {
-      message: `DIFFERS FROM RULE\n${diffString}`,
+      message: `DIFFERS FROM RULE:\n${diffString}`,
       path: valuePath,
       fix: ({ packageJson }) =>
         lodashSet(packageJson, valuePath, expectedValue),

@@ -1,9 +1,7 @@
 const rootConfig = require("../../.eslintrc.cjs");
 module.exports = {
   ...rootConfig,
-  parserOptions: {
-    ...rootConfig.parserOptions,
-  },
+  ignorePatterns: [...rootConfig.ignorePatterns, "vite.config.ts"],
   rules: {
     "react/prop-types": "off",
   },

@@ -1,6 +1,6 @@
 {
   "name": "@lauf/store-react",
-  "version": "1.3.0",
+  "version": "2.0.0-beta.1",
   "description": "Update React components when @lauf/store state changes",
   "homepage": "https://github.com/cefn/watchable/tree/main/modules/store#readme",
   "bugs": {
@@ -15,7 +15,8 @@
   "types": "dist/index.d.ts",
   "files": [
     "README.md",
-    "dist"
+    "dist",
+    "src"
   ],
   "scripts": {
     "build": "wireit",
@@ -28,16 +29,15 @@
     "@testing-library/user-event": "^14.4.3",
     "@types/react": "^18.0.25",
     "typescript": "^5.0.4",
+    "vite": "^4.2.1",
     "wireit": "^0.9.5"
   },
   "peerDependencies": {
-    "@lauf/store": "1.3.0",
+    "@lauf/store": "2.0.0-beta.1",
     "react": "^18.2.0"
   },
   "publishConfig": {
-    "access": "public",
-    "main": "dist/index.js",
-    "types": "dist/index.d.ts"
+    "access": "public"
   },
   "wireit": {
     "test": {
@@ -60,14 +60,13 @@
       "dependencies": [
         "../../packages/store:build"
       ],
-      "command": "node ./esbuild.cjs && tsc --build",
+      "command": "tsc && vite build",
       "files": [
         "src/**/*",
         "tsconfig.json",
         "tsconfig.build.json",
         "../../tsconfig.base.json",
-        "esbuild.cjs",
-        "../../esbuild.base.cjs"
+        "vite.config.ts"
       ],
       "output": [
         "./dist"
@@ -86,5 +85,12 @@
         "build"
       ]
     }
-  }
+  },
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    }
+  },
+  "sideEffects": false
 }

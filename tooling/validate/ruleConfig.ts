@@ -7,7 +7,8 @@ import { getUpstreamBuildDependencies } from "./lib/rules/packages";
 import type { PackageJsonSpec } from "./types";
 
 export const PACKAGE_JSON_RULES = {
-  type: "module",
+  type: byPackageName({ "counter-dom-commonjs": "commonjs" }, "module"),
+  sideEffects: byPackageType({ packages: false, apps: undefined }),
   license: "MIT",
   author: "Cefn Hoile <github.com@cefn.com> (https://cefn.com)",
   repository: "github:cefn/watchable",
@@ -25,9 +26,10 @@ export const PACKAGE_JSON_RULES = {
     packages: "wireit",
     apps: byPackageName(
       {
+        "counter-preact-ts": "wireit",
         "counter-react-ts": "wireit",
-        "counter-react-ts-context": "wireit",
         "counter-react-ts-edit": "wireit",
+        "counter-react-ts-edit-context": "wireit",
       },
       undefined // delete
     ),
@@ -47,7 +49,7 @@ export const PACKAGE_JSON_RULES = {
       js: {
         ...common,
         command: "vite build",
-        files: ["src/**/*"],
+        files: ["vite.config.ts", "src/**/*"],
         output: ["./dist"],
       },
       ts: byPackageType({
@@ -56,23 +58,21 @@ export const PACKAGE_JSON_RULES = {
           command: "tsc && vite build",
           files: [
             "src/**/*",
+            "vite.config.ts",
             "tsconfig.build.json",
             "../../tsconfig.base.json",
-            "esbuild.cjs",
-            "../../esbuild.base.cjs",
           ],
           output: ["./dist"],
         },
         packages: {
           ...common,
-          command: "node ./esbuild.cjs && tsc --build",
+          command: "tsc && vite build",
           files: [
             "src/**/*",
             "tsconfig.json",
             "tsconfig.build.json",
             "../../tsconfig.base.json",
-            "esbuild.cjs",
-            "../../esbuild.base.cjs",
+            "vite.config.ts",
           ],
           output: ["./dist"],
         },
@@ -102,9 +102,9 @@ export const PACKAGE_JSON_RULES = {
       dependencies: ["build"],
     };
 
-    const tsAppsNoUnitTests = {
+    const tsAppsWithUnitTests = {
       ...common,
-      command: "run-s test:dev:bundle",
+      command: "run-s test:unit test:dev:bundle",
       files: [
         "src/**/*",
         "test/**/*",
@@ -113,32 +113,35 @@ export const PACKAGE_JSON_RULES = {
         "tsconfig.json",
         "vite.config.ts",
         "waitOnConfig.json",
-      ],
-      output: ["dist", "coverage", "playwright-report"],
-    };
-
-    const tsAppsWithUnitTests = {
-      ...tsAppsNoUnitTests,
-      command: "run-s test:unit test:dev:bundle",
-      files: [
-        ...tsAppsNoUnitTests.files,
         "jest.config.cjs",
         "../../jest.config.base.cjs",
       ],
+      output: ["dist", "coverage", "playwright-report"],
     };
 
     return byPackageType({
       packages: tsPackages,
       apps: byPackageName(
         {
+          "counter-preact-ts": tsAppsWithUnitTests,
           "counter-react-ts": tsAppsWithUnitTests,
-          "counter-react-ts-context": tsAppsWithUnitTests,
-          "counter-react-ts-edit": tsAppsNoUnitTests,
+          "counter-react-ts-edit": tsAppsWithUnitTests,
+          "counter-react-ts-edit-context": tsAppsWithUnitTests,
         },
         undefined // delete
       ),
     });
   },
+  publishConfig: byPackageType({
+    apps: undefined,
+    packages: {
+      access: "public",
+    },
+  }),
+  private: byPackageType({
+    apps: true,
+    packages: undefined,
+  }),
   main: byPackageType({
     apps: undefined,
     packages: "dist/index.js",
@@ -147,20 +150,17 @@ export const PACKAGE_JSON_RULES = {
     apps: undefined,
     packages: "dist/index.d.ts",
   }),
-  publishConfig: byPackageType({
+  exports: byPackageType({
     apps: undefined,
     packages: {
-      access: "public",
-      main: "dist/index.js",
-      types: "dist/index.d.ts",
+      ".": {
+        import: "./dist/index.js",
+        require: "./dist/index.cjs",
+      },
     },
-  }),
-  private: byPackageType({
-    apps: true,
-    packages: undefined,
   }),
   files: byPackageType({
     apps: undefined,
-    packages: ["README.md", "dist"],
+    packages: ["README.md", "dist", "src"],
   }),
 } as const satisfies PackageJsonSpec;

@@ -1,5 +1,110 @@
 # @lauf/store-follow
 
+## 2.0.0-beta.1
+
+### Patch Changes
+
+- Beta with source to check bundlephobia
+- Updated dependencies
+  - @lauf/queue@2.0.0-beta.1
+  - @lauf/store@2.0.0-beta.1
+
+## 2.0.0-beta.0
+
+### Major Changes
+
+- Beta version 2 release candidate.
+
+### Patch Changes
+
+- Updated dependencies
+  - @lauf/queue@2.0.0-beta.0
+  - @lauf/store@2.0.0-beta.0
+
+## 1.3.2
+
+### Patch Changes
+
+- a4c5ce2: Prerelease without umd
+- 1e5ad2a: Another alpha to prove external deps
+- 44a2490: Immer compatibility
+- Release to close off umd bundle issues
+- Updated dependencies [a4c5ce2]
+- Updated dependencies [1e5ad2a]
+- Updated dependencies [44a2490]
+- Updated dependencies
+  - @lauf/queue@1.3.2
+  - @lauf/store@1.3.2
+
+## 1.3.2-alpha.2
+
+### Patch Changes
+
+- Immer compatibility
+- Updated dependencies
+  - @lauf/queue@1.3.2-alpha.2
+  - @lauf/store@1.3.2-alpha.2
+
+## 1.3.2-alpha.1
+
+### Patch Changes
+
+- Another alpha to prove external deps
+- Updated dependencies
+  - @lauf/queue@1.3.2-alpha.1
+  - @lauf/store@1.3.2-alpha.1
+
+## 1.3.2-alpha.0
+
+### Patch Changes
+
+- Prerelease without umd
+- Updated dependencies
+  - @lauf/queue@1.3.2-alpha.0
+  - @lauf/store@1.3.2-alpha.0
+
+## 1.3.1
+
+### Patch Changes
+
+- 3b623c6: Fix declaration of externals
+- 547f408: Fix external dependency ids
+- Fix external dependency ids
+- 5df19f9: Fix button label. Ensure external deps properly identified
+- Updated dependencies [3b623c6]
+- Updated dependencies [547f408]
+- Updated dependencies
+- Updated dependencies [5df19f9]
+  - @lauf/queue@1.3.1
+  - @lauf/store@1.3.1
+
+## 1.3.1-alpha.2
+
+### Patch Changes
+
+- Fix external dependency ids
+- Updated dependencies
+  - @lauf/queue@1.3.1-alpha.2
+  - @lauf/store@1.3.1-alpha.2
+
+## 1.3.1-alpha.1
+
+### Patch Changes
+
+- Fix button label. Ensure external deps properly identified
+- Updated dependencies
+  - @lauf/queue@1.3.1-alpha.1
+  - @lauf/store@1.3.1-alpha.1
+
+## 1.3.1-alpha.0
+
+### Patch Changes
+
+- Fix declaration of externals
+- Updated dependencies
+  - @lauf/queue@1.3.1-alpha.0
+  - @lauf/store@1.3.1-alpha.0
+
 ## 1.3.0
 
 ### Patch Changes

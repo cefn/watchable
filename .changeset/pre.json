@@ -1,0 +1,24 @@
+{
+  "mode": "pre",
+  "tag": "beta",
+  "initialVersions": {
+    "counter-dom-commonjs": "1.3.2",
+    "counter-dom-esm": "1.3.2",
+    "counter-dom-tiny": "1.3.2",
+    "counter-dom-ts": "1.3.2",
+    "counter-preact-ts": "1.3.2",
+    "counter-react-js": "1.3.2",
+    "counter-react-ts": "1.3.2",
+    "counter-react-ts-edit": "1.3.2",
+    "counter-react-ts-edit-context": "1.3.2",
+    "@lauf/queue": "1.3.2",
+    "@lauf/store": "1.3.2",
+    "@lauf/store-edit": "1.3.2",
+    "@lauf/store-follow": "1.3.2",
+    "@lauf/store-react": "1.3.2"
+  },
+  "changesets": [
+    "new-sloths-eat",
+    "new-tigers-admire"
+  ]
+}

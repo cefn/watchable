@@ -1,5 +1,71 @@
 # @lauf/queue
 
+## 2.0.0-beta.1
+
+### Patch Changes
+
+- Beta with source to check bundlephobia
+
+## 2.0.0-beta.0
+
+### Major Changes
+
+- Beta version 2 release candidate.
+
+## 1.3.2
+
+### Patch Changes
+
+- a4c5ce2: Prerelease without umd
+- 1e5ad2a: Another alpha to prove external deps
+- 44a2490: Immer compatibility
+- Release to close off umd bundle issues
+
+## 1.3.2-alpha.2
+
+### Patch Changes
+
+- Immer compatibility
+
+## 1.3.2-alpha.1
+
+### Patch Changes
+
+- Another alpha to prove external deps
+
+## 1.3.2-alpha.0
+
+### Patch Changes
+
+- Prerelease without umd
+
+## 1.3.1
+
+### Patch Changes
+
+- 3b623c6: Fix declaration of externals
+- 547f408: Fix external dependency ids
+- Fix external dependency ids
+- 5df19f9: Fix button label. Ensure external deps properly identified
+
+## 1.3.1-alpha.2
+
+### Patch Changes
+
+- Fix external dependency ids
+
+## 1.3.1-alpha.1
+
+### Patch Changes
+
+- Fix button label. Ensure external deps properly identified
+
+## 1.3.1-alpha.0
+
+### Patch Changes
+
+- Fix declaration of externals
+
 ## 1.3.0
 
 ### Patch Changes

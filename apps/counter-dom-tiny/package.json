@@ -1,0 +1,56 @@
+{
+  "name": "counter-dom-tiny",
+  "version": "1.3.3-beta.1",
+  "private": true,
+  "description": "",
+  "homepage": "https://github.com/cefn/watchable/tree/main/modules/store#readme",
+  "bugs": {
+    "url": "https://github.com/cefn/watchable/issues",
+    "email": "watchable@cefn.com"
+  },
+  "repository": "github:cefn/watchable",
+  "license": "MIT",
+  "author": "Cefn Hoile <github.com@cefn.com> (https://cefn.com)",
+  "type": "module",
+  "scripts": {
+    "build": "wireit",
+    "dev": "vite",
+    "lint": "wireit",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@lauf/store": "2.0.0-beta.1"
+  },
+  "devDependencies": {
+    "vite": "^4.2.1",
+    "wireit": "^0.9.5"
+  },
+  "wireit": {
+    "build": {
+      "dependencies": [
+        "../../packages/store:build"
+      ],
+      "command": "vite build",
+      "files": [
+        "vite.config.ts",
+        "src/**/*"
+      ],
+      "output": [
+        "./dist"
+      ]
+    },
+    "lint": {
+      "command": "eslint -c .eslintrc.cjs .",
+      "files": [
+        "**/*.js",
+        "**/*.jsx",
+        "**/*.ts",
+        "**/*.jsx"
+      ],
+      "output": [],
+      "dependencies": [
+        "build"
+      ]
+    }
+  }
+}
