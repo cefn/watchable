@@ -3,15 +3,17 @@ export const INITIAL_STATE = {
 };
 
 export function increment(store) {
-  const { counter } = store.read();
+  const state = store.read();
   store.write({
-    counter: counter + 1,
+    ...state,
+    counter: state.counter + 1,
   });
 }
 
 export function decrement(store) {
-  const { counter } = store.read();
+  const state = store.read();
   store.write({
-    counter: counter - 1,
+    ...state,
+    counter: state.counter - 1,
   });
 }

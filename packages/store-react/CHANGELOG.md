@@ -1,5 +1,31 @@
 # @lauf/store-react
 
+## 1.3.0
+
+### Patch Changes
+
+- 80692ad: Test publishing after repo move and wireit integration
+- Version released with esm only.
+- d820877: Test running alpha release
+- d820877: Test alternative main field dist/index.js
+- Updated dependencies [80692ad]
+- Updated dependencies
+- Updated dependencies [d820877]
+- Updated dependencies [d820877]
+  - @lauf/store@1.3.0
+
+## 1.3.0-alpha.1
+
+### Patch Changes
+
+- Test publishing after repo move and wireit integration
+- d820877: Test running alpha release
+- d820877: Test alternative main field dist/index.js
+- Updated dependencies
+- Updated dependencies [d820877]
+- Updated dependencies [d820877]
+  - @lauf/store@1.3.0-alpha.1
+
 ## 1.1.2-alpha.10
 
 ### Patch Changes

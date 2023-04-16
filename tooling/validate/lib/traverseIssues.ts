@@ -6,7 +6,7 @@ import {
   listPackageJsonPaths,
   loadPackageMeta,
 } from "./listRuleIssues";
-import { AbsolutePath, PackageMeta, ErrorReport } from "../types";
+import type { AbsolutePath, PackageMeta, ErrorReport } from "../types";
 import { listPackageSkeletonIssues } from "./listSkeletonIssues";
 
 export async function traverseIssues(
@@ -54,7 +54,7 @@ export function traverseJsonIssues(
     for (const { message, path, fix } of jsonIssues) {
       if (fixRequested) {
         // fix requested
-        if (fix) {
+        if (typeof fix === "function") {
           // fix is available
           console.log(chalk.greenBright(`FIXING ${path} : ${message}`));
           fix(packageMeta);
