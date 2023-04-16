@@ -4,10 +4,10 @@ export type Value = object | string | boolean;
 /** A dot-separated (lodash) path to a value. */
 export type ValuePath = string;
 
-/** A Rule to reject or replace a value in package.json. Value means itself,
+/** A Rule to reject or replace a value in package.json. A literal Value requires equality,
  * `undefined` means delete, `RexExp` means match, `ValueFactory` redirects the
- * check to other logic. */
-export type ValueRule = Value | ValueFactory | RegExp | undefined;
+ * check to other logic, null means leave alone. */
+export type ValueRule = Value | ValueFactory | RegExp | undefined | null;
 
 /** Logic to calculate a value based on package context */
 export type ValueFactory = (packageMeta: PackageMeta) => ValueRule;
@@ -20,13 +20,13 @@ export interface PackageMeta {
   packageJson: {
     name: string;
     version: string;
+    dependencies?: Record<string, string>;
+    peerDependencies?: Record<string, string>;
   };
 }
 
 /** Rules for controlled ValuePaths in package.json */
-export interface PackageJsonSpec {
-  [path: ValuePath]: ValueRule;
-}
+export type PackageJsonSpec = Record<ValuePath, ValueRule>;
 
 /** Issue when contents of package.json violates a ValueRule */
 export interface PackageJsonIssue {

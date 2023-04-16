@@ -65,14 +65,13 @@ export const PACKAGE_JSON_RULES = {
         },
         packages: {
           ...common,
-          command: "node ./esbuild.cjs && tsc --build",
+          command: "tsc && vite build",
           files: [
             "src/**/*",
             "tsconfig.json",
             "tsconfig.build.json",
             "../../tsconfig.base.json",
-            "esbuild.cjs",
-            "../../esbuild.base.cjs",
+            "vite.config.ts",
           ],
           output: ["./dist"],
         },
@@ -139,6 +138,16 @@ export const PACKAGE_JSON_RULES = {
       ),
     });
   },
+  publishConfig: byPackageType({
+    apps: undefined,
+    packages: {
+      access: "public",
+    },
+  }),
+  private: byPackageType({
+    apps: true,
+    packages: undefined,
+  }),
   main: byPackageType({
     apps: undefined,
     packages: "dist/index.js",
@@ -147,17 +156,14 @@ export const PACKAGE_JSON_RULES = {
     apps: undefined,
     packages: "dist/index.d.ts",
   }),
-  publishConfig: byPackageType({
+  exports: byPackageType({
     apps: undefined,
     packages: {
-      access: "public",
-      main: "dist/index.js",
-      types: "dist/index.d.ts",
+      ".": {
+        import: "./dist/index.js",
+        require: "./dist/index.umd.cjs",
+      },
     },
-  }),
-  private: byPackageType({
-    apps: true,
-    packages: undefined,
   }),
   files: byPackageType({
     apps: undefined,
