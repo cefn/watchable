@@ -16,8 +16,9 @@
     "dev:bundle": "run-s build preview",
     "build": "wireit",
     "preview": "vite preview",
-    "test:dev": "SERVER=http://localhost:5173 run-p --race dev test:server",
-    "test:dev:bundle": "SERVER=http://localhost:4173 run-p --race dev:bundle test:server",
+    "test:unit": "jest test/jest/**.test.ts",
+    "test:dev": "SERVER=http://localhost:5174 run-p --race dev test:server",
+    "test:dev:bundle": "SERVER=http://localhost:4174 run-p --race dev:bundle test:server",
     "test:server": "wait-on --config waitOnConfig.json ${SERVER} && playwright test",
     "test": "wireit",
     "lint": "wireit"
@@ -67,7 +68,7 @@
         "../../packages/store-edit:build",
         "../../packages/store-react:build"
       ],
-      "command": "run-s test:dev:bundle",
+      "command": "run-s test:unit test:dev:bundle",
       "files": [
         "src/**/*",
         "test/**/*",
@@ -75,7 +76,9 @@
         "playwright.config.ts",
         "tsconfig.json",
         "vite.config.ts",
-        "waitOnConfig.json"
+        "waitOnConfig.json",
+        "jest.config.cjs",
+        "../../jest.config.base.cjs"
       ],
       "output": [
         "dist",

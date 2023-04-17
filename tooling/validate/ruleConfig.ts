@@ -25,6 +25,7 @@ export const PACKAGE_JSON_RULES = {
     packages: "wireit",
     apps: byPackageName(
       {
+        "counter-preact-ts": "wireit",
         "counter-react-ts": "wireit",
         "counter-react-ts-edit": "wireit",
         "counter-react-ts-edit-context": "wireit",
@@ -129,8 +130,9 @@ export const PACKAGE_JSON_RULES = {
       packages: tsPackages,
       apps: byPackageName(
         {
+          "counter-preact-ts": tsAppsWithUnitTests,
           "counter-react-ts": tsAppsWithUnitTests,
-          "counter-react-ts-edit": tsAppsNoUnitTests,
+          "counter-react-ts-edit": tsAppsWithUnitTests,
           "counter-react-ts-edit-context": tsAppsWithUnitTests,
         },
         undefined // delete
