@@ -1,5 +1,11 @@
 # @lauf/store
 
+## 1.3.1-alpha.1
+
+### Patch Changes
+
+- Fix button label. Ensure external deps properly identified
+
 ## 1.3.1-alpha.0
 
 ### Patch Changes
