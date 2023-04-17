@@ -1,6 +1,7 @@
 import React from "react";
 import { useSelected, useStore } from "@lauf/store-react";
-import { decrement, increment, INITIAL_STATE } from "./logic";
+import { edit } from "@lauf/store-edit";
+import { INITIAL_STATE } from "./logic";
 import { CounterRoot, useCounterStore } from "./context";
 
 export const Display = () => {
@@ -14,7 +15,9 @@ export const IncreaseButton = () => {
   return (
     <button
       onClick={() => {
-        increment(counterStore);
+        edit(counterStore, (draft) => {
+          draft.counter += 1;
+        });
       }}
     >
       Increase
@@ -27,7 +30,9 @@ export const DecreaseButton = () => {
   return (
     <button
       onClick={() => {
-        decrement(counterStore);
+        edit(counterStore, (draft) => {
+          draft.counter -= 1;
+        });
       }}
     >
       Increase
