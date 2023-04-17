@@ -1,5 +1,20 @@
 # @lauf/store-follow
 
+## 1.3.1
+
+### Patch Changes
+
+- 3b623c6: Fix declaration of externals
+- 547f408: Fix external dependency ids
+- Fix external dependency ids
+- 5df19f9: Fix button label. Ensure external deps properly identified
+- Updated dependencies [3b623c6]
+- Updated dependencies [547f408]
+- Updated dependencies
+- Updated dependencies [5df19f9]
+  - @lauf/queue@1.3.1
+  - @lauf/store@1.3.1
+
 ## 1.3.1-alpha.2
 
 ### Patch Changes
