@@ -163,7 +163,7 @@ export const PACKAGE_JSON_RULES = {
     packages: {
       ".": {
         import: "./dist/index.js",
-        require: "./dist/index.umd.cjs",
+        require: "./dist/index.cjs",
       },
     },
   }),
