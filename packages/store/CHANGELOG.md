@@ -1,5 +1,14 @@
 # @lauf/store
 
+## 1.3.2
+
+### Patch Changes
+
+- a4c5ce2: Prerelease without umd
+- 1e5ad2a: Another alpha to prove external deps
+- 44a2490: Immer compatibility
+- Release to close off umd bundle issues
+
 ## 1.3.2-alpha.2
 
 ### Patch Changes
