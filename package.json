@@ -28,7 +28,6 @@
     "prerelease:exit": "changeset pre exit alpha",
     "npm:login": "npm whoami || npm login",
     "publish": "run-s changeset:create changeset:version qa changeset:publish",
-    "publish:prerelease": "run-s npm:login git:ensureclean prerelease:enter publish prerelease:exit git:commit:release",
     "publish:release": "run-s npm:login git:ensureclean publish git:commit:release"
   },
   "devDependencies": {
