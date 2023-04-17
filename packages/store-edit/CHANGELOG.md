@@ -1,5 +1,13 @@
 # @lauf/store-edit
 
+## 1.3.2-alpha.0
+
+### Patch Changes
+
+- Prerelease without umd
+- Updated dependencies
+  - @lauf/store@1.3.2-alpha.0
+
 ## 1.3.1
 
 ### Patch Changes
