@@ -1,6 +1,6 @@
 {
   "name": "counter-dom-esm",
-  "version": "1.3.0",
+  "version": "1.3.1-alpha.0",
   "private": true,
   "description": "",
   "homepage": "https://github.com/cefn/watchable/tree/main/modules/store#readme",
@@ -19,8 +19,8 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@lauf/store": "1.3.0",
-    "@lauf/store-follow": "1.3.0"
+    "@lauf/store": "1.3.1-alpha.0",
+    "@lauf/store-follow": "1.3.1-alpha.0"
   },
   "devDependencies": {
     "vite": "^4.2.1",

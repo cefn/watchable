@@ -1,5 +1,13 @@
 # counter-dom-js
 
+## 1.3.1-alpha.0
+
+### Patch Changes
+
+- Updated dependencies
+  - @lauf/store-follow@1.3.1-alpha.0
+  - @lauf/store@1.3.1-alpha.0
+
 ## 1.3.0
 
 ### Patch Changes

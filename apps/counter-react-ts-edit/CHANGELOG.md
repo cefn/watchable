@@ -1,5 +1,14 @@
 # counter-react-ts
 
+## 1.3.1-alpha.0
+
+### Patch Changes
+
+- Updated dependencies
+  - @lauf/store-react@1.3.1-alpha.0
+  - @lauf/store-edit@1.3.1-alpha.0
+  - @lauf/store@1.3.1-alpha.0
+
 ## 1.3.0
 
 ### Patch Changes

@@ -1,5 +1,14 @@
 # @lauf/store-follow
 
+## 1.3.1-alpha.0
+
+### Patch Changes
+
+- Fix declaration of externals
+- Updated dependencies
+  - @lauf/queue@1.3.1-alpha.0
+  - @lauf/store@1.3.1-alpha.0
+
 ## 1.3.0
 
 ### Patch Changes

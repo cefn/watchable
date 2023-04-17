@@ -35,7 +35,7 @@ export const DecreaseButton = () => {
         });
       }}
     >
-      Increase
+      Decrease
     </button>
   );
 };
