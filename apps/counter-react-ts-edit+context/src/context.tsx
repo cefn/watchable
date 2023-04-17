@@ -6,13 +6,13 @@ import React, {
 import type { Store } from "@lauf/store";
 import type { CounterState } from "./logic";
 
-/** Deliberately not exported. This helps encapsulate Context
+/** Deliberately not exported. Ensures encapsulation of Context
  * behaviour in this single file.
  */
 const CounterContext = createContext<Store<CounterState> | null>(null);
 
-/** Requires a `store` argument. This ensures no CounterContext.Provider
- * is ever actually created with a default (null) store value. */
+/** Requires a concrete `store` argument. Ensures no CounterContext.Provider is
+ * actually passed a null value (react Context API default value is null). */
 export const CounterRoot = ({
   store,
   children,
@@ -22,7 +22,7 @@ export const CounterRoot = ({
   );
 };
 
-/** */
+/** Hook to get store from CounterContext.Provider ancestor. */
 export function useCounterStore() {
   const store = useContext(CounterContext);
   if (store === null) {
