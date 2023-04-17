@@ -23,6 +23,7 @@
     "test": "wireit"
   },
   "devDependencies": {
+    "@rollup/plugin-node-resolve": "^15.0.2",
     "@testing-library/dom": "^9.2.0",
     "@testing-library/react": "^14.0.0",
     "@testing-library/user-event": "^14.4.3",

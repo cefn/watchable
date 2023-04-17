@@ -23,6 +23,7 @@
     "test": "wireit"
   },
   "devDependencies": {
+    "@rollup/plugin-node-resolve": "^15.0.2",
     "typescript": "^5.0.4",
     "wireit": "^0.9.5"
   },
