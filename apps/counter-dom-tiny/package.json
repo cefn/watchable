@@ -28,8 +28,7 @@
   "wireit": {
     "build": {
       "dependencies": [
-        "../../packages/store:build",
-        "../../packages/store-follow:build"
+        "../../packages/store:build"
       ],
       "command": "vite build",
       "files": [

@@ -7,7 +7,7 @@ import { getUpstreamBuildDependencies } from "./lib/rules/packages";
 import type { PackageJsonSpec } from "./types";
 
 export const PACKAGE_JSON_RULES = {
-  type: "module",
+  type: byPackageName({ "counter-dom-commonjs": "commonjs" }, "module"),
   license: "MIT",
   author: "Cefn Hoile <github.com@cefn.com> (https://cefn.com)",
   repository: "github:cefn/watchable",
@@ -47,7 +47,7 @@ export const PACKAGE_JSON_RULES = {
       js: {
         ...common,
         command: "vite build",
-        files: ["src/**/*"],
+        files: ["vite.config.ts", "src/**/*"],
         output: ["./dist"],
       },
       ts: byPackageType({
@@ -56,10 +56,9 @@ export const PACKAGE_JSON_RULES = {
           command: "tsc && vite build",
           files: [
             "src/**/*",
+            "vite.config.ts",
             "tsconfig.build.json",
             "../../tsconfig.base.json",
-            "esbuild.cjs",
-            "../../esbuild.base.cjs",
           ],
           output: ["./dist"],
         },

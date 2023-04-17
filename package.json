@@ -84,8 +84,8 @@
         "./apps/counter-dom-ts:build",
         "./apps/counter-react-js:build",
         "./apps/counter-react-ts:build",
-        "./apps/counter-react-ts-context:build",
         "./apps/counter-react-ts-edit:build",
+        "./apps/counter-react-ts-edit+context:build",
         "./packages/queue:build",
         "./packages/store:build",
         "./packages/store-edit:build",
@@ -101,6 +101,8 @@
     "test": {
       "dependencies": [
         "./apps/counter-react-ts:test",
+        "./apps/counter-react-ts-edit:test",
+        "./apps/counter-react-ts-edit+context:test",
         "./packages/queue:test",
         "./packages/store:test",
         "./packages/store-edit:test",
@@ -110,9 +112,14 @@
     },
     "lint": {
       "dependencies": [
-        "./apps/counter-dom-js:lint",
+        "./apps/counter-dom-commonjs:lint",
+        "./apps/counter-dom-esm:lint",
+        "./apps/counter-dom-tiny:lint",
+        "./apps/counter-dom-ts:lint",
         "./apps/counter-react-js:lint",
         "./apps/counter-react-ts:lint",
+        "./apps/counter-react-ts-edit:lint",
+        "./apps/counter-react-ts-edit+context:lint",
         "./packages/queue:lint",
         "./packages/store:lint",
         "./packages/store-edit:lint",
