@@ -8,6 +8,7 @@ import type { PackageJsonSpec } from "./types";
 
 export const PACKAGE_JSON_RULES = {
   type: byPackageName({ "counter-dom-commonjs": "commonjs" }, "module"),
+  sideEffects: byPackageType({ packages: false, apps: undefined }),
   license: "MIT",
   author: "Cefn Hoile <github.com@cefn.com> (https://cefn.com)",
   repository: "github:cefn/watchable",

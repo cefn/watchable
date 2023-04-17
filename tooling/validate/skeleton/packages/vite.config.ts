@@ -1,6 +1,7 @@
 import { resolve } from "path";
 import { defineConfig } from "vite";
-import externals from "rollup-plugin-node-externals";
+import nodeExternals from "rollup-plugin-node-externals";
+import nodeResolve from "@rollup/plugin-node-resolve";
 
 import packageJson from "./package.json";
 
@@ -31,9 +32,17 @@ export default defineConfig({
       name,
       entry: resolve(__dirname, "src/index.ts"),
       fileName: "index",
+      formats: ["cjs", "es"],
     },
     rollupOptions: {
-      plugins: [externals()],
+      plugins: [
+        //nodeExternals(),
+        nodeResolve(),
+      ],
+      external,
+      // output: {
+      //   globals,
+      // },
     },
     sourcemap: true,
   },
