@@ -6,7 +6,7 @@ import { CounterRoot, useCounterStore } from "./context";
 export const Display = () => {
   const counterStore = useCounterStore();
   const counter = useSelected(counterStore, (state) => state.counter);
-  return <h1>{counter}</h1>;
+  return <h1>Counter is {counter}</h1>;
 };
 
 export const IncreaseButton = () => {

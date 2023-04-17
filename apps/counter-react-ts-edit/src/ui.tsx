@@ -11,7 +11,7 @@ interface StoreProps {
 
 export const Display = ({ store }: StoreProps) => {
   const counter = useSelected(store, (state) => state.counter);
-  return <h1>{counter}</h1>;
+  return <h1>Counter is {counter}</h1>;
 };
 
 export const IncreaseButton = ({ store }: StoreProps) => (
