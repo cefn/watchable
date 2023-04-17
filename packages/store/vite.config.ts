@@ -1,6 +1,6 @@
 import { resolve } from "path";
 import { defineConfig } from "vite";
-import nodeResolve from "@rollup/plugin-node-resolve";
+// import nodeResolve from "@rollup/plugin-node-resolve";
 
 import packageJson from "./package.json";
 
@@ -19,9 +19,6 @@ const external = Object.keys({
   ...peerDependencies,
 });
 
-/** Alias ids to themselves (rollup requirement) */
-// const globals = Object.fromEntries(external.map((id) => [id, id]));
-
 export default defineConfig({
   build: {
     target: "node10",
@@ -34,9 +31,9 @@ export default defineConfig({
       formats: ["cjs", "es"],
     },
     rollupOptions: {
-      plugins: [nodeResolve()],
+      // plugins: [nodeResolve()],
       external,
     },
-    sourcemap: true,
+    // sourcemap: true,
   },
 });

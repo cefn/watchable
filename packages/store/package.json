@@ -80,8 +80,5 @@
       ]
     }
   },
-  "dependencies": {
-    "@rollup/plugin-node-resolve": "^15.0.2"
-  },
   "sideEffects": false
 }
