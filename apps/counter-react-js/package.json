@@ -39,7 +39,7 @@
       ],
       "command": "vite build",
       "files": [
-        "vite.config.js",
+        "vite.config.ts",
         "src/**/*"
       ],
       "output": [

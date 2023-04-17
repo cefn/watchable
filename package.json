@@ -77,7 +77,10 @@
     },
     "build": {
       "dependencies": [
-        "./apps/counter-dom-js:build",
+        "./apps/counter-dom-commonjs:build",
+        "./apps/counter-dom-esm:build",
+        "./apps/counter-dom-tiny:build",
+        "./apps/counter-dom-ts:build",
         "./apps/counter-react-js:build",
         "./apps/counter-react-ts:build",
         "./apps/counter-react-ts-context:build",
