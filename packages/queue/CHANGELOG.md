@@ -1,5 +1,11 @@
 # @lauf/queue
 
+## 1.3.1-alpha.2
+
+### Patch Changes
+
+- Fix external dependency ids
+
 ## 1.3.1-alpha.1
 
 ### Patch Changes
