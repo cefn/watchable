@@ -1,5 +1,13 @@
 # @lauf/store-edit
 
+## 1.3.2-alpha.2
+
+### Patch Changes
+
+- Immer compatibility
+- Updated dependencies
+  - @lauf/store@1.3.2-alpha.2
+
 ## 1.3.2-alpha.1
 
 ### Patch Changes

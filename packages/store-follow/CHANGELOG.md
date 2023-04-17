@@ -1,5 +1,14 @@
 # @lauf/store-follow
 
+## 1.3.2-alpha.2
+
+### Patch Changes
+
+- Immer compatibility
+- Updated dependencies
+  - @lauf/queue@1.3.2-alpha.2
+  - @lauf/store@1.3.2-alpha.2
+
 ## 1.3.2-alpha.1
 
 ### Patch Changes

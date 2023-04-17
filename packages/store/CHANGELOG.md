@@ -1,5 +1,11 @@
 # @lauf/store
 
+## 1.3.2-alpha.2
+
+### Patch Changes
+
+- Immer compatibility
+
 ## 1.3.2-alpha.1
 
 ### Patch Changes
