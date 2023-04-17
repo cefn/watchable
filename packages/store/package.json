@@ -29,7 +29,7 @@
     "test": "wireit"
   },
   "devDependencies": {
-    "@rollup/plugin-node-resolve": "^15.0.2",
+    "rollup-plugin-node-externals": "^5.1.2",
     "typescript": "^5.0.4",
     "vite": "^4.2.1",
     "wireit": "^0.9.5"

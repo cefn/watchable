@@ -1,6 +1,6 @@
 import { resolve } from "path";
 import { defineConfig } from "vite";
-import { nodeResolve } from "@rollup/plugin-node-resolve";
+import externals from "rollup-plugin-node-externals";
 
 import packageJson from "./package.json";
 
@@ -33,11 +33,7 @@ export default defineConfig({
       fileName: "index",
     },
     rollupOptions: {
-      plugins: [nodeResolve()],
-      external,
-      output: {
-        globals,
-      },
+      plugins: [externals()],
     },
     sourcemap: true,
   },
