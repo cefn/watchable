@@ -1,5 +1,14 @@
 # @lauf/store-follow
 
+## 1.3.2-alpha.1
+
+### Patch Changes
+
+- Another alpha to prove external deps
+- Updated dependencies
+  - @lauf/queue@1.3.2-alpha.1
+  - @lauf/store@1.3.2-alpha.1
+
 ## 1.3.2-alpha.0
 
 ### Patch Changes

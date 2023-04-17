@@ -1,5 +1,11 @@
 # @lauf/queue
 
+## 1.3.2-alpha.1
+
+### Patch Changes
+
+- Another alpha to prove external deps
+
 ## 1.3.2-alpha.0
 
 ### Patch Changes
