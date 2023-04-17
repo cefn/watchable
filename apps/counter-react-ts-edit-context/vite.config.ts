@@ -12,11 +12,11 @@ export default defineConfig({
   ],
   clearScreen: false,
   server: {
-    port: 5173,
+    port: 5175,
     strictPort: true,
   },
   preview: {
-    port: 4173,
+    port: 4175,
     strictPort: true,
   },
 });
