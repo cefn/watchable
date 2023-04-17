@@ -17,8 +17,8 @@
     "build": "wireit",
     "preview": "vite preview",
     "test:unit": "jest test/jest/**.test.ts",
-    "test:dev": "SERVER=http://localhost:5173 run-p --race dev test:server",
-    "test:dev:bundle": "SERVER=http://localhost:4173 run-p --race dev:bundle test:server",
+    "test:dev": "SERVER=http://localhost:5172 run-p --race dev test:server",
+    "test:dev:bundle": "SERVER=http://localhost:4172 run-p --race dev:bundle test:server",
     "test:server": "wait-on --config waitOnConfig.json ${SERVER} && playwright test",
     "test": "wireit",
     "lint": "wireit"
