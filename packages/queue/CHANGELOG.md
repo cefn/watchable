@@ -1,5 +1,11 @@
 # @lauf/queue
 
+## 2.0.0-beta.0
+
+### Major Changes
+
+- Beta version 2 release candidate.
+
 ## 1.3.2
 
 ### Patch Changes

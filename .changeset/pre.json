@@ -17,5 +17,7 @@
     "@lauf/store-follow": "1.3.2",
     "@lauf/store-react": "1.3.2"
   },
-  "changesets": []
+  "changesets": [
+    "new-tigers-admire"
+  ]
 }

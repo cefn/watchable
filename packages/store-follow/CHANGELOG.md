@@ -1,5 +1,17 @@
 # @lauf/store-follow
 
+## 2.0.0-beta.0
+
+### Major Changes
+
+- Beta version 2 release candidate.
+
+### Patch Changes
+
+- Updated dependencies
+  - @lauf/queue@2.0.0-beta.0
+  - @lauf/store@2.0.0-beta.0
+
 ## 1.3.2
 
 ### Patch Changes
