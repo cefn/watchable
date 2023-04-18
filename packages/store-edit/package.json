@@ -30,7 +30,7 @@
   },
   "peerDependencies": {
     "@lauf/store": "2.0.0-beta.1",
-    "immer": "^9.0.16"
+    "immer": "^9.0.16 || ^10.0.1"
   },
   "publishConfig": {
     "access": "public"
