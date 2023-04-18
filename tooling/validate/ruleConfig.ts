@@ -44,39 +44,45 @@ export const PACKAGE_JSON_RULES = {
   },
   "wireit.build": (packageMeta) => {
     const dependencies = getUpstreamBuildDependencies(packageMeta);
+
     const common = dependencies != null ? { dependencies } : null;
-    return byPackageLanguage({
-      js: {
+
+    const jsBuild = {
+      ...common,
+      command: "vite build",
+      files: ["vite.config.ts", "src/**/*"],
+      output: ["./dist"],
+    };
+
+    const tsBuild = byPackageType({
+      apps: {
         ...common,
-        command: "vite build",
-        files: ["vite.config.ts", "src/**/*"],
+        command: "tsc && vite build",
+        files: [
+          "src/**/*",
+          "vite.config.ts",
+          "tsconfig.build.json",
+          "../../tsconfig.base.json",
+        ],
         output: ["./dist"],
       },
-      ts: byPackageType({
-        apps: {
-          ...common,
-          command: "tsc && vite build",
-          files: [
-            "src/**/*",
-            "vite.config.ts",
-            "tsconfig.build.json",
-            "../../tsconfig.base.json",
-          ],
-          output: ["./dist"],
-        },
-        packages: {
-          ...common,
-          command: "tsc && vite build",
-          files: [
-            "src/**/*",
-            "tsconfig.json",
-            "tsconfig.build.json",
-            "../../tsconfig.base.json",
-            "vite.config.ts",
-          ],
-          output: ["./dist"],
-        },
-      }),
+      packages: {
+        ...common,
+        command: "tsc && vite build",
+        files: [
+          "src/**/*",
+          "tsconfig.json",
+          "tsconfig.build.json",
+          "../../tsconfig.base.json",
+          "vite.config.ts",
+        ],
+        output: ["./dist"],
+      },
+    });
+
+    return byPackageLanguage({
+      js: jsBuild,
+      ts: tsBuild,
     });
   },
   /** Populate test dependencies according to package dependencies. E.g
