@@ -169,6 +169,6 @@ export const PACKAGE_JSON_RULES = {
   }),
   files: byPackageType({
     apps: undefined,
-    packages: ["README.md", "dist"],
+    packages: ["README.md", "dist", "src"],
   }),
 } as const satisfies PackageJsonSpec;
