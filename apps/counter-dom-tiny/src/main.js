@@ -13,11 +13,17 @@ const counterDisplay = getDomElement("#counter");
 const incrementButton = getDomElement("#increment");
 const decrementButton = getDomElement("#decrement");
 
-const watchers = [
-  ({ counter }) => (counterDisplay.innerText = `Counter is ${counter}`),
-];
+// create a store
+const store = createStore(INITIAL_STATE);
 
-const store = createStore(INITIAL_STATE, watchers);
+const updateDisplay = ({ counter }) =>
+  (counterDisplay.innerText = `Counter is ${counter}`);
+
+// watch for the future
+store.watch(updateDisplay);
+
+// display the initial state
+updateDisplay(store.read());
 
 incrementButton.onclick = () => {
   increment(store);
