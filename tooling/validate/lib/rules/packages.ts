@@ -1,12 +1,12 @@
 import { sep } from "path";
-import { PackageMeta } from "tooling/validate/types";
+import type { PackageMeta } from "tooling/validate/types";
 import { isMember } from "../util";
 
 /** The scope prefix (soon to be changed to watchable). */
 export const SCOPE = "@lauf";
 
 const PACKAGE_TYPES = ["apps", "packages"] as const;
-export type PackageType = typeof PACKAGE_TYPES[number];
+export type PackageType = (typeof PACKAGE_TYPES)[number];
 
 /** Check if package is in `apps` or `packages` folder. */
 export function getPackageType({ packagePath }: PackageMeta) {
@@ -19,22 +19,16 @@ export function getPackageType({ packagePath }: PackageMeta) {
   throw new Error(`Could not extract packageType from ${packagePath}`);
 }
 
+/** List upstream dependencies from packageJson */
 function getUpstreamNames({ packageJson }: PackageMeta) {
   const upstreamNames: string[] = [];
-  interface OptionalJson {
-    dependencies?: {};
-    peerDependencies?: {};
-    wireit?: {};
-  }
-  const { dependencies, peerDependencies } = packageJson as OptionalJson;
   const deps = {
-    ...dependencies,
-    ...peerDependencies,
+    ...packageJson.dependencies,
+    ...packageJson.peerDependencies,
   };
   for (const scopedName of Object.keys(deps)) {
     const [scope, name] = scopedName.split("/");
     if (name !== undefined && scope === SCOPE) {
-      // depend on upstream test
       upstreamNames.push(name);
     }
   }

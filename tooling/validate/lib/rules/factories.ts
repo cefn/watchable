@@ -34,7 +34,10 @@ export function byPackageLanguage(
   lookup: Record<"ts" | "js", ValueRule>
 ): ValueFactory {
   return ({ packageJson }) => {
-    const language = packageJson.name.match(/-js$/) != null ? "js" : "ts";
+    const language =
+      /\bts\b/.test(packageJson.name) || /^@lauf/.test(packageJson.name)
+        ? "ts"
+        : "js";
     return lookup[language];
   };
 }

@@ -15,6 +15,7 @@
     "qa": "wireit",
     "qa:clean": "find . -iname '.wireit' -type d | xargs -I{} rm -rf {}",
     "qa:watch": "npm run qa --watch",
+    "build": "wireit",
     "packages:sort": "npm exec sort-package-json package.json {apps,packages}/*/package.json",
     "packages:validate": "tsx tooling/validate/cli.ts",
     "packages:validate:fix": "npm run packages:validate -- --fix",
@@ -27,7 +28,6 @@
     "prerelease:exit": "changeset pre exit alpha",
     "npm:login": "npm whoami || npm login",
     "publish": "run-s changeset:create changeset:version qa changeset:publish",
-    "publish:prerelease": "run-s npm:login git:ensureclean prerelease:enter publish prerelease:exit git:commit:release",
     "publish:release": "run-s npm:login git:ensureclean publish git:commit:release"
   },
   "devDependencies": {
@@ -76,9 +76,15 @@
     },
     "build": {
       "dependencies": [
-        "./apps/counter-dom-js:build",
+        "./apps/counter-dom-commonjs:build",
+        "./apps/counter-dom-esm:build",
+        "./apps/counter-dom-tiny:build",
+        "./apps/counter-dom-ts:build",
+        "./apps/counter-preact-ts:build",
         "./apps/counter-react-js:build",
         "./apps/counter-react-ts:build",
+        "./apps/counter-react-ts-edit:build",
+        "./apps/counter-react-ts-edit-context:build",
         "./packages/queue:build",
         "./packages/store:build",
         "./packages/store-edit:build",
@@ -88,7 +94,10 @@
     },
     "test": {
       "dependencies": [
+        "./apps/counter-preact-ts:test",
         "./apps/counter-react-ts:test",
+        "./apps/counter-react-ts-edit:test",
+        "./apps/counter-react-ts-edit-context:test",
         "./packages/queue:test",
         "./packages/store:test",
         "./packages/store-edit:test",
@@ -98,9 +107,15 @@
     },
     "lint": {
       "dependencies": [
-        "./apps/counter-dom-js:lint",
+        "./apps/counter-dom-commonjs:lint",
+        "./apps/counter-dom-esm:lint",
+        "./apps/counter-dom-tiny:lint",
+        "./apps/counter-dom-ts:lint",
+        "./apps/counter-preact-ts:lint",
         "./apps/counter-react-js:lint",
         "./apps/counter-react-ts:lint",
+        "./apps/counter-react-ts-edit:lint",
+        "./apps/counter-react-ts-edit-context:lint",
         "./packages/queue:lint",
         "./packages/store:lint",
         "./packages/store-edit:lint",
