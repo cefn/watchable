@@ -2,7 +2,7 @@
   "name": "@lauf/store-react",
   "version": "2.0.0-beta.1",
   "description": "Update React components when @lauf/store state changes",
-  "homepage": "https://github.com/cefn/watchable/tree/main/modules/store#readme",
+  "homepage": "https://github.com/cefn/watchable/tree/main/packages/store-react#readme",
   "bugs": {
     "url": "https://github.com/cefn/watchable/issues",
     "email": "watchable@cefn.com"
