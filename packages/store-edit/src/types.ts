@@ -16,17 +16,10 @@ import type { Draft } from "immer";
  * changes as well as returning a value, (easily done by accident in simple
  * arrow functions).
  *
- * For careful use in rare cases, Immer's `castDraft` is available in the second
- * editor argument. It can cast parts of previous `Immutable` states to be
- * 'mutable' for assignment to the next `draft` state. Thos items can be added
- * to the draft state, but no changes should actually be made to them.
- *
  * See {@link https://immerjs.github.io/immer/ | Immer docs} for more detail on
  * the conventions for Immer `producers`.
  *
- * @param draft A mutable proxy of a [[Store]]'s existing `Immutable` state,
- * used to compose the next state.
- * @param castDraft Unsafely casts `Immutable` references to mutable to use them
- * in the next draft.
+ * @param draft A mutable proxy of a [[Store]]'s existing `Immutable` state.
+ * Manipulate this object to compose the next state.
  * */
 export type Editor<T> = (draft: Draft<T>) => void;

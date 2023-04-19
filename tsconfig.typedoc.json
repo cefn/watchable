@@ -1,9 +1,6 @@
 {
-  "extends": "./tsconfig.build.json",
+  "extends": "./tsconfig.json",
   "compilerOptions": {
-    "module": "ES2022",
-    "moduleResolution": "node",
-    "target": "ES2017",
     /** CEFN: Monorepo config **/
     "baseUrl": ".",
     "paths": {
@@ -11,5 +8,6 @@
     },
     "declaration": false,
     "noEmit": true /* Do not emit outputs. */
-  }
+  },
+  "include": ["packages/*/src/**/*"]
 }

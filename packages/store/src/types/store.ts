@@ -1,5 +1,5 @@
-import type { Immutable } from './immutable';
-import type { WatchableState } from './watchable';
+import type { Immutable } from "./immutable";
+import type { WatchableState } from "./watchable";
 
 /** A `Store` keeps an Immutable [[RootState]] - any array, tuple or object -
  * which can be changed and monitored for changes to drive an app. Make a new
@@ -47,7 +47,10 @@ export type Store<State extends RootState> = WatchableState<Immutable<State>>;
  * Array, Tuple, or keyed Object */
 export type RootState = object;
 
-/** Function deriving some sub-part or computed value from a [[RootState]]. */
+/** A Selector derives some sub-part or computed value from a [[RootState]] in a
+ * @lauf/store [[Store]]. `Object.is(prev, next)` is normally used to compare
+ * with the previous resultfrom the same Selector to monitor if some part has
+ * changed, defining when app logic should be re-run. */
 export type Selector<State extends RootState, Selected> = (
   state: Immutable<State>
 ) => Immutable<Selected>;

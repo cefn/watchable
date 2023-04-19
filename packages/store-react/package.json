@@ -23,6 +23,9 @@
     "lint": "wireit",
     "test": "wireit"
   },
+  "dependencies": {
+    "@lauf/store": "2.0.0-beta.1"
+  },
   "devDependencies": {
     "@testing-library/dom": "^9.2.0",
     "@testing-library/react": "^14.0.0",
