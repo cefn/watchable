@@ -4,6 +4,7 @@ import {
   byPackageType,
 } from "./lib/rules/factories";
 import { getUpstreamBuildDependencies } from "./lib/rules/packages";
+import { getRepoPath } from "./lib/util";
 import type { PackageJsonSpec } from "./types";
 
 export const PACKAGE_JSON_RULES = {
@@ -12,7 +13,13 @@ export const PACKAGE_JSON_RULES = {
   license: "MIT",
   author: "Cefn Hoile <github.com@cefn.com> (https://cefn.com)",
   repository: "github:cefn/watchable",
-  homepage: "https://github.com/cefn/watchable/tree/main/modules/store#readme",
+  homepage: ({ packagePath }) => {
+    const repoPath = getRepoPath();
+    const relativePath = packagePath
+      .replace(repoPath, "")
+      .replace("/package.json", "");
+    return `https://github.com/cefn/watchable/tree/main${relativePath}#readme`;
+  },
   bugs: {
     url: "https://github.com/cefn/watchable/issues",
     email: "watchable@cefn.com",
@@ -122,7 +129,7 @@ export const PACKAGE_JSON_RULES = {
         "jest.config.cjs",
         "../../jest.config.base.cjs",
       ],
-      output: ["dist", "coverage", "playwright-report"],
+      output: ["coverage", "playwright-report"],
     };
 
     return byPackageType({

@@ -2,7 +2,7 @@
   "name": "@lauf/store-follow",
   "version": "2.0.0-beta.1",
   "description": "Await @lauf/store state changes and trigger business logic",
-  "homepage": "https://github.com/cefn/watchable/tree/main/modules/store#readme",
+  "homepage": "https://github.com/cefn/watchable/tree/main/packages/store-follow#readme",
   "bugs": {
     "url": "https://github.com/cefn/watchable/issues",
     "email": "watchable@cefn.com"

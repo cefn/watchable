@@ -20,8 +20,19 @@ export function resolveAbsolute(parentPath: AbsolutePath, childPath: string) {
   return resolve(parentPath, childPath) as AbsolutePath;
 }
 
-export function getToolingPath() {
+/** Return the location of this file (like __dirname in commonjs) */
+export function getUtilPath() {
   const filePath = fileURLToPath(import.meta.url);
   const dirPath = dirname(filePath);
-  return resolve(dirPath, "../../") as AbsolutePath;
+  return resolve(dirPath) as AbsolutePath;
+}
+
+/** Resolve a path from the /tooling folder. */
+export function getToolingPath(...relativePaths: string[]) {
+  return resolve(getUtilPath(), "../../", ...relativePaths) as AbsolutePath;
+}
+
+/** Resolve a path from the root of the monorepo. */
+export function getRepoPath(...relativePaths: string[]) {
+  return getToolingPath("../", ...relativePaths) as AbsolutePath;
 }
