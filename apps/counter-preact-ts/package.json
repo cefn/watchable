@@ -80,7 +80,6 @@
         "../../jest.config.base.cjs"
       ],
       "output": [
-        "dist",
         "coverage",
         "playwright-report"
       ]

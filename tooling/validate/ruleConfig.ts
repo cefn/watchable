@@ -129,7 +129,7 @@ export const PACKAGE_JSON_RULES = {
         "jest.config.cjs",
         "../../jest.config.base.cjs",
       ],
-      output: ["dist", "coverage", "playwright-report"],
+      output: ["coverage", "playwright-report"],
     };
 
     return byPackageType({

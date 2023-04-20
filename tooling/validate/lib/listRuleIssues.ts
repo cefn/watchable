@@ -21,11 +21,13 @@ import { PACKAGE_JSON_RULES } from "../ruleConfig";
 
 /** Traverse monorepo to find package.json files */
 export async function listPackageJsonPaths() {
+  $.verbose = false;
   const relativePackagePaths = (
     await $`ls -1 packages/*/package.json apps/*/package.json`
   ).stdout
     .trim()
     .split("\n");
+  $.verbose = true;
   const absolutePackagePaths = relativePackagePaths.map(
     (packagePath) => resolve(packagePath) as AbsolutePath
   );
