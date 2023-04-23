@@ -1,5 +1,5 @@
 /**
- * [[include:modules/queue/README.md]]
+ * [[include:packages/queue/README.md]]
  *
  * @module @lauf/queue
  */

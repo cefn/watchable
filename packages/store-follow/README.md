@@ -10,22 +10,35 @@ value returned by the Selector changes.
 
 ```typescript
 // given this example store
-const gameStore = createStore({ steps: 0, direction: null });
+const gameStore = createStore({
+  steps: 0,
+  direction: null,
+});
 
 // queue any changes to `steps` to be passed to a callback
 followSelector(
   gameStore,
   (state) => state.steps,
   async (steps) => {
-    stepDisplay.innerText = `Comleted ${steps} steps`;
+    stepDisplay.innerText = `Completed ${steps} steps`;
   }
 );
 ```
 
+## Getting Started
+
+### Install
+
+```zsh
+npm install @lauf/store-edit
+```
+
+## Advanced Usage
+
 ### Explicitly handle queue.receive()
 
 For complex examples needing access to underlying queue logic, use
-`withSelectorQueue`. Its what `followSelector` uses under the hood.
+`withSelectorQueue`. It's what `followSelector` uses under the hood.
 
 Sometimes you can't afford the syntactic sugar of `followSelector` which
 subscribes your callback automatically and hides the `queue.receive()` API
@@ -34,37 +47,46 @@ that is notified of changes to your selection.
 Like `followSelector`, `withSelectorQueue` also creates and subscribes a Queue
 to be notified every time a new value is returned, but it passes this Queue
 direct to your handler along with the initial selected value. It unsubscribes and
-disposes the queue when your handler returns.
+disposes the queue only when your handler returns.
 
 #### Example
 
-The `withSelectorQueue` example below waits for the first event of either
+The `withSelectorQueue` example below needs direct access to `queue.receive()` as it waits for the first event of either...
 
-1. a change of the game character's direction (from users keyboard input)
-2. an expired timer (the character should step in the current direction every 300ms)
+1. game character direction changed (from users keyboard input)
+2. timer expired (the character steps every 300ms)
 
-It has to use `Promise.race()` to handle either the receive or the timeout, whichever comes first.
+It therefore has to use `Promise.race()` to handle either the receive or the timeout, whichever comes first.
 
 ```typescript
+// given this example store
+const gameStore = createStore({
+  steps: 0,
+  direction: null,
+});
+
 // track direction (set elsewhere in the app)
 const lastDirection = await withSelectorQueue(
   gameStore,
   (state) => state.direction,
   async function ({ receive }, initialDirection) {
     let direction = initialDirection;
+    let directionPromise = null;
+    let stepPromise = null;
     while (direction !== null) {
+      // loop until player stopped moving
       directionPromise = directionPromise || receive();
-      expiryPromise = expiryPromise || promiseExpiry(STEP_MS);
+      stepPromise = stepPromise || sleep(STEP_MS);
       const winner: string = await Promise.race([
-        directionPromise.then(() => "motionChanged"),
-        expiryPromise.then(() => "stepDue"),
+        directionPromise.then(() => "direction"),
+        stepPromise.then(() => "step"),
       ]);
-      if (winner === "motionChanged") {
+      if (winner === "direction") {
         direction = await directionPromise; // direction changed
-        motionPromise = null; // dispose promise
-      } else if (winner === "stepDue") {
-        moveDirection(direction); // time to move
-        expiryPromise = null; // dispose promise
+        directionPromise = null; // dispose promise
+      } else if (winner === "step") {
+        stepDirection(direction); // time to step
+        stepPromise = null; // dispose promise
       }
     }
   }

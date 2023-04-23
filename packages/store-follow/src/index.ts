@@ -1,5 +1,5 @@
 /**
- * [[include:modules/store-follow/README.md]]
+ * [[include:packages/store-follow/README.md]]
  *
  * @module @lauf/store-follow
  */

@@ -1,5 +1,5 @@
 /**
- * [[include:modules/store-edit/README.md]]
+ * [[include:packages/store-edit/README.md]]
  *
  * @module @lauf/store-edit
  */
