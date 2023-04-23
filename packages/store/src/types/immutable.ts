@@ -4,8 +4,8 @@
  * special objects and methods and typically doesn't require you to change your
  * code.
  *
- * It is used to flag and enforce immutability of a [[RootState]] and its
- * descendants - values assigned to a [[Store]] ([[Store.write]]) or retrieved
+ * It is used to flag and enforce immutability of a {@link RootState} and its
+ * descendants - values assigned to a {@link Store} ([[Store.write]]) or retrieved
  * from it ([[Store.read]]). The type `Immutable<T>` is equivalent to applying
  * `Readonly<T>` to `T` and its descendant properties, telling the compiler that
  * no change should be made anywhere in a Store's state tree.
@@ -28,7 +28,7 @@ export type Immutable<T> = T extends (...args: unknown[]) => unknown
   ? ImmutableIndex<T>
   : T;
 
-/** Recursive Readonly implementation for any (indexable) [[RootState]] such as
+/** Recursive Readonly implementation for any (indexable) {@link RootState} such as
  * an array or object */
 type ImmutableIndex<T> = Readonly<{
   [K in keyof T]: Immutable<T[K]>;

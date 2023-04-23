@@ -65,7 +65,7 @@ const rootState = useRootState(props.store);
 Note, this is rarely needed in production code for several reasons...
 
 - well-architected business logic should live outside the render loop, using `followSelector(...)` from @lauf/store-follow
-- to consume **part** of the state, prefer [[useSelector]] which doesn't trigger renders on every state change
+- to consume **part** of the state, prefer {@link useSelector} which doesn't trigger renders on every state change
 
 ```typescript
 // Re-runs this functional component when any state changes

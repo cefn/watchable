@@ -4,15 +4,15 @@ import { DefaultWatchableState } from "./watchableState";
 
 // commented
 
-/** Reference implementation of Lauf [[Store]]  */
+/** Reference implementation of Lauf {@link Store}  */
 class DefaultStore<State extends RootState>
   extends DefaultWatchableState<Immutable<State>>
   implements Store<State> {}
 
-/** Initialise a [[Store]] with an [[Immutable]] initial [[RootState]] - any
+/** Initialise a {@link Store} with an {@link Immutable} initial {@link RootState} - any
  * array, tuple or object. This state can be updated and monitored for updates
  * to drive an app.
- * @param initialState - The initial [[RootState]] stored
+ * @param initialState - The initial {@link RootState} stored
  * @param watchers - A list of [[Watcher|Watchers]] to be notified once and permanently subscribed
  * @category
  */

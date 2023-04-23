@@ -16,7 +16,7 @@ export type Follower<Selected, Ending> = (
   // eslint-disable-next-line @typescript-eslint/no-invalid-void-type
 ) => Promise<void | ExitStatus>;
 
-/** A control object for a [[Follower]] function to signal
+/** A control object for a {@link Follower} function to signal
  * exit behaviour, retrieve references.
  */
 export interface Controls<Selected, Ending> {
