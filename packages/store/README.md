@@ -84,16 +84,16 @@ npm install @lauf/store
 
 ### Demonstration Apps
 
-Our [Example Counter Apps](../../apps) offer minimal demonstrations of `@lauf/store`
+Our [Example Counter Apps](https://github.com/cefn/watchable/tree/main/apps) offer minimal demonstrations of `@lauf/store`
 
 - Web Frameworks
-  - [with React](../../apps/counter-react-ts) (using [@lauf/store-react](../../packages/store-react))
-  - [with no framework](../../apps/counter-dom-ts) (using [@lauf/store-follow](../../packages/store-follow))
-  - [with Preact](../../apps/counter-preact-ts) (using [@lauf/store-react](../../packages/store-react)) and aliased React
+  - [with React](https://github.com/cefn/watchable/tree/main/apps/counter-react-ts) (using [@lauf/store-react](https://github.com/cefn/watchable/tree/main/packages/store-react))
+  - [with no framework](https://github.com/cefn/watchable/tree/main/apps/counter-dom-ts) (using [@lauf/store-follow](https://github.com/cefn/watchable/tree/main/packages/store-follow))
+  - [with Preact](https://github.com/cefn/watchable/tree/main/apps/counter-preact-ts) (using [@lauf/store-react](https://github.com/cefn/watchable/tree/main/packages/store-react)) and aliased React
 - Bundling
-  - [via Commonjs](../../apps/counter-dom-commonjs)
-  - [via ESM](../../apps/counter-dom-esm)
-  - [for tiniest bundle](../../apps/counter-dom-tiny) (a tree-shaken counter app in just 406 bytes!)
+  - [via Commonjs](https://github.com/cefn/watchable/tree/main/apps/counter-dom-commonjs)
+  - [via ESM](https://github.com/cefn/watchable/tree/main/apps/counter-dom-esm)
+  - [for tiniest bundle](https://github.com/cefn/watchable/tree/main/apps/counter-dom-tiny) (a tree-shaken counter app in just 406 bytes!)
 - Mainstream usage
-  - Manage Immutability using [editable drafts](../../apps/counter-react-ts-edit) - eliminates [Immutable update patterns](https://redux.js.org/usage/structuring-reducers/immutable-update-patterns)
-  - Access the store using [React Context API](../../apps/counter-react-ts-edit-context) - eliminates [prop drilling](https://kentcdodds.com/blog/prop-drilling)
+  - Manage Immutability using [editable drafts](https://github.com/cefn/watchable/tree/main/apps/counter-react-ts-edit) - eliminates [Immutable update patterns](https://redux.js.org/usage/structuring-reducers/immutable-update-patterns)
+  - Access the store using [React Context API](https://github.com/cefn/watchable/tree/main/apps/counter-react-ts-edit-context) - eliminates [prop drilling](https://kentcdodds.com/blog/prop-drilling)

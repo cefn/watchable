@@ -42,7 +42,7 @@ const store = useStore<CounterState>({ counter: 0, active: false });
 
 A Store created through `useStore` can be passed through [prop
 drilling](https://kentcdodds.com/blog/prop-drilling) or
-[Context](../../apps/counter-react-ts-edit-context) to descendant components,
+[Context](https://github.com/cefn/watchable/tree/main/apps/counter-react-ts-edit-context) to descendant components,
 who will subscribe to the parts they want to track.
 
 Note, using the `useStore` hook can often be avoided. A Store can be a
