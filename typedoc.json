@@ -4,8 +4,7 @@
     "packages/store-edit/src/index.ts",
     "packages/store-react/src/index.ts",
     "packages/store-follow/src/index.ts",
-    "packages/queue/src/index.ts",
-    "packages/lock/src/index.ts"
+    "packages/queue/src/index.ts"
   ],
   "out": "api"
 }
