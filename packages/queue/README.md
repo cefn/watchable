@@ -1,4 +1,4 @@
-# @lauf/queue
+## Minimal in-memory message queue
 
 A Typescript queue implementation with...
 

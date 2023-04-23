@@ -1,4 +1,4 @@
-# @lauf/store-react
+## Store bindings for React
 
 Enables React apps to use
 [@lauf/store](https://www.npmjs.com/package/@lauf/store) for state-management

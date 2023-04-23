@@ -1,7 +1,7 @@
-/** Function to be subscribed through [[Watchable.watch]] to be notified of an item T.  */
+/** Function to be subscribed through {@link Watchable.watch} to be notified of an item T.  */
 export type Watcher<T> = (item: T) => unknown;
 
-/** Handle returned from [[Watchable.watch]] that can disable an earlier subscription. */
+/** Handle returned from {@link Watchable.watch} that can disable an earlier subscription. */
 export type Unwatch = () => void;
 
 /** A subscribable object, accepts {@link Watcher} callbacks, sends notifications of

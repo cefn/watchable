@@ -13,7 +13,7 @@ class DefaultStore<State extends RootState>
  * array, tuple or object. This state can be updated and monitored for updates
  * to drive an app.
  * @param initialState - The initial {@link RootState} stored
- * @param watchers - A list of [[Watcher|Watchers]] to be notified once and permanently subscribed
+ * @param watchers - A list of {@link Watcher | Watchers} to be notified once and permanently subscribed
  * @category
  */
 export function createStore<State extends RootState>(

@@ -6,25 +6,25 @@ import type { WatchableState } from "./watchable";
  * `Store` by calling {@link createStore} with an `initialState`.
  *
  * Flagging all state references as {@link Immutable} guides IDEs to treat these as
- * [Immutable Objects]{@link https://en.wikipedia.org/wiki/Immutable_object} to
+ * {@link https://en.wikipedia.org/wiki/Immutable_object | Immutable Objects} to
  * avoid programming errors.
  *
  * ## Watching State
  *
- * Assigning a new {@link Immutable} `RootState` using [[Store.write]] notifies
- * [[Watcher|Watchers]] previously subscribed using [[Store.watch]]. This
+ * Assigning a new {@link Immutable} `RootState` using {@link Store.write} notifies
+ * {@link Watcher | Watchers} previously subscribed using {@link Store.watch}. This
  * mechanism ensures that app logic and renderers can track the latest state.
  *
  * ## Immutable State: Motivation
  *
  * Never modifying the state tree means when the state or a
- * [[Selector|selected]] branch of the state is the same ***item*** as before,
+ * {@link Selector | selected} branch of the state is the same ***item*** as before,
  * it is guaranteed to contain all the same ***values*** as before. This
  * guarantee is crucial.
  *
  * Immutability allows Watchers you write, renderers like
- * [[https://reactjs.org/|React]] and memoizers like
- * [[https://github.com/reduxjs/reselect|Reselect]] or React's
+ * {@link https://reactjs.org/ | React} and memoizers like
+ * {@link https://github.com/reduxjs/reselect | Reselect} or React's
  * [useMemo()](https://reactjs.org/docs/hooks-reference.html#usememo) to use
  * 'shallow equality checking'. They can efficiently check when changes to an
  * item should trigger a re-render or recompute - simply
@@ -67,7 +67,7 @@ export type Selector<State extends RootState, Selected> = (
  *
  * Partitioning can also make eventing more efficient. When a parent Store's
  * `RootState` changes, implementations can omit notifications for all
- * [[Watcher|Watchers]] of a child partition if the child {@link RootState} has not
+ * {@link Watcher | Watchers} of a child partition if the child {@link RootState} has not
  * changed, meaning no value within the child partition has changed.
  *
  * See also {@link createStorePartition}.

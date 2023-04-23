@@ -1,29 +1,12 @@
-# @lauf/store
+## Framework-independent, writable, trackable store
 
 **490 gzipped bytes** of powerful state-management!
 
-A [Store](https://cefn.com/lauf/api/interfaces/_lauf_store.Store.html) maintains a protected reference to an Immutable array or object `state`. It brokers all changes to `state`, enabling app interfaces and business logic to track modifications through Selectors.
+A [Store](https://cefn.com/lauf/api/types/_lauf_store.Store.html) maintains a protected reference to an Immutable array or object `state`. It brokers all changes to `state`, enabling app interfaces and business logic to track modifications through Selectors.
 
 It is incredibly simple, lightweight and framework-independent, and therefore suited to manage state within almost any server-side or client-side Typescript or Javascript project.
 
 ## Usage
-
-### Read and Write State
-
-```typescript
-// read state
-const state = store.read();
-
-// write state using immutable patterns
-store.write({
-  ...state,
-  counter: state.counter + 1,
-});
-
-// write state using drafted state object
-import { edit } from "@lauf/store-edit";
-edit(store, (draft) => (draft.counter += 1));
-```
 
 ### Track State
 
@@ -45,6 +28,23 @@ followSelector(
     if (counter > 10) return exit(counter);
   }
 );
+```
+
+### Read and Write State
+
+```typescript
+// read state
+const state = store.read();
+
+// write state using immutable patterns
+store.write({
+  ...state,
+  counter: state.counter + 1,
+});
+
+// write state using drafted state object
+import { edit } from "@lauf/store-edit";
+edit(store, (draft) => (draft.counter += 1));
 ```
 
 ### Import OR Require

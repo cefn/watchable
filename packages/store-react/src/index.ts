@@ -8,14 +8,14 @@ import { createStore } from "@lauf/store";
 import { useState, useEffect } from "react";
 
 /** When the component is first mounted, this hook creates and returns a a new
- * long-lived {@link Store} initialised with `initialState`.
+ * long-lived {@link @lauf/store!Store} initialised with `initialState`.
  *
  * In later renders the hook will always return the same `Store`, It
  * deliberately doesn't force a component refresh when the Store state changes.
  * To track changes in the store, see {@link useSelected} or {@link useRootState}.
  *
  * @param initialState
- * @returns A lazily-created {@link Store}
+ * @returns A lazily-created {@link @lauf/store!Store}
  */
 export function useStore<T extends RootState>(initialState: Immutable<T>) {
   const [store] = useState(() => {
@@ -28,7 +28,7 @@ export function useStore<T extends RootState>(initialState: Immutable<T>) {
  * {@link RootState} of a {@link Store} by a {@link Selector} function.
  *
  * This hook calls `selector` with the `Store`'s `RootState` and returns the
- * derived value. Then it [[Watcher|watches]] the store, calling the `selector`
+ * derived value. Then it {@link @lauf/store!Watcher watches} the store, calling the `selector`
  * again for every change to the `RootState`. If the value returned by
  * `selector` is not identical to the last saved value, a re-render will be
  * triggered (and this hook will return the new value).
@@ -66,7 +66,7 @@ export function useSelected<State extends RootState, Selected>(
 /** A hook for tracking the {@link RootState} of a {@link Store}. Note, this forces a reload
  * of the component when ***any*** part of the state tree changes. You probably want
  * {@link useSelected} instead.
- * @param store The {@link Store} to track.
+ * @param store The {@link @lauf/store!Store} to track.
  */
 export function useRootState<State extends RootState>(store: Store<State>) {
   const { read, watch } = store;

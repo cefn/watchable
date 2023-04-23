@@ -1,4 +1,4 @@
-# @lauf/store-follow
+## Track selected changes to state
 
 Promise-oriented tracking to monitor selected parts of a @lauf/store {@link Store}.
 Re-runs a Selector after each change to store state, and notifies when the

@@ -63,7 +63,7 @@ class DefaultStorePartition<
  *
  * @param store The parent store containing the partition
  * @param key The child key to partition the parent's state.
- * @param watchers - A list of [[Watcher|Watchers]] to be notified once and permanently subscribed
+ * @param watchers - A list of {@link Watcher | Watchers} to be notified once and permanently subscribed
  * @returns The partitioned store.
  */
 export function createStorePartition<

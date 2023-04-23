@@ -4,7 +4,8 @@ import type { Controls, Follower, QueueHandler, ExitStatus } from "./types";
 import { createQueue } from "@lauf/queue";
 
 /**
- * Configures a {@link MessageQueue} that will receive messages with every new value
+ * Configures a {@link @lauf/queue
+ * .MessageQueue} that will receive messages with every new value
  * of a {@link Selector} against a {@link Store}. Passes the queue and the initial value
  * from the Selector to `handleQueue` then waits for `handleQueue` to return,
  * after which the queue is unsubscribed.
@@ -43,13 +44,13 @@ export async function withSelectorQueue<
 }
 
 /**
- * Invokes the [[Follower|follower]] once with the initial value of
- * [[Selector|selector]] and again every time [[Store|store]] has a changed
+ * Invokes the {@link Follower | follower} once with the initial value of
+ * {@link Selector | selector} and again every time {@link Store | store} has a changed
  * value of `Selector`. If follower is async, each invocation will
  * be awaited before the next is called.
  *
  * The `follower` is passed the new value each time, and also a
- * [[Controls|control]] object which can be used to exit the loop like `return
+ * {@link Controls | control} object which can be used to exit the loop like `return
  * control.exit(myValue)`. If `follower` doesn't return an exit
  * instruction, its return value is ignored and it will be invoked again
  * on the the next `Selector` change.

@@ -1,6 +1,6 @@
-# @lauf/store-edit
+## Edit a store's immutable state
 
-An idiot-proof mechanism to write @lauf/store state. Guarantees safe Immutable edits without needing to learn [Immutable update patterns](https://redux.js.org/usage/structuring-reducers/immutable-update-patterns)
+An idiot-proof mechanism to write @lauf/store state without breaking immutability. Guarantees safe Immutable edits without needing to learn [Immutable update patterns](https://redux.js.org/usage/structuring-reducers/immutable-update-patterns)
 
 ## Usage
 

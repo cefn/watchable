@@ -1,14 +1,19 @@
-/** Recursive implementation of Typescript's `Readonly<T>`.
+/** `Immutable<T>` is used to flag and enforce immutability of a
+ * {@link RootState} and its descendants - typically values assigned to a
+ * {@link Store} ({@link @lauf/store.Store#write}) or retrieved from it
+ * ({@link @lauf/store.Store#read}). This tells the compiler that no
+ * modification should be made anywhere in a Store's state tree.
  *
- * Unlike some implementations of immutability this approach introduces no
- * special objects and methods and typically doesn't require you to change your
- * code.
+ * Unlike some implementations (such as Object.freeze, Object.seal or
+ * {@link https://immutable-js.com/ Immutable.js}) our compile-time Immutability
+ * approach introduces no special objects and methods and doesn't require you to
+ * change your runtime code at all.
  *
- * It is used to flag and enforce immutability of a {@link RootState} and its
- * descendants - values assigned to a {@link Store} ([[Store.write]]) or retrieved
- * from it ([[Store.read]]). The type `Immutable<T>` is equivalent to applying
- * `Readonly<T>` to `T` and its descendant properties, telling the compiler that
- * no change should be made anywhere in a Store's state tree.
+ * Under the hood, `Immutable<T>` is a recursive implementation of Typescript's
+ * `Readonly<T>`. Primitive properties are already immutable by definition.
+ * Functions are treated as primitive values. All other objects and arrays and
+ * their descendants are made `Readonly` recursively until they hit a primitive
+ * 'leaf' value.
  *
  * Relying on Typescript's builtin `Readonly` allows the use of normal
  * javascript values and syntax, with the exception that operations which would
@@ -16,10 +21,6 @@
  * Typescript get the greatest benefit from this approach, but javascript IDEs
  * that load typings for code-completion can also indicate violations of the
  * `Readonly` contract.
- *
- * Primitive properties are already immutable by definition. Functions are
- * treated as primitive values. All other objects and arrays have their children
- * made `Readonly` recursively.
  *
  */
 export type Immutable<T> = T extends (...args: unknown[]) => unknown
