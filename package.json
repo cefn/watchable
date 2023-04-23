@@ -68,10 +68,11 @@
   "wireit": {
     "qa": {
       "dependencies": [
+        "packages:validate",
         "build",
         "test",
         "lint",
-        "packages:validate"
+        "docs"
       ]
     },
     "build": {
