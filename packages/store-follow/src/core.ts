@@ -4,15 +4,15 @@ import type { Controls, Follower, QueueHandler, ExitStatus } from "./types";
 import { createQueue } from "@lauf/queue";
 
 /**
- * Configures a {@link @lauf/queue
- * .MessageQueue} that will receive messages with every new value
- * of a {@link Selector} against a {@link Store}. Passes the queue and the initial value
- * from the Selector to `handleQueue` then waits for `handleQueue` to return,
- * after which the queue is unsubscribed.
+ * Configures a {@link @lauf/queue!MessageQueue} that will receive messages with
+ * every new value of a {@link @lauf/store!Selector} against a
+ * {@link @lauf/store!Store}. Passes the queue and the initial value from the
+ * Selector to `handleQueue` then waits for `handleQueue` to return, after which
+ * the queue is unsubscribed.
  *
- * @param store Store to monitor
- * @param selector Function that extracts the selected value
- * @param handleQueue Function passed the initial selected value and queue
+ * @param store {@link @lauf/store!Store} to monitor
+ * @param selector a {@link @lauf/store!Selector} function to extract the selected value
+ * @param handleQueue {@link QueueHandler} function passed the initial selected value and queue
  * @returns the value returned by `handleQueue`
  */
 export async function withSelectorQueue<
@@ -45,15 +45,15 @@ export async function withSelectorQueue<
 
 /**
  * Invokes the {@link Follower | follower} once with the initial value of
- * {@link Selector | selector} and again every time {@link Store | store} has a changed
- * value of `Selector`. If follower is async, each invocation will
- * be awaited before the next is called.
+ * {@link @lauf/store!Selector | selector} and again every time
+ * {@link @lauf/store!Store | store} has a changed value of `Selector`. If follower is
+ * async, each invocation will be awaited before the next is called.
  *
  * The `follower` is passed the new value each time, and also a
- * {@link Controls | control} object which can be used to exit the loop like `return
- * control.exit(myValue)`. If `follower` doesn't return an exit
- * instruction, its return value is ignored and it will be invoked again
- * on the the next `Selector` change.
+ * {@link Controls | control} object which can be used to exit the loop like
+ * `return control.exit(myValue)`. If `follower` doesn't return an exit
+ * instruction, its return value is ignored and it will be invoked again on the
+ * the next `Selector` change.
  *
  * @param store The store to follow
  * @param selector The function to extract the selected value

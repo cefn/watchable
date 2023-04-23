@@ -1,25 +1,26 @@
 import type { Immutable } from "./immutable";
 import type { WatchableState } from "./watchable";
 
-/** A `Store` keeps an Immutable {@link RootState} - any array, tuple or object -
- * which can be changed and monitored for changes to drive an app. Make a new
+/** A `Store` keeps an Immutable {@link RootState} - any array, tuple or object
+ * - which can be changed and monitored for changes to drive an app. Make a new
  * `Store` by calling {@link createStore} with an `initialState`.
  *
- * Flagging all state references as {@link Immutable} guides IDEs to treat these as
- * {@link https://en.wikipedia.org/wiki/Immutable_object | Immutable Objects} to
- * avoid programming errors.
+ * Flagging all state references as {@link Immutable} guides IDEs to treat these
+ * as {@link https://en.wikipedia.org/wiki/Immutable_object | Immutable Objects}
+ * to avoid programming errors.
  *
  * ## Watching State
  *
- * Assigning a new {@link Immutable} `RootState` using {@link Store.write} notifies
- * {@link Watcher | Watchers} previously subscribed using {@link Store.watch}. This
- * mechanism ensures that app logic and renderers can track the latest state.
+ * Assigning a new {@link @lauf/store!Immutable} `RootState` using
+ * {@link @lauf/store!WatchableState.write} notifies {@link Watcher | Watchers}
+ * previously subscribed using {@link @lauf/store!Watchable.watch}. This mechanism
+ * ensures that app logic and renderers can track the latest state.
  *
  * ## Immutable State: Motivation
  *
  * Never modifying the state tree means when the state or a
- * {@link Selector | selected} branch of the state is the same ***item*** as before,
- * it is guaranteed to contain all the same ***values*** as before. This
+ * {@link Selector | selected} branch of the state is the same ***item*** as
+ * before, it is guaranteed to contain all the same ***values*** as before. This
  * guarantee is crucial.
  *
  * Immutability allows Watchers you write, renderers like

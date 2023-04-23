@@ -16,7 +16,7 @@ module.exports = {
     sourceType: "module",
     project: ["tsconfig.json"],
   },
-  plugins: ["react", "jest"],
+  plugins: ["react", "jest", "eslint-plugin-tsdoc"],
   ignorePatterns: ["*/*/dist"],
   rules: {
     "@typescript-eslint/semi": [2, "always"],
