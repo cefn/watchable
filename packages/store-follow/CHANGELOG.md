@@ -1,5 +1,14 @@
 # @lauf/store-follow
 
+## 2.0.0-beta.2
+
+### Patch Changes
+
+- Ensure READMEs are packaged.
+- Updated dependencies
+  - @lauf/queue@2.0.0-beta.2
+  - @lauf/store@2.0.0-beta.2
+
 ## 2.0.0-beta.1
 
 ### Patch Changes

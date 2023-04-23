@@ -19,6 +19,7 @@
   },
   "changesets": [
     "new-sloths-eat",
-    "new-tigers-admire"
+    "new-tigers-admire",
+    "quiet-humans-judge"
   ]
 }

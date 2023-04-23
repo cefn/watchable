@@ -1,6 +1,6 @@
 {
   "name": "counter-dom-tiny",
-  "version": "1.3.3-beta.1",
+  "version": "1.3.3-beta.2",
   "private": true,
   "description": "",
   "homepage": "https://github.com/cefn/watchable/tree/main/apps/counter-dom-tiny#readme",
@@ -19,7 +19,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@lauf/store": "2.0.0-beta.1"
+    "@lauf/store": "2.0.0-beta.2"
   },
   "devDependencies": {
     "vite": "^4.2.1",

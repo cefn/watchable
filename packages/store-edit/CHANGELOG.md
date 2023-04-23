@@ -1,5 +1,13 @@
 # @lauf/store-edit
 
+## 2.0.0-beta.2
+
+### Patch Changes
+
+- Ensure READMEs are packaged.
+- Updated dependencies
+  - @lauf/store@2.0.0-beta.2
+
 ## 2.0.0-beta.1
 
 ### Patch Changes

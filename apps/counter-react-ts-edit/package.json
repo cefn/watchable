@@ -1,6 +1,6 @@
 {
   "name": "counter-react-ts-edit",
-  "version": "1.3.3-beta.1",
+  "version": "1.3.3-beta.2",
   "private": true,
   "homepage": "https://github.com/cefn/watchable/tree/main/apps/counter-react-ts-edit#readme",
   "bugs": {
@@ -24,9 +24,9 @@
     "lint": "wireit"
   },
   "dependencies": {
-    "@lauf/store": "2.0.0-beta.1",
-    "@lauf/store-edit": "2.0.0-beta.1",
-    "@lauf/store-react": "2.0.0-beta.1",
+    "@lauf/store": "2.0.0-beta.2",
+    "@lauf/store-edit": "2.0.0-beta.2",
+    "@lauf/store-react": "2.0.0-beta.2",
     "immer": "^10.0.1",
     "react": "^18.2.0",
     "react-dom": "^18.2.0"
