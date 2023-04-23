@@ -1,4 +1,6 @@
 {
+  "hideParameterTypesInTitle": false,
+  "searchInComments": true,
   "entryPoints": [
     "packages/store/src/index.ts",
     "packages/store-edit/src/index.ts",
