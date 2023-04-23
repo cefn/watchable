@@ -1,17 +1,17 @@
 import type { Immutable } from "./immutable";
 import type { WatchableState } from "./watchable";
 
-/** A `Store` keeps an Immutable [[RootState]] - any array, tuple or object -
+/** A `Store` keeps an Immutable {@link RootState} - any array, tuple or object -
  * which can be changed and monitored for changes to drive an app. Make a new
- * `Store` by calling [[createStore]] with an `initialState`.
+ * `Store` by calling {@link createStore} with an `initialState`.
  *
- * Flagging all state references as [[Immutable]] guides IDEs to treat these as
+ * Flagging all state references as {@link Immutable} guides IDEs to treat these as
  * [Immutable Objects]{@link https://en.wikipedia.org/wiki/Immutable_object} to
  * avoid programming errors.
  *
  * ## Watching State
  *
- * Assigning a new [[Immutable]] `RootState` using [[Store.write]] notifies
+ * Assigning a new {@link Immutable} `RootState` using [[Store.write]] notifies
  * [[Watcher|Watchers]] previously subscribed using [[Store.watch]]. This
  * mechanism ensures that app logic and renderers can track the latest state.
  *
@@ -42,35 +42,35 @@ import type { WatchableState } from "./watchable";
  */
 export type Store<State extends RootState> = WatchableState<Immutable<State>>;
 
-/** Defines the set of possible state types for a [[Store]],
+/** Defines the set of possible state types for a {@link Store},
  * usually the top level State 'container' is either an
  * Array, Tuple, or keyed Object */
 export type RootState = object;
 
-/** A Selector derives some sub-part or computed value from a [[RootState]] in a
- * @lauf/store [[Store]]. `Object.is(prev, next)` is normally used to compare
+/** A Selector derives some sub-part or computed value from a {@link RootState} in a
+ * @lauf/store {@link Store}. `Object.is(prev, next)` is normally used to compare
  * with the previous resultfrom the same Selector to monitor if some part has
  * changed, defining when app logic should be re-run. */
 export type Selector<State extends RootState, Selected> = (
   state: Immutable<State>
 ) => Immutable<Selected>;
 
-/** An item satisfying type constraints of [[RootState]] but where a child item
+/** An item satisfying type constraints of {@link RootState} but where a child item
  * at `Key` ***also*** satisfies `RootState`. A Store with a
- * [[PartitionableState]] can therefore be partitioned into a child [[Store]] by
+ * {@link PartitionableState} can therefore be partitioned into a child {@link Store} by
  * `Key`.
  *
- * Partitioning enables hierarchy and logical isolation of a [[Store]], so that
+ * Partitioning enables hierarchy and logical isolation of a {@link Store}, so that
  * higher-level stores can be composed of multiple lower-level stores. Logic
  * relying on some `Store<T>` need not know whether `<T>` is the whole app state
  * or just some part of it.
  *
  * Partitioning can also make eventing more efficient. When a parent Store's
  * `RootState` changes, implementations can omit notifications for all
- * [[Watcher|Watchers]] of a child partition if the child [[RootState]] has not
+ * [[Watcher|Watchers]] of a child partition if the child {@link RootState} has not
  * changed, meaning no value within the child partition has changed.
  *
- * See also [[createStorePartition]].
+ * See also {@link createStorePartition}.
  */
 export type PartitionableState<Key extends string | number | symbol> =
   RootState & { [k in Key]: RootState };

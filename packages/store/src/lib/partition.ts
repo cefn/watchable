@@ -7,7 +7,7 @@ import type {
 } from "../types";
 import { DefaultWatchable } from "./watchable";
 
-/** Utility class for partitioning of a Store. See [[createStorePartition]]. */
+/** Utility class for partitioning of a Store. See {@link createStorePartition}. */
 class DefaultStorePartition<
     ParentState extends PartitionableState<Key>,
     Key extends keyof ParentState
@@ -58,8 +58,8 @@ class DefaultStorePartition<
 }
 
 /**
- * Constructs a [[Store]] that tracks a child property of another store's
- * [[RootState]]. See [[PartitionableState]] for more details.
+ * Constructs a {@link Store} that tracks a child property of another store's
+ * {@link RootState}. See {@link PartitionableState} for more details.
  *
  * @param store The parent store containing the partition
  * @param key The child key to partition the parent's state.

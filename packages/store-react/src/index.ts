@@ -8,14 +8,14 @@ import { createStore } from "@lauf/store";
 import { useState, useEffect } from "react";
 
 /** When the component is first mounted, this hook creates and returns a a new
- * long-lived [[Store]] initialised with `initialState`.
+ * long-lived {@link Store} initialised with `initialState`.
  *
  * In later renders the hook will always return the same `Store`, It
  * deliberately doesn't force a component refresh when the Store state changes.
- * To track changes in the store, see [[useSelected]] or [[useRootState]].
+ * To track changes in the store, see {@link useSelected} or {@link useRootState}.
  *
  * @param initialState
- * @returns A lazily-created [[Store]]
+ * @returns A lazily-created {@link Store}
  */
 export function useStore<T extends RootState>(initialState: Immutable<T>) {
   const [store] = useState(() => {
@@ -25,7 +25,7 @@ export function useStore<T extends RootState>(initialState: Immutable<T>) {
 }
 
 /** A hook for tracking a subpart or a computed value derived from the
- * [[RootState]] of a [[Store]] by a [[Selector]] function.
+ * {@link RootState} of a {@link Store} by a {@link Selector} function.
  *
  * This hook calls `selector` with the `Store`'s `RootState` and returns the
  * derived value. Then it [[Watcher|watches]] the store, calling the `selector`
@@ -34,13 +34,13 @@ export function useStore<T extends RootState>(initialState: Immutable<T>) {
  * triggered (and this hook will return the new value).
  *
  * If your `selector` constructs a new data structure based on the `RootState`,
- * (rather than just selecting some part of the [[Immutable]] `RootState` or
+ * (rather than just selecting some part of the {@link Immutable} `RootState` or
  * calculating a primitive value), then it might return a non-identical value
  * even when nothing has changed. Computed data structures should be
  * [memoized](https://github.com/reduxjs/reselect#creating-a-memoized-selector)
  * to minimise component refreshes.
  *
- * See [[Selector]]
+ * See {@link Selector}
  */
 export function useSelected<State extends RootState, Selected>(
   store: Store<State>,
@@ -63,10 +63,10 @@ export function useSelected<State extends RootState, Selected>(
   return selected;
 }
 
-/** A hook for tracking the [[RootState]] of a [[Store]]. Note, this forces a reload
+/** A hook for tracking the {@link RootState} of a {@link Store}. Note, this forces a reload
  * of the component when ***any*** part of the state tree changes. You probably want
- * [[useSelected]] instead.
- * @param store The [[Store]] to track.
+ * {@link useSelected} instead.
+ * @param store The {@link Store} to track.
  */
 export function useRootState<State extends RootState>(store: Store<State>) {
   const { read, watch } = store;

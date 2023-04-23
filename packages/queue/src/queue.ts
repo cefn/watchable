@@ -48,10 +48,10 @@ class DefaultMessageQueue<Message> implements MessageQueue<Message> {
 }
 
 /**
- * Create a new [[MessageQueue]], with no backlog limits by default.
+ * Create a new {@link MessageQueue}, with no backlog limits by default.
  * @param messageBacklog Maximum backlog of waiting messages before [[send()]] returns `false`
  * @param receiverBacklog Maximum backlog of waiting receivers before [[receive()]] throws an Error
- * @returns a [[MessageQueue]] with the specified backlog limits
+ * @returns a {@link MessageQueue} with the specified backlog limits
  */
 export function createQueue<T>(
   messageBacklog?: number,

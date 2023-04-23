@@ -4,8 +4,8 @@ import type { Controls, Follower, QueueHandler, ExitStatus } from "./types";
 import { createQueue } from "@lauf/queue";
 
 /**
- * Configures a [[MessageQueue]] that will receive messages with every new value
- * of a [[Selector]] against a [[Store]]. Passes the queue and the initial value
+ * Configures a {@link MessageQueue} that will receive messages with every new value
+ * of a {@link Selector} against a {@link Store}. Passes the queue and the initial value
  * from the Selector to `handleQueue` then waits for `handleQueue` to return,
  * after which the queue is unsubscribed.
  *
