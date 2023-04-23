@@ -1,5 +1,5 @@
 /**
- * [[include:modules/store-react/README.md]]
+ * [[include:packages/store-react/README.md]]
  *
  * @module @lauf/store-react
  */

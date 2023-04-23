@@ -1,10 +1,9 @@
-This Counter app is identical to the other ones, but here we have tuned it for the tiniest possible bundle.
+This Counter app is identical to the other ones, but tuned for the tiniest possible bundle. The result is a bundle of just 406 bytes combining the fully reactive `@lauf/store` state library and the app logic.
 
-- We no longer use the promise support of a `@lauf/store-follow` queue. We use watcher callbacks instead.
-- We include no polyfills for legacy browsers or module preload
-- We use `terser` instead of `esbuild` for minification
-
-The result is a bundle of just 406 bytes combining the fully reactive `@lauf/store` state library and the app logic.
+- Like all counter-dom-\* apps this uses the dom directly, avoiding the (~45k gzip) overhead of React
+- It doesn't use the promise support of a `@lauf/store-follow` queue. It uses watcher callbacks instead.
+- It includes no polyfills for legacy browsers or module preload
+- It uses `terser` instead of `esbuild` for minification
 
 ```
 npm run build
