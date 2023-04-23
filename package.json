@@ -57,6 +57,7 @@
     "sort-package-json": "^2.4.1",
     "ts-jest": "^29.0.3",
     "tsx": "^3.12.6",
+    "typedoc": "^0.24.5",
     "typescript": "^5.0.4",
     "wireit": "^0.9.5",
     "zx": "^7.1.1"
@@ -124,8 +125,5 @@
         "./packages/store-react:lint"
       ]
     }
-  },
-  "dependencies": {
-    "typedoc": "^0.24.4"
   }
 }
