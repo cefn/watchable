@@ -23,6 +23,7 @@
     "@lauf/store-follow": "2.0.0-beta.3"
   },
   "devDependencies": {
+    "@vitejs/plugin-legacy": "^4.0.2",
     "typescript": "^5.0.4",
     "vite": "^4.2.1",
     "wireit": "^0.9.5"

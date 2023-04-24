@@ -24,6 +24,7 @@
   },
   "devDependencies": {
     "@rollup/plugin-commonjs": "^24.1.0",
+    "@vitejs/plugin-legacy": "^4.0.2",
     "vite": "^4.2.1",
     "vite-plugin-commonjs": "^0.6.2",
     "wireit": "^0.9.5"

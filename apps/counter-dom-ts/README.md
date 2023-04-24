@@ -1,6 +1,8 @@
 # Counter (Optimised Typescript)
 
-This is the Typescript reference counter app behaves just like the [React Typescript version](https://github.com/cefn/lauf/tree/main/apps/counter-react-ts), [React Javascript version](https://github.com/cefn/lauf/tree/main/apps/counter-react-js) and the [Preact version](https://github.com/cefn/lauf/tree/main/apps/counter-preact-ts).
+This is the Typescript DOM counter app. It behaves just like the [React Typescript version](https://github.com/cefn/lauf/tree/main/apps/counter-react-ts), [React Javascript version](https://github.com/cefn/lauf/tree/main/apps/counter-react-js) and the [Preact version](https://github.com/cefn/lauf/tree/main/apps/counter-preact-ts).
+
+[Open this app in a Stackblitz editable sandbox](https://stackblitz.com/github/cefn/watchable/tree/main/apps/counter-dom-ts?file=src/main.ts)
 
 However, it illustrates how managing state in a dedicated Store, independently of any web framework, allows you ultimate flexibility. This implementation directly manipulates the DOM when app state changes, without any JSX component framework at all!
 
