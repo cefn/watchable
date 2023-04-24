@@ -45,7 +45,14 @@ export const PACKAGE_JSON_RULES = {
   "scripts.build": "wireit",
   "wireit.lint": {
     command: "eslint -c .eslintrc.cjs .",
-    files: ["**/*.js", "**/*.jsx", "**/*.ts", "**/*.jsx"],
+    files: [
+      "**/*.js",
+      "**/*.jsx",
+      "**/*.ts",
+      "**/*.jsx",
+      "!dist/**/*",
+      "!coverage/**/*",
+    ],
     output: [],
     dependencies: ["build"],
   },
