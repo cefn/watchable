@@ -3,6 +3,8 @@
 Enables React apps to use
 [@lauf/store](https://www.npmjs.com/package/@lauf/store) for state-management
 
+Read the [API Reference](https://cefn.com/lauf/api/modules/_lauf_store_react.html) or the reference usages below.
+
 ## Usage
 
 ### Track a part of Store state
@@ -42,7 +44,7 @@ const store = useStore<CounterState>({ counter: 0, active: false });
 
 A Store created through `useStore` can be passed through [prop
 drilling](https://kentcdodds.com/blog/prop-drilling) or
-[Context](https://github.com/cefn/watchable/tree/main/apps/counter-react-ts-edit-context) to descendant components,
+[Context](https://github.com/cefn/watchable/tree/main/apps/counter-react-ts-edit-context#readme) to descendant components,
 who will subscribe to the parts they want to track.
 
 Note, using the `useStore` hook can often be avoided. A Store can be a

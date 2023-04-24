@@ -1,8 +1,12 @@
 # Counter (Optimised Typescript)
 
-This is the Typescript reference counter app behaves just like the [React Typescript version](https://github.com/cefn/watchable/tree/main/apps/counter-react-ts#readme), [React Javascript version](https://github.com/cefn/watchable/tree/main/apps/counter-react-js#readme) and the [Preact version](https://github.com/cefn/watchable/tree/main/apps/counter-preact-ts#readme).
+<<<<<<< HEAD
+This is the Typescript DOM counter app. It behaves just like the [React Typescript version](https://github.com/cefn/watchable/tree/main/apps/counter-react-ts), [React Javascript version](https://github.com/cefn/watchable/tree/main/apps/counter-react-js) and the [Preact version](https://github.com/cefn/watchable/tree/main/apps/counter-preact-ts).
 
 [Open this app in a Stackblitz editable sandbox](https://stackblitz.com/github/cefn/watchable/tree/main/apps/counter-dom-ts?file=src/main.ts)
+=======
+This is the Typescript reference counter app behaves just like the [React Typescript version](https://github.com/cefn/watchable/tree/main/apps/counter-react-ts#readme), [React Javascript version](https://github.com/cefn/watchable/tree/main/apps/counter-react-js#readme) and the [Preact version](https://github.com/cefn/watchable/tree/main/apps/counter-preact-ts#readme).
+>>>>>>> ab091a9 (Update READMES)
 
 However, it illustrates how managing state in a dedicated Store, independently of any web framework, allows you ultimate flexibility. This implementation directly manipulates the DOM when app state changes, without any JSX component framework at all!
 
@@ -15,7 +19,7 @@ The smallest version of the `dom` app collectionj - `counter-dom-tiny` - bundles
 The `ESM Javascript` and `Typescript` bundles neck-and-neck at nearly **80 times smaller** than the React version thanks to effective tree-shaking removing unused symbols. However, even the wasteful commonjs bundle is still nearly **11 times smaller**.
 
 ```zsh
-find -type d -iname 'counter*dom*' | xargs -I{} zsh -c "echo -n '{} '; cd {}; cat dist/assets/*.js | gzip | wc -c" | sort -n -k2
+watchable git:(main) ✗ find -type d -iname 'counter*dom*' | xargs -I{} zsh -c "echo -n '{} '; cd {}; cat dist/assets/*.js | gzip | wc -c" | sort -n -k2
 ./apps/counter-dom-tiny 424
 ./apps/counter-dom-esm 1282
 ./apps/counter-dom-ts 1282
