@@ -78,7 +78,9 @@
         "**/*.js",
         "**/*.jsx",
         "**/*.ts",
-        "**/*.jsx"
+        "**/*.jsx",
+        "!dist/**/*",
+        "!coverage/**/*"
       ],
       "output": [],
       "dependencies": [
