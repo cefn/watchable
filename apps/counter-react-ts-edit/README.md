@@ -1,9 +1,3 @@
-# Counter (Typescript)
+# Counter (Typescript with @lauf/store-edit)
 
-This minimal Typescript app shows how to bind React views and controls to shared state that is managed independently of React. See also the [Javascript version of this app](../../apps/counter-js)
-
-Use `npm install` then `npm run dev` to demo the application locally. To run the code in an editable sandbox visit https://stackblitz.com/github/cefn/watchable/tree/alpha-release/apps/counter-react-ts?file=README.md
-
-See [logic.ts](https://github.com/cefn/lauf/tree/main/apps/counter/src/logic.ts) and [ui.tsx](https://github.com/cefn/lauf/tree/main/apps/counter/src/ui.tsx) to understand how it works.
-
-This project builds and runs using [Vite](https://vitejs.dev/).
+This is identical to the [Standard counter app](https://github.com/cefn/lauf/tree/main/apps/counter-react-ts) except it uses [@lauf/store-edit](https://www.npmjs.com/package/@lauf/store-edit) to avoid the developer having to learn and follow [Immutable update patterns](https://redux.js.org/usage/structuring-reducers/immutable-update-patterns).
