@@ -1,5 +1,11 @@
 # @lauf/store
 
+## 2.0.0-beta.3
+
+### Patch Changes
+
+- Rollback to typedoc 0.23.x
+
 ## 2.0.0-beta.2
 
 ### Patch Changes

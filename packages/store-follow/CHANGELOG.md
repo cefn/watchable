@@ -1,5 +1,14 @@
 # @lauf/store-follow
 
+## 2.0.0-beta.3
+
+### Patch Changes
+
+- Rollback to typedoc 0.23.x
+- Updated dependencies
+  - @lauf/queue@2.0.0-beta.3
+  - @lauf/store@2.0.0-beta.3
+
 ## 2.0.0-beta.2
 
 ### Patch Changes

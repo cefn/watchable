@@ -1,6 +1,6 @@
 {
   "name": "@lauf/store-follow",
-  "version": "2.0.0-beta.2",
+  "version": "2.0.0-beta.3",
   "description": "Await @lauf/store state changes and trigger business logic",
   "homepage": "https://github.com/cefn/watchable/tree/main/packages/store-follow#readme",
   "bugs": {
@@ -24,8 +24,8 @@
     "test": "wireit"
   },
   "dependencies": {
-    "@lauf/queue": "2.0.0-beta.2",
-    "@lauf/store": "2.0.0-beta.2"
+    "@lauf/queue": "2.0.0-beta.3",
+    "@lauf/store": "2.0.0-beta.3"
   },
   "devDependencies": {
     "typescript": "^5.0.4",
@@ -33,8 +33,8 @@
     "wireit": "^0.9.5"
   },
   "peerDependencies": {
-    "@lauf/queue": "2.0.0-beta.2",
-    "@lauf/store": "2.0.0-beta.2"
+    "@lauf/queue": "2.0.0-beta.3",
+    "@lauf/store": "2.0.0-beta.3"
   },
   "publishConfig": {
     "access": "public"
