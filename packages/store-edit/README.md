@@ -2,6 +2,8 @@
 
 An idiot-proof mechanism to write @lauf/store state without breaking immutability. Guarantees safe Immutable edits without needing to learn [Immutable update patterns](https://redux.js.org/usage/structuring-reducers/immutable-update-patterns)
 
+Read the [API Reference](https://cefn.com/lauf/api/modules/_lauf_store_edit.html) or the reference usages below.
+
 ## Usage
 
 ### Making Edits
@@ -40,5 +42,5 @@ npm install @lauf/store-edit
 
 Selected [Example Counter Apps](https://github.com/cefn/watchable/tree/main/apps) offer minimal demonstrations of `@lauf/store-edit`. See the following...
 
-- [counter-react-ts-edit](https://github.com/cefn/watchable/tree/main/apps/counter-react-ts-edit)
-- [counter-react-ts-edit-context](https://github.com/cefn/watchable/tree/main/apps/counter-react-ts-edit-context)
+- [counter-react-ts-edit](https://github.com/cefn/watchable/tree/main/apps/counter-react-ts-edit#readme)
+- [counter-react-ts-edit-context](https://github.com/cefn/watchable/tree/main/apps/counter-react-ts-edit-context#readme)

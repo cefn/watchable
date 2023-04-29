@@ -1,6 +1,6 @@
 # Counter (Preact with Typescript)
 
-This is identical to the [React version of this app](https://github.com/cefn/lauf/tree/main/apps/counter-react-ts) as a demonstration that [@lauf/store-react](https://www.npmjs.com/package/@lauf/store-react) also works with [Preact](https://preactjs.com/).
+This is identical to the [React version of this app](https://github.com/cefn/watchable/tree/main/apps/counter-react-ts#readme) as a demonstration that [@lauf/store-react](https://www.npmjs.com/package/@lauf/store-react) also works with [Preact](https://preactjs.com/).
 
 The gzipped bundle size with Preact is tiny, with the same app bundled in React being 6 times bigger!
 
