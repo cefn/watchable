@@ -6,20 +6,20 @@ export class DefaultWatchable<Value> implements Watchable<Value> {
     this.watchers = watchers;
   }
 
-  protected notify = async (item: Value) => {
+  protected async notify(item: Value) {
     const watchers = this.watchers;
     await Promise.resolve(); // equivalent to queueMicrotask()
     for (const watcher of watchers) {
       watcher(item);
     }
-  };
+  }
 
-  watch = (watcher: Watcher<Value>) => {
+  watch(watcher: Watcher<Value>) {
     this.watchers = [...this.watchers, watcher];
     return () => {
       this.watchers = this.watchers.filter(
         (candidate) => candidate !== watcher
       );
     };
-  };
+  }
 }
