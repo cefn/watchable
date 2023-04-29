@@ -4,6 +4,8 @@ import { createStore, createStorePartition } from "../../src/lib";
 import { createStoreSuite } from "../storeSuite";
 import { createDeferred } from "../util";
 
+import { vi, describe, test, expect } from "vitest";
+
 /** TEST PARTITIONS AS A GENERAL STORE */
 
 /** Creates a store as an object property in a parent store. */
@@ -62,6 +64,7 @@ describe("Parent Stores and Child Store Partitions", () => {
       childStore,
     };
   }
+
   test("Child watchers notified of parent store assignments inside partition", async () => {
     const { deferred, deferredResolve } = createDeferred<ChildState>();
     const { parentStore, childStore } = createPartitionedStores();
@@ -79,7 +82,7 @@ describe("Parent Stores and Child Store Partitions", () => {
   });
 
   test("Child watchers not notified of parent store assignments outside partition", async () => {
-    const watcher = jest.fn();
+    const watcher = vi.fn();
     const { parentStore, childStore } = createPartitionedStores();
     childStore.watch(watcher);
     // set a deep value

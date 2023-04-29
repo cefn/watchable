@@ -1,6 +1,8 @@
 import { DefaultWatchable } from "../../src/lib/watchable";
 import { DefaultWatchableState } from "../../src/lib/watchableState";
 
+import { vi, describe, test, expect } from "vitest";
+
 describe("BasicWatchable behaviour", () => {
   test("Can create BasicWatchable", () => {
     expect(new DefaultWatchable()).toBeDefined();
@@ -15,7 +17,7 @@ describe("BasicWatchable behaviour", () => {
 
   test("Can watch BasicWatchable", async () => {
     const notifiable = new Notifiable<string>();
-    const watcher = jest.fn();
+    const watcher = vi.fn();
     notifiable.watch(watcher);
     void notifiable.doNotify("foo");
     await Promise.resolve(); // wait one tick for notifications
@@ -24,7 +26,7 @@ describe("BasicWatchable behaviour", () => {
 
   test("Can unwatch BasicWatchable", async () => {
     const notifiable = new Notifiable<string>();
-    const watcher = jest.fn();
+    const watcher = vi.fn();
     const unwatch = notifiable.watch(watcher);
     unwatch();
     void notifiable.doNotify("foo");
@@ -46,7 +48,7 @@ describe("BasicWatchableValue behaviour", () => {
 
   test("Can watch BasicWatchableValue", async () => {
     const watchableValue = new DefaultWatchableState<string>("foo");
-    const watcher = jest.fn();
+    const watcher = vi.fn();
     watchableValue.watch(watcher);
     watchableValue.write("bar");
     await Promise.resolve(); // wait one tick for notifications
@@ -54,7 +56,7 @@ describe("BasicWatchableValue behaviour", () => {
   });
 
   test("Can watch BasicWatchableValue from moment of construction", async () => {
-    const watcher = jest.fn();
+    const watcher = vi.fn();
     const watchers = [watcher];
     const watchableValue = new DefaultWatchableState<string>("foo", watchers);
     await Promise.resolve(); // wait one tick for notifications

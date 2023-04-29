@@ -41,19 +41,19 @@
   },
   "wireit": {
     "test": {
-      "command": "jest",
+      "dependencies": [
+        "build"
+      ],
+      "command": "vitest run",
       "files": [
         "src/**/*",
         "test/**/*",
         "tsconfig.json",
-        "jest.config.cjs",
-        "../../jest.config.base.cjs"
+        "tsconfig.test.json",
+        "vite.config.ts"
       ],
       "output": [
         "./coverage"
-      ],
-      "dependencies": [
-        "build"
       ]
     },
     "build": {

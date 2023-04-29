@@ -1,6 +1,8 @@
 import { createStore } from "@lauf/store";
 import { edit } from "../src/edit";
 
+import { test, expect } from "vitest";
+
 test("Editing replaces only ancestor objects containing a change", () => {
   const store = createStore({
     ancient: ["Roses are red", "Violets are blue"],

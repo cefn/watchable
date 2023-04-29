@@ -26,6 +26,7 @@
   "devDependencies": {
     "typescript": "^5.0.4",
     "vite": "^4.2.1",
+    "vitest": "^0.30.1",
     "wireit": "^0.9.5"
   },
   "publishConfig": {
@@ -33,19 +34,19 @@
   },
   "wireit": {
     "test": {
-      "command": "jest",
+      "dependencies": [
+        "build"
+      ],
+      "command": "vitest run",
       "files": [
         "src/**/*",
         "test/**/*",
         "tsconfig.json",
-        "jest.config.cjs",
-        "../../jest.config.base.cjs"
+        "tsconfig.test.json",
+        "vite.config.ts"
       ],
       "output": [
         "./coverage"
-      ],
-      "dependencies": [
-        "build"
       ]
     },
     "build": {

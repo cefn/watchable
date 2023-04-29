@@ -1,6 +1,7 @@
 import { defineConfig } from "vite";
 import legacy from "@vitejs/plugin-legacy";
 import preact from "@preact/preset-vite";
+import {} from "vitest";
 
 // https://vitejs.dev/config/
 export default defineConfig({
@@ -24,5 +25,8 @@ export default defineConfig({
   preview: {
     port: 4172,
     strictPort: true,
+  },
+  test: {
+    exclude: ["test/playwright/**/*"],
   },
 });

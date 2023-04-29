@@ -14,3 +14,12 @@ export function createDeferred<Result>() {
     deferred,
   };
 }
+
+/** Type-aware alias of Object.entries  */
+export function safeEntries<Lookup extends object>(lookup: Lookup) {
+  return Object.entries(lookup) as Array<InferEntry<Lookup>>;
+}
+
+export type InferEntry<Lookup, K extends keyof Lookup = keyof Lookup> = {
+  [K in keyof Lookup]: [K, Lookup[K]];
+}[K];

@@ -1,6 +1,8 @@
 import { createStore } from "@lauf/store";
 import { edit } from "@lauf/store-edit";
-import { INITIAL_STATE } from "../../src/logic";
+import { INITIAL_STATE } from "../src/logic";
+
+import { describe, test, expect } from "vitest";
 
 describe("Counter App Business Logic", () => {
   test("Counter is initially 0", () => {

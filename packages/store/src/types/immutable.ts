@@ -26,11 +26,11 @@
 export type Immutable<T> = T extends (...args: unknown[]) => unknown
   ? T
   : T extends object
-  ? ImmutableIndex<T>
+  ? ImmutableObject<T>
   : T;
 
 /** Recursive Readonly implementation for any (indexable) {@link RootState} such as
  * an array or object */
-type ImmutableIndex<T> = Readonly<{
+export type ImmutableObject<T extends object> = Readonly<{
   [K in keyof T]: Immutable<T[K]>;
 }>;

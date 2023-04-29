@@ -29,6 +29,18 @@ export const PACKAGE_JSON_RULES = {
     js: undefined,
   }),
   "devDependencies.wireit": "^0.9.5",
+  "scripts.test:unit": byPackageType({
+    apps: byPackageName(
+      {
+        "counter-preact-ts": "vitest run",
+        "counter-react-ts": "vitest run",
+        "counter-react-ts-edit": "vitest run",
+        "counter-react-ts-edit-context": "vitest run",
+      },
+      undefined
+    ),
+    packages: undefined,
+  }),
   "scripts.test": byPackageType({
     packages: "wireit",
     apps: byPackageName(
@@ -110,13 +122,13 @@ export const PACKAGE_JSON_RULES = {
 
     const tsPackages = {
       ...common,
-      command: "jest",
+      command: "vitest run",
       files: [
         "src/**/*",
         "test/**/*",
         "tsconfig.json",
-        "jest.config.cjs",
-        "../../jest.config.base.cjs",
+        "tsconfig.test.json",
+        "vite.config.ts",
       ],
       output: ["./coverage"],
       dependencies: ["build"],
@@ -133,8 +145,6 @@ export const PACKAGE_JSON_RULES = {
         "tsconfig.json",
         "vite.config.ts",
         "waitOnConfig.json",
-        "jest.config.cjs",
-        "../../jest.config.base.cjs",
       ],
       output: ["coverage", "playwright-report"],
     };

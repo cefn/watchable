@@ -4,6 +4,8 @@ import { withSelectorQueue } from "@lauf/store-follow";
 
 import { manyTicks } from "./util";
 
+import { describe, test, expect } from "vitest";
+
 interface Location {
   name: string;
   distance: number;

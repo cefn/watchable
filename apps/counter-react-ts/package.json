@@ -16,7 +16,7 @@
     "dev:bundle": "run-s build preview",
     "build": "wireit",
     "preview": "vite preview",
-    "test:unit": "jest test/jest/**.test.ts",
+    "test:unit": "vitest run",
     "test:dev": "SERVER=http://localhost:5173 run-p --race dev test:server",
     "test:dev:bundle": "SERVER=http://localhost:4173 run-p --race dev:bundle test:server",
     "test:server": "wait-on --config waitOnConfig.json ${SERVER} && playwright test",
@@ -74,9 +74,7 @@
         "playwright.config.ts",
         "tsconfig.json",
         "vite.config.ts",
-        "waitOnConfig.json",
-        "jest.config.cjs",
-        "../../jest.config.base.cjs"
+        "waitOnConfig.json"
       ],
       "output": [
         "coverage",
