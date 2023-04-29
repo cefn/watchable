@@ -16,17 +16,17 @@ describe("Counter UI Behaviours", () => {
 
   test("Counter begins at 0", async ({ page }) => {
     const numberString = await page.textContent("h1");
-    expect(numberString).toBe("0");
+    expect(numberString).toBe("Counter is 0");
   });
 
   test("User can add to Counter", async ({ page }) => {
     await page.click("text=Increase");
-    await page.innerText("text=1");
+    await page.innerText("text=Counter is 1");
   });
 
   test("User can take from Counter", async ({ page }) => {
     await page.click("text=Decrease");
-    await page.innerText("text=-1");
+    await page.innerText("text=Counter is -1");
   });
 
   test("Repeated presses are all counted", async ({ page }) => {
@@ -34,6 +34,6 @@ describe("Counter UI Behaviours", () => {
     await page.click("text=Increase");
     await page.click("text=Increase");
     await page.click("text=Increase");
-    await page.innerText("text=4");
+    await page.innerText("text=Counter is 4");
   });
 });
