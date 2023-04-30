@@ -20,6 +20,7 @@
     "@watchable/store-react": "0.9.0-alpha.0"
   },
   "changesets": [
-    "flat-ligers-heal"
+    "flat-ligers-heal",
+    "thin-rockets-sing"
   ]
 }

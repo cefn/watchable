@@ -1,6 +1,6 @@
 {
   "name": "counter-preact-ts",
-  "version": "0.9.0-alpha.1",
+  "version": "0.9.0-alpha.2",
   "private": true,
   "homepage": "https://github.com/cefn/watchable/tree/main/apps/counter-preact-ts#readme",
   "bugs": {
@@ -24,8 +24,8 @@
     "lint": "wireit"
   },
   "dependencies": {
-    "@watchable/store": "0.9.0-alpha.1",
-    "@watchable/store-react": "0.9.0-alpha.1",
+    "@watchable/store": "0.9.0-alpha.2",
+    "@watchable/store-react": "0.9.0-alpha.2",
     "react": "npm:@preact/compat",
     "react-dom": "npm:@preact/compat"
   },
