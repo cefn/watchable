@@ -6,7 +6,7 @@ A Typescript queue implementation with...
 - queue limits to facilitate [backpressure](https://medium.com/@jayphelps/backpressure-explained-the-flow-of-data-through-software-2350b3e77ce7)
 - immutable queue state to facilitate [time-travel debugging](https://medium.com/replay-io/introduction-to-time-travel-debugging-a02786c5c0d9)
 
-Read the [API Reference](https://cefn.com/watchable/api/modules/_watchable_queue.html) or the reference usages below.
+Read the [API Reference](https://watchable.dev/api/modules/_watchable_queue.html) or the reference usages below.
 
 ## Usage
 

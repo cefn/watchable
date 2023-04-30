@@ -4,7 +4,7 @@ Promise-oriented tracking to monitor selected parts of a @watchable/store {@link
 Re-runs a Selector after each change to store state, and notifies when the
 value returned by the Selector changes.
 
-Read the [API Reference](https://cefn.com/watchable/api/modules/_watchable_store_follow.html) or the reference usages below.
+Read the [API Reference](https://watchable.dev/api/modules/_watchable_store_follow.html) or the reference usages below.
 
 ## Usage
 

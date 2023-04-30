@@ -3,7 +3,7 @@
 Enables React apps to use
 [@watchable/store](https://www.npmjs.com/package/@watchable/store) for state-management
 
-Read the [API Reference](https://cefn.com/watchable/api/modules/_watchable_store_react.html) or the reference usages below.
+Read the [API Reference](https://watchable.dev/api/modules/_watchable_store_react.html) or the reference usages below.
 
 ## Usage
 
