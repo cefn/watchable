@@ -90,7 +90,7 @@ export const PACKAGE_JSON_RULES = {
       packages: {
         ...common,
         command: "tsc --build && vite build",
-        files: ["src/**/*", "tsconfig.json", "vite.config.ts"],
+        files: ["src/**/*", "tsconfig.json", "vite.config.ts", "README.md"],
         output: ["./dist"],
       },
     });

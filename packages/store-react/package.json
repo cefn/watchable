@@ -69,7 +69,8 @@
       "files": [
         "src/**/*",
         "tsconfig.json",
-        "vite.config.ts"
+        "vite.config.ts",
+        "README.md"
       ],
       "output": [
         "./dist"
