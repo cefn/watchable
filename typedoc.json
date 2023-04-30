@@ -3,5 +3,6 @@
   "entryPointStrategy": "packages",
   "entryPoints": ["packages/*"],
   "out": "api",
-  "titleLink": "https://watchable.dev"
+  "titleLink": "https://watchable.dev",
+  "name": "watchable.dev"
 }
