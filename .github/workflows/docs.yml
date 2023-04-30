@@ -1,7 +1,7 @@
 name: Generate and Publish Docs
 on:
   push:
-    branches: [main]
+    branches: [rename-to-watchable]
 
 jobs:
   generate-docs:
