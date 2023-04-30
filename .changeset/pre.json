@@ -1,0 +1,23 @@
+{
+  "mode": "pre",
+  "tag": "alpha",
+  "initialVersions": {
+    "counter-dom-commonjs": "0.9.0-alpha.0",
+    "counter-dom-esm": "0.9.0-alpha.0",
+    "counter-dom-tiny": "0.9.0-alpha.0",
+    "counter-dom-ts": "0.9.0-alpha.0",
+    "counter-preact-ts": "0.9.0-alpha.0",
+    "counter-react-js": "0.9.0-alpha.0",
+    "counter-react-ts": "0.9.0-alpha.0",
+    "counter-react-ts-edit": "0.9.0-alpha.0",
+    "counter-react-ts-edit-context": "0.9.0-alpha.0",
+    "fast": "0.9.0-alpha.0",
+    "tiny": "0.9.0-alpha.0",
+    "@watchable/queue": "0.9.0-alpha.0",
+    "@watchable/store": "0.9.0-alpha.0",
+    "@watchable/store-edit": "0.9.0-alpha.0",
+    "@watchable/store-follow": "0.9.0-alpha.0",
+    "@watchable/store-react": "0.9.0-alpha.0"
+  },
+  "changesets": []
+}
