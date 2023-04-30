@@ -4,7 +4,7 @@
 
 Read the [API Reference](https://cefn.com/watchable/api/modules/_watchable_store.html) or the reference usages below.
 
-A [Store](https://cefn.com/watchable/api/types/_watchable_store.Store.html) maintains a protected reference to an Immutable array or object `state`. It brokers all changes to `state`, enabling app interfaces and business logic to track modifications through Selectors.
+A [Store](https://cefn.com/watchable/api/interfaces/_watchable_store.Store.html) maintains a protected reference to an Immutable array or object `state`. It brokers all changes to `state`, enabling app interfaces and business logic to track modifications through Selectors.
 
 It is incredibly simple, lightweight and framework-independent, and therefore suited to manage state within almost any server-side or client-side Typescript or Javascript project.
 
