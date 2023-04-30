@@ -92,10 +92,10 @@ Our Example Counter [Apps](https://github.com/cefn/watchable/tree/main/apps#read
   - [with React](https://github.com/cefn/watchable/tree/main/apps/counter-react-ts) (using [@lauf/store-react](https://github.com/cefn/watchable/tree/main/packages/store-react#readme))
   - [with no framework](https://github.com/cefn/watchable/tree/main/apps/counter-dom-ts#readme) (using [@lauf/store-follow](https://github.com/cefn/watchable/tree/main/packages/store-follow#readme))
   - [with Preact](https://github.com/cefn/watchable/tree/main/apps/counter-preact-ts#readme) (using [@lauf/store-react](https://github.com/cefn/watchable/tree/main/packages/store-react#readme)) and aliased React
-- Counter Apps using various **_Bundling approaches_**
+- Counter Apps using various **_Bundling approaches_**:
   - [via Commonjs](https://github.com/cefn/watchable/tree/main/apps/counter-dom-commonjs#readme)
   - [via ESM](https://github.com/cefn/watchable/tree/main/apps/counter-dom-esm#readme)
   - [for tiniest bundle](https://github.com/cefn/watchable/tree/main/apps/counter-dom-tiny#readme) (a tree-shaken counter app in just 406 bytes!)
-- Counter Apps demonstrating **_Tips and Tricks_**
+- Counter Apps demonstrating **_Tips and Tricks_**:
   - Manage Immutability using [editable drafts](https://github.com/cefn/watchable/tree/main/apps/counter-react-ts-edit#readme) - eliminates [Immutable update patterns](https://redux.js.org/usage/structuring-reducers/immutable-update-patterns)
   - Share a store with multiple components using [React Context API](https://github.com/cefn/watchable/tree/main/apps/counter-react-ts-edit-context#readme) - eliminates [prop drilling](https://kentcdodds.com/blog/prop-drilling)
