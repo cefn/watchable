@@ -1,4 +1,5 @@
 import { createQueue } from "../src";
+import { describe, test, expect } from "vitest";
 
 describe("BasicMessageQueue behaviour", () => {
   test("Create a BasicMessageQueue", () => {

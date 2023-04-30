@@ -16,7 +16,7 @@
     "dev:bundle": "run-s build preview",
     "build": "wireit",
     "preview": "vite preview",
-    "test:unit": "jest test/jest/**.test.ts",
+    "test:unit": "vitest run",
     "test:dev": "SERVER=http://localhost:5175 run-p --race dev test:server",
     "test:dev:bundle": "SERVER=http://localhost:4175 run-p --race dev:bundle test:server",
     "test:server": "wait-on --config waitOnConfig.json ${SERVER} && playwright test",
@@ -33,7 +33,6 @@
   },
   "devDependencies": {
     "@playwright/test": "^1.32.3",
-    "@types/jest": "^29.5.0",
     "@types/react": "^18.0.34",
     "@types/react-dom": "^18.0.11",
     "@vitejs/plugin-legacy": "^4.0.2",
@@ -42,6 +41,7 @@
     "playwright-chromium": "^1.32.3",
     "typescript": "^5.0.4",
     "vite": "^4.2.1",
+    "vitest": "^0.30.1",
     "wait-on": "^7.0.1",
     "wireit": "^0.9.5"
   },
@@ -78,9 +78,7 @@
         "playwright.config.ts",
         "tsconfig.json",
         "vite.config.ts",
-        "waitOnConfig.json",
-        "jest.config.cjs",
-        "../../jest.config.base.cjs"
+        "waitOnConfig.json"
       ],
       "output": [
         "coverage",

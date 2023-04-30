@@ -1,15 +1,16 @@
 /**
- * @jest-environment jsdom
+ * @vitest-environment jsdom
  */
 
 import React from "react";
-import { useRootState, useSelected, useStore } from "../src";
-import { render, waitFor, screen } from "@testing-library/react";
+import { render, waitFor, screen, cleanup, act } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { act } from "react-dom/test-utils";
+import { vi, describe, test, expect, afterEach } from "vitest";
 
 import type { Immutable, Selector, Store, RootState } from "@lauf/store";
 import { createStore } from "@lauf/store";
+
+import { useRootState, useSelected, useStore } from "../src";
 
 /** A promise of the next state change in a store. Watchers are notified in
  * order of subscription, so notifications to any previously-subscribed watchers
@@ -49,7 +50,7 @@ async function promiseWritePropagated<T extends RootState>(
 /** IMAGINARY APPLICATION-SPECIFIC DATA, COMPONENTS, SELECTORS */
 
 const planets = ["earth", "mars"] as const;
-type Planet = typeof planets[number];
+type Planet = (typeof planets)[number];
 interface State {
   planet: Planet;
   haveAmulet?: boolean;
@@ -66,6 +67,8 @@ const PlanetLabel = ({ planet }: { planet: string }) => (
 );
 
 describe("store-react :", () => {
+  afterEach(cleanup);
+
   describe("useRootState behaviour", () => {
     test("Bind with useRootState", async () => {
       const store = createStore<State>({ planet: "earth" });
@@ -154,7 +157,7 @@ describe("store-react :", () => {
     });
 
     describe("Renders no more than necessary", () => {
-      const renderSpy = jest.fn();
+      const renderSpy = vi.fn();
 
       const StoreSelectionComponent = (props: {
         store: Store<TestState>;
@@ -165,7 +168,9 @@ describe("store-react :", () => {
         return <div data-testid="component">{JSON.stringify(coord)}</div>;
       };
 
-      afterEach(() => renderSpy.mockReset());
+      afterEach(() => {
+        renderSpy.mockReset();
+      });
 
       test("Skip render if selected value identical after selector replaced", async () => {
         const store = createStore<TestState>({
@@ -220,8 +225,8 @@ describe("store-react :", () => {
     });
 
     test("Render count as expected before and after store writes", async () => {
-      const rootRenderSpy = jest.fn();
-      const branchRenderSpy = jest.fn();
+      const rootRenderSpy = vi.fn();
+      const branchRenderSpy = vi.fn();
 
       const Root = () => {
         rootRenderSpy();
