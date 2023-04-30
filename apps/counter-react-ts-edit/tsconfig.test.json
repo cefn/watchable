@@ -1,4 +1,3 @@
 {
-  "extends": "../../tsconfig.build.json",
   "include": ["playwright.config.ts", "vite.config.ts", "src/**/*", "test/**/*"]
 }
