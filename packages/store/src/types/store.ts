@@ -1,9 +1,9 @@
 import type { Immutable } from "./immutable";
 import type { WatchableState } from "./watchable";
 
-/** A `Store` keeps an Immutable {@link RootState} - any array, tuple or object
- * - which can be changed and monitored for changes to drive an app. Make a new
- * `Store` by calling {@link createStore} with an `initialState`.
+/** A `Store` keeps an Immutable {@link RootState}, (any array, tuple or
+ * object), which can be changed and monitored for changes to drive an app. Make
+ * a new `Store` by calling {@link createStore} with an `initialState`.
  *
  * Flagging all state references as {@link Immutable} guides IDEs to treat these
  * as {@link https://en.wikipedia.org/wiki/Immutable_object | Immutable Objects}
@@ -13,8 +13,8 @@ import type { WatchableState } from "./watchable";
  *
  * Assigning a new {@link @lauf/store!Immutable} `RootState` using
  * {@link @lauf/store!WatchableState.write} notifies {@link Watcher | Watchers}
- * previously subscribed using {@link @lauf/store!Watchable.watch}. This mechanism
- * ensures that app logic and renderers can track the latest state.
+ * previously subscribed using {@link @lauf/store!Watchable.watch}. This
+ * mechanism ensures that app logic and renderers can track the latest state.
  *
  * ## Immutable State: Motivation
  *
@@ -27,9 +27,9 @@ import type { WatchableState } from "./watchable";
  * {@link https://reactjs.org/ | React} and memoizers like
  * {@link https://github.com/reduxjs/reselect | Reselect} or React's
  * [useMemo()](https://reactjs.org/docs/hooks-reference.html#usememo) to use
- * 'shallow equality checking'. They can efficiently check when changes to an
- * item should trigger a re-render or recompute - simply
- * when`Object.is(prevItem,nextItem)===false`.
+ * 'shallow equality checking'. There can only have been changes to an item's
+ * descendants (that might trigger a re-render or recompute) if
+ * `Object.is(prevItem,nextItem)===false`.
  *
  * Immutability eliminates bugs and race conditions in state-change event
  * handlers. Handlers notified of a change effectively have a snapshot of state.
