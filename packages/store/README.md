@@ -2,9 +2,9 @@
 
 **490 gzipped bytes** of powerful state-management!
 
-Read the [API Reference](https://cefn.com/lauf/api/modules/_lauf_store.html) or the reference usages below.
+Read the [API Reference](https://cefn.com/watchable/api/modules/_watchable_store.html) or the reference usages below.
 
-A [Store](https://cefn.com/lauf/api/types/_lauf_store.Store.html) maintains a protected reference to an Immutable array or object `state`. It brokers all changes to `state`, enabling app interfaces and business logic to track modifications through Selectors.
+A [Store](https://cefn.com/watchable/api/types/_watchable_store.Store.html) maintains a protected reference to an Immutable array or object `state`. It brokers all changes to `state`, enabling app interfaces and business logic to track modifications through Selectors.
 
 It is incredibly simple, lightweight and framework-independent, and therefore suited to manage state within almost any server-side or client-side Typescript or Javascript project.
 
@@ -17,11 +17,11 @@ It is incredibly simple, lightweight and framework-independent, and therefore su
 store.watch((state) => console.dir(state));
 
 // using a selector and a memoizing React Hook
-import { useSelected } from "@lauf/store-react";
+import { useSelected } from "@watchable/store-react";
 const counter = useSelected(store, (state) => state.counter);
 
 // using a selector and a memoizing event queue (framework independent)
-import { followSelector } from "@lauf/store-follow";
+import { followSelector } from "@watchable/store-follow";
 followSelector(
   store,
   (state) => state.counter,
@@ -45,15 +45,15 @@ store.write({
 });
 
 // write state using drafted state object
-import { edit } from "@lauf/store-edit";
+import { edit } from "@watchable/store-edit";
 edit(store, (draft) => (draft.counter += 1));
 ```
 
 ### Import OR Require
 
 ```javascript
-import { createStore } from "@lauf/store"; // for esm
-const { createStore } = require("@lauf/store"); // for commonjs
+import { createStore } from "@watchable/store"; // for esm
+const { createStore } = require("@watchable/store"); // for commonjs
 ```
 
 ### Create a Store in Javascript
@@ -81,17 +81,17 @@ const store = createStore<CounterState>(INITIAL_STATE);
 ### Install
 
 ```zsh
-npm install @lauf/store
+npm install @watchable/store
 ```
 
 ### Demonstration Apps
 
-Our Example Counter [Apps](https://github.com/cefn/watchable/tree/main/apps#readme) offer minimal demonstrations of `@lauf/store`
+Our Example Counter [Apps](https://github.com/cefn/watchable/tree/main/apps#readme) offer minimal demonstrations of `@watchable/store`
 
 - Counter Apps using various **_Web Frameworks_**:
-  - [with React](https://github.com/cefn/watchable/tree/main/apps/counter-react-ts) (using [@lauf/store-react](https://github.com/cefn/watchable/tree/main/packages/store-react#readme))
-  - [with no framework](https://github.com/cefn/watchable/tree/main/apps/counter-dom-ts#readme) (using [@lauf/store-follow](https://github.com/cefn/watchable/tree/main/packages/store-follow#readme))
-  - [with Preact](https://github.com/cefn/watchable/tree/main/apps/counter-preact-ts#readme) (using [@lauf/store-react](https://github.com/cefn/watchable/tree/main/packages/store-react#readme)) and aliased React
+  - [with React](https://github.com/cefn/watchable/tree/main/apps/counter-react-ts) (using [@watchable/store-react](https://github.com/cefn/watchable/tree/main/packages/store-react#readme))
+  - [with no framework](https://github.com/cefn/watchable/tree/main/apps/counter-dom-ts#readme) (using [@watchable/store-follow](https://github.com/cefn/watchable/tree/main/packages/store-follow#readme))
+  - [with Preact](https://github.com/cefn/watchable/tree/main/apps/counter-preact-ts#readme) (using [@watchable/store-react](https://github.com/cefn/watchable/tree/main/packages/store-react#readme)) and aliased React
 - Counter Apps using various **_Bundling approaches_**:
   - [via Commonjs](https://github.com/cefn/watchable/tree/main/apps/counter-dom-commonjs#readme)
   - [via ESM](https://github.com/cefn/watchable/tree/main/apps/counter-dom-esm#readme)

@@ -11,9 +11,9 @@ import type { WatchableState } from "./watchable";
  *
  * ## Watching State
  *
- * Assigning a new {@link @lauf/store!Immutable} `RootState` using
- * {@link @lauf/store!WatchableState.write} notifies {@link Watcher | Watchers}
- * previously subscribed using {@link @lauf/store!Watchable.watch}. This
+ * Assigning a new {@link @watchable/store!Immutable} `RootState` using
+ * {@link @watchable/store!WatchableState.write} notifies {@link Watcher | Watchers}
+ * previously subscribed using {@link @watchable/store!Watchable.watch}. This
  * mechanism ensures that app logic and renderers can track the latest state.
  *
  * ## Immutable State: Motivation
@@ -49,7 +49,7 @@ export type Store<State extends RootState> = WatchableState<Immutable<State>>;
 export type RootState = object;
 
 /** A Selector derives some sub-part or computed value from a {@link RootState} in a
- * @lauf/store {@link Store}. `Object.is(prev, next)` is normally used to compare
+ * @watchable/store {@link Store}. `Object.is(prev, next)` is normally used to compare
  * with the previous resultfrom the same Selector to monitor if some part has
  * changed, defining when app logic should be re-run. */
 export type Selector<State extends RootState, Selected> = (

@@ -1,5 +1,5 @@
-const { createStore } = require("@lauf/store");
-const { followSelector } = require("@lauf/store-follow");
+const { createStore } = require("@watchable/store");
+const { followSelector } = require("@watchable/store-follow");
 const { INITIAL_STATE, increment, decrement } = require("./logic");
 
 const store = createStore(INITIAL_STATE);

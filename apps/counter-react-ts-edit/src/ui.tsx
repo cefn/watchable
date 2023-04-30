@@ -1,9 +1,9 @@
 import React from "react";
-import type { Store } from "@lauf/store";
-import { useSelected, useStore } from "@lauf/store-react";
+import type { Store } from "@watchable/store";
+import { useSelected, useStore } from "@watchable/store-react";
 import type { CounterState } from "./logic";
 import { INITIAL_STATE } from "./logic";
-import { edit } from "@lauf/store-edit";
+import { edit } from "@watchable/store-edit";
 
 interface StoreProps {
   store: Store<CounterState>;

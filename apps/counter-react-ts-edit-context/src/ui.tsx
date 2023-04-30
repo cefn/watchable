@@ -1,6 +1,6 @@
 import React from "react";
-import { useSelected, useStore } from "@lauf/store-react";
-import { edit } from "@lauf/store-edit";
+import { useSelected, useStore } from "@watchable/store-react";
+import { edit } from "@watchable/store-edit";
 import { INITIAL_STATE } from "./logic";
 import { CounterRoot, useCounterStore } from "./context";
 

@@ -1,4 +1,4 @@
-import { createStore } from "@lauf/store";
+import { createStore } from "@watchable/store";
 
 // achieves around 32000 renders per second on a chromebook
 

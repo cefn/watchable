@@ -3,7 +3,7 @@ import type { PackageMeta } from "tooling/validate/types";
 import { isMember } from "../util";
 
 /** The scope prefix (soon to be changed to watchable). */
-export const SCOPE = "@lauf";
+export const SCOPE = "@watchable";
 
 const PACKAGE_TYPES = ["apps", "packages"] as const;
 export type PackageType = (typeof PACKAGE_TYPES)[number];

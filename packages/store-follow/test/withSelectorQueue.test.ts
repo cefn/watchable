@@ -1,6 +1,6 @@
-import type { Immutable } from "@lauf/store";
-import { createStore } from "@lauf/store";
-import { withSelectorQueue } from "@lauf/store-follow";
+import type { Immutable } from "@watchable/store";
+import { createStore } from "@watchable/store";
+import { withSelectorQueue } from "@watchable/store-follow";
 
 import { manyTicks } from "./util";
 

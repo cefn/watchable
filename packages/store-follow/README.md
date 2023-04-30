@@ -1,10 +1,10 @@
 ## Track selected changes to state
 
-Promise-oriented tracking to monitor selected parts of a @lauf/store {@link Store}.
+Promise-oriented tracking to monitor selected parts of a @watchable/store {@link Store}.
 Re-runs a Selector after each change to store state, and notifies when the
 value returned by the Selector changes.
 
-Read the [API Reference](https://cefn.com/lauf/api/modules/_lauf_store_follow.html) or the reference usages below.
+Read the [API Reference](https://cefn.com/watchable/api/modules/_watchable_store_follow.html) or the reference usages below.
 
 ## Usage
 
@@ -32,7 +32,7 @@ followSelector(
 ### Install
 
 ```zsh
-npm install @lauf/store-edit
+npm install @watchable/store-edit
 ```
 
 ## Advanced Usage

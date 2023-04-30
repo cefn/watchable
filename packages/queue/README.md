@@ -6,7 +6,7 @@ A Typescript queue implementation with...
 - queue limits to facilitate [backpressure](https://medium.com/@jayphelps/backpressure-explained-the-flow-of-data-through-software-2350b3e77ce7)
 - immutable queue state to facilitate [time-travel debugging](https://medium.com/replay-io/introduction-to-time-travel-debugging-a02786c5c0d9)
 
-Read the [API Reference](https://cefn.com/lauf/api/modules/_lauf_queue.html) or the reference usages below.
+Read the [API Reference](https://cefn.com/watchable/api/modules/_watchable_queue.html) or the reference usages below.
 
 ## Usage
 
@@ -42,8 +42,8 @@ const { x, y } = await queue.receive();
 ### Import OR Require
 
 ```javascript
-import { createQueue } from "@lauf/queue"; // for esm
-const { createQueue } = require("@lauf/queue"); // for commonjs
+import { createQueue } from "@watchable/queue"; // for esm
+const { createQueue } = require("@watchable/queue"); // for commonjs
 ```
 
 ## Getting Started
@@ -51,5 +51,5 @@ const { createQueue } = require("@lauf/queue"); // for commonjs
 ### Install
 
 ```zsh
-npm install @lauf/queue
+npm install @watchable/queue
 ```

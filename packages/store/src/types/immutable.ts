@@ -1,7 +1,7 @@
 /** `Immutable<T>` is used to flag and enforce immutability of a
  * {@link RootState} and its descendants - typically values assigned to a
- * {@link Store} ({@link @lauf/store.Store#write}) or retrieved from it
- * ({@link @lauf/store.Store#read}). This tells the compiler that no
+ * {@link Store} ({@link @watchable/store.Store#write}) or retrieved from it
+ * ({@link @watchable/store.Store#read}). This tells the compiler that no
  * modification should be made anywhere in a Store's state tree.
  *
  * Unlike some implementations (such as Object.freeze, Object.seal or

@@ -1,4 +1,4 @@
-import type { Immutable, Store } from "@lauf/store";
+import type { Immutable, Store } from "@watchable/store";
 
 export interface CounterState {
   counter: number;

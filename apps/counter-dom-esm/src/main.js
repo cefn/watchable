@@ -1,5 +1,5 @@
-import { createStore } from "@lauf/store";
-import { followSelector } from "@lauf/store-follow";
+import { createStore } from "@watchable/store";
+import { followSelector } from "@watchable/store-follow";
 import { INITIAL_STATE, increment, decrement } from "./logic";
 
 const store = createStore(INITIAL_STATE);

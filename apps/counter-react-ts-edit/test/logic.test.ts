@@ -1,5 +1,5 @@
-import { createStore } from "@lauf/store";
-import { edit } from "@lauf/store-edit";
+import { createStore } from "@watchable/store";
+import { edit } from "@watchable/store-edit";
 import { INITIAL_STATE } from "../src/logic";
 
 import { describe, test, expect } from "vitest";

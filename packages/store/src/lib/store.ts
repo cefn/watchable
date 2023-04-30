@@ -4,7 +4,7 @@ import { DefaultWatchableState } from "./watchableState";
 
 // commented
 
-/** Reference implementation of Lauf {@link Store}  */
+/** Reference implementation of watchable {@link Store}  */
 class DefaultStore<State extends RootState>
   extends DefaultWatchableState<Immutable<State>>
   implements Store<State> {}

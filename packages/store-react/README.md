@@ -1,9 +1,9 @@
 ## Store bindings for React
 
 Enables React apps to use
-[@lauf/store](https://www.npmjs.com/package/@lauf/store) for state-management
+[@watchable/store](https://www.npmjs.com/package/@watchable/store) for state-management
 
-Read the [API Reference](https://cefn.com/lauf/api/modules/_lauf_store_react.html) or the reference usages below.
+Read the [API Reference](https://cefn.com/watchable/api/modules/_watchable_store_react.html) or the reference usages below.
 
 ## Usage
 
@@ -30,7 +30,7 @@ export const Display = (props: { store: Store<CounterState> }) => {
 ### Install
 
 ```zsh
-npm install @lauf/store-react
+npm install @watchable/store-react
 ```
 
 ## Advanced
@@ -66,7 +66,7 @@ const rootState = useRootState(props.store);
 
 Note, this is rarely needed in production code for several reasons...
 
-- well-architected business logic should live outside the render loop, using `followSelector(...)` from @lauf/store-follow
+- well-architected business logic should live outside the render loop, using `followSelector(...)` from @watchable/store-follow
 - to consume **part** of the state, prefer {@link useSelector} which doesn't trigger renders on every state change
 
 ```typescript
