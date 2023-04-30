@@ -19,8 +19,8 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@watchable/store": "2.0.0-beta.3",
-    "@watchable/store-follow": "2.0.0-beta.3"
+    "@watchable/store": "0.9.0-alpha.0",
+    "@watchable/store-follow": "0.9.0-alpha.0"
   },
   "devDependencies": {
     "@rollup/plugin-commonjs": "^24.1.0",
