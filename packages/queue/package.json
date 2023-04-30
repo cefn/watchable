@@ -1,6 +1,6 @@
 {
   "name": "@watchable/queue",
-  "version": "0.9.0-alpha.0",
+  "version": "0.9.0-alpha.1",
   "description": "In-memory MessageQueue with compile-time-immutable state.",
   "homepage": "https://github.com/cefn/watchable/tree/main/packages/queue#readme",
   "bugs": {

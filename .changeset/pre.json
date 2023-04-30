@@ -19,5 +19,7 @@
     "@watchable/store-follow": "0.9.0-alpha.0",
     "@watchable/store-react": "0.9.0-alpha.0"
   },
-  "changesets": []
+  "changesets": [
+    "flat-ligers-heal"
+  ]
 }

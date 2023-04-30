@@ -1,6 +1,6 @@
 {
   "name": "tiny",
-  "version": "0.9.0-alpha.0",
+  "version": "0.9.0-alpha.1",
   "private": true,
   "description": "",
   "homepage": "https://github.com/cefn/watchable/tree/main/apps/tiny#readme",
@@ -19,7 +19,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@watchable/store": "0.9.0-alpha.0"
+    "@watchable/store": "0.9.0-alpha.1"
   },
   "devDependencies": {
     "vite": "^4.2.1",
