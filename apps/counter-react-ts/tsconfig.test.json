@@ -1,4 +1,6 @@
 {
-  "extends": "../../tsconfig.build.json",
+  "compilerOptions": {
+    "strictNullChecks": true
+  },
   "include": ["playwright.config.ts", "vite.config.ts", "src/**/*", "test/**/*"]
 }
