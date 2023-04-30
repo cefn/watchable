@@ -7,7 +7,6 @@ module.exports = {
   env: {
     browser: true,
     es2021: true,
-    "jest/globals": true,
   },
   extends: ["plugin:react/recommended", "standard-with-typescript", "prettier"],
   overrides: [],
@@ -16,7 +15,7 @@ module.exports = {
     sourceType: "module",
     project: ["tsconfig.json"],
   },
-  plugins: ["react", "jest", "eslint-plugin-tsdoc"],
+  plugins: ["react", "eslint-plugin-tsdoc"],
   ignorePatterns: ["*/*/dist"],
   rules: {
     "@typescript-eslint/semi": [2, "always"],
