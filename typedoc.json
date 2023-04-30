@@ -2,5 +2,6 @@
   "searchInComments": true,
   "entryPointStrategy": "packages",
   "entryPoints": ["packages/*"],
-  "out": "api"
+  "out": "api",
+  "titleLink": "https://watchable.dev"
 }
