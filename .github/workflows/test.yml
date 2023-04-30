@@ -32,7 +32,7 @@ jobs:
 
       # Couldn't restore Playwright browser binaries - install from scratch
       - name: Install Playwright's dependencies
-        if: steps.playwright-cache.outputs.cache-hit != 'true'
+        #if: steps.playwright-cache.outputs.cache-hit != 'true'
         run: npx playwright install --with-deps
 
       - name: "Run tests (with Github Actions wireit cache)"
