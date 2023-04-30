@@ -61,12 +61,10 @@
         "../../packages/queue:build",
         "../../packages/store:build"
       ],
-      "command": "tsc && vite build",
+      "command": "tsc --build && vite build",
       "files": [
         "src/**/*",
         "tsconfig.json",
-        "tsconfig.build.json",
-        "../../tsconfig.base.json",
         "vite.config.ts"
       ],
       "output": [

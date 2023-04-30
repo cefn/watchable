@@ -34,11 +34,10 @@
         "../../packages/store:build",
         "../../packages/store-follow:build"
       ],
-      "command": "tsc && vite build",
+      "command": "tsc --build && vite build",
       "files": [
         "src/**/*",
         "vite.config.ts",
-        "tsconfig.build.json",
         "../../tsconfig.base.json"
       ],
       "output": [

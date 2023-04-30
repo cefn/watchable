@@ -39,7 +39,7 @@ import type { WatchableState } from "./watchable";
  * Finally, Immutability establishes a basis for advanced debugging techniques
  * such as time-travel debugging since every state change notification includes
  * a momentary snapshot of the app state which can be stored indefinitely.
- *
+ * @interface
  */
 export type Store<State extends RootState> = WatchableState<Immutable<State>>;
 
