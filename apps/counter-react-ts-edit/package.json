@@ -52,11 +52,10 @@
         "../../packages/store-edit:build",
         "../../packages/store-react:build"
       ],
-      "command": "tsc && vite build",
+      "command": "tsc --build && vite build",
       "files": [
         "src/**/*",
         "vite.config.ts",
-        "tsconfig.build.json",
         "../../tsconfig.base.json"
       ],
       "output": [

@@ -83,25 +83,14 @@ export const PACKAGE_JSON_RULES = {
     const tsBuild = byPackageType({
       apps: {
         ...common,
-        command: "tsc && vite build",
-        files: [
-          "src/**/*",
-          "vite.config.ts",
-          "tsconfig.build.json",
-          "../../tsconfig.base.json",
-        ],
+        command: "tsc --build && vite build",
+        files: ["src/**/*", "vite.config.ts", "../../tsconfig.base.json"],
         output: ["./dist"],
       },
       packages: {
         ...common,
-        command: "tsc && vite build",
-        files: [
-          "src/**/*",
-          "tsconfig.json",
-          "tsconfig.build.json",
-          "../../tsconfig.base.json",
-          "vite.config.ts",
-        ],
+        command: "tsc --build && vite build",
+        files: ["src/**/*", "tsconfig.json", "vite.config.ts"],
         output: ["./dist"],
       },
     });

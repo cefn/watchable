@@ -1,14 +1,20 @@
 {
-  "extends": "./tsconfig.build.json",
-  "compilerOptions": {
-    /** CEFN: Monorepo config **/
-    "module": "ES2022",
-    "target": "ES2017",
-    "baseUrl": ".",
-    "paths": {
-      "@lauf/*": ["packages/*/src"]
+  "files": [],
+  "references": [
+    {
+      "path": "./packages/queue"
     },
-    "declaration": false,
-    "noEmit": true /* Do not emit outputs. */
-  }
+    {
+      "path": "./packages/store"
+    },
+    {
+      "path": "./packages/store-edit"
+    },
+    {
+      "path": "./packages/store-follow"
+    },
+    {
+      "path": "./packages/store-react"
+    }
+  ]
 }

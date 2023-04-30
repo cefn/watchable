@@ -13,10 +13,10 @@
   ],
   "scripts": {
     "qa": "wireit",
-    "qa:clean": "find . -iname '.wireit' -type d | xargs -I{} rm -rf {}",
+    "qa:clean": "find . -name '*.tsbuildinfo' -or -iname '.wireit' -type d | xargs -I{} rm -rf {}",
     "qa:watch": "npm run qa --watch",
     "build": "wireit",
-    "docs": "typedoc --tsconfig tsconfig.typedoc.json --includes ./ --out api",
+    "docs": "typedoc",
     "apps:playwright:align": "find ./apps -maxdepth 1 -mindepth 1 -type d -name 'counter*react*ts*' -and -not -name 'counter-react-ts' | xargs -I{} zsh -c \"cp apps/counter-react-ts/playwright.config.ts {} && cp apps/counter-react-ts/test/playwright/index.test.ts {}/test/playwright/index.test.ts\"",
     "packages:sort": "npm exec sort-package-json package.json {apps,packages}/*/package.json",
     "packages:validate": "tsx tooling/validate/cli.ts",
@@ -54,8 +54,7 @@
     "rimraf": "^5.0.0",
     "sort-package-json": "^2.4.1",
     "tsx": "^3.12.6",
-    "typedoc": "^0.23.28",
-    "typedoc-plugin-expand-object-like-types": "^0.1.2",
+    "typedoc": "^0.24.5",
     "typescript": "^5.0.4",
     "wireit": "^0.9.5",
     "zx": "^7.1.1"

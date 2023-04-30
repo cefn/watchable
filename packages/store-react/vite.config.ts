@@ -4,6 +4,8 @@ import { defineConfig } from "vite";
 
 import packageJson from "./package.json";
 
+import {} from "vitest";
+
 /** Ensure same logic can run, even if a root package
  * (that has no dependencies or peerDependencies) */
 const { name, dependencies, peerDependencies } =
@@ -35,5 +37,8 @@ export default defineConfig({
       external,
     },
     // sourcemap: true,
+  },
+  test: {
+    environment: "jsdom",
   },
 });

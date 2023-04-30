@@ -1,12 +1,6 @@
 {
   "searchInComments": true,
-  "entryPointStrategy": "expand",
-  "entryPoints": [
-    "packages/store/src/index.ts",
-    "packages/store-edit/src/index.ts",
-    "packages/store-react/src/index.ts",
-    "packages/store-follow/src/index.ts",
-    "packages/queue/src/index.ts"
-  ],
+  "entryPointStrategy": "packages",
+  "entryPoints": ["packages/*"],
   "out": "api"
 }

@@ -1,8 +1,3 @@
-/**
- * [[include:packages/store-react/README.md]]
- *
- * @module @lauf/store-react
- */
 import type { Store, Selector, Immutable, RootState } from "@lauf/store";
 import { createStore } from "@lauf/store";
 import { useState, useEffect } from "react";

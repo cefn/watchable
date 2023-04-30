@@ -22,6 +22,8 @@
     "@lauf/store": "2.0.0-beta.3"
   },
   "devDependencies": {
+    "@vitejs/plugin-legacy": "^4.0.3",
+    "@vitejs/plugin-react": "^4.0.0",
     "vite": "^4.2.1",
     "wireit": "^0.9.5"
   },
