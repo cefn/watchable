@@ -1,5 +1,5 @@
 import React, { createContext, useContext, type ReactNode } from "react";
-import type { Store } from "@lauf/store";
+import type { Store } from "@watchable/store";
 import type { CounterState } from "./logic";
 
 /** Deliberately not exported. Ensures encapsulation of Context

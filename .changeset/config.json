@@ -1,12 +1,11 @@
 {
-  "$schema": "https://unpkg.com/@changesets/config@2.2.0/schema.json",
+  "$schema": "https://unpkg.com/@changesets/config@2.3.0/schema.json",
   "changelog": "@changesets/cli/changelog",
   "commit": false,
   "fixed": [],
-  "linked": [["@lauf/queue*"], ["@lauf/store*"]],
+  "linked": [],
   "access": "restricted",
   "baseBranch": "main",
-  "updateInternalDependencies": "minor",
-  "onlyUpdatePeerDependentsWhenOutOfRange": true,
+  "updateInternalDependencies": "patch",
   "ignore": []
 }

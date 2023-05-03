@@ -35,7 +35,7 @@ export function byPackageLanguage(
 ): ValueFactory {
   return ({ packageJson }) => {
     const language =
-      /\bts\b/.test(packageJson.name) || /^@lauf/.test(packageJson.name)
+      /\bts\b/.test(packageJson.name) || /^@watchable/.test(packageJson.name)
         ? "ts"
         : "js";
     return lookup[language];

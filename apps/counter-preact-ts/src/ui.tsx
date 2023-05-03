@@ -1,6 +1,6 @@
 import React from "react";
-import type { Store } from "@lauf/store";
-import { useSelected, useStore } from "@lauf/store-react";
+import type { Store } from "@watchable/store";
+import { useSelected, useStore } from "@watchable/store-react";
 import type { CounterState } from "./logic";
 import { INITIAL_STATE, decrement, increment } from "./logic";
 

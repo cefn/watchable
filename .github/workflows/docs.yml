@@ -35,4 +35,4 @@ jobs:
           SSH_PRIVATE_KEY: ${{ secrets.SERVER_SSH_KEY }}
           ARGS: "--recursive --whole-file --delete --verbose"
           SOURCE: "api/"
-          TARGET: "/var/www/html/cefn.com/lauf/api/"
+          TARGET: "/var/www/html/watchable.dev/api/"

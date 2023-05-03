@@ -1,5 +1,5 @@
 import React from "react";
-import { useSelected, useStore } from "@lauf/store-react";
+import { useSelected, useStore } from "@watchable/store-react";
 import { INITIAL_STATE, decrement, increment } from "./logic";
 
 export const Display = ({ store }) => {

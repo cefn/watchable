@@ -1,7 +1,7 @@
 {
-  "name": "@lauf/store-edit",
-  "version": "2.0.0-beta.3",
-  "description": "Intuitive editing of @lauf/store state, (using Immer drafts)",
+  "name": "@watchable/store-edit",
+  "version": "0.9.0-alpha.3",
+  "description": "Intuitive editing of @watchable/store state, (using Immer drafts)",
   "homepage": "https://github.com/cefn/watchable/tree/main/packages/store-edit#readme",
   "bugs": {
     "url": "https://github.com/cefn/watchable/issues",
@@ -24,7 +24,7 @@
     "test": "wireit"
   },
   "dependencies": {
-    "@lauf/store": "2.0.0-beta.3",
+    "@watchable/store": "0.9.0-alpha.3",
     "immer": "^9.0.16 || ^10.0.1"
   },
   "devDependencies": {
@@ -34,7 +34,7 @@
     "wireit": "^0.9.5"
   },
   "peerDependencies": {
-    "@lauf/store": "2.0.0-beta.3",
+    "@watchable/store": "0.9.0-alpha.3",
     "immer": "^9.0.16 || ^10.0.1"
   },
   "publishConfig": {
@@ -65,7 +65,8 @@
       "files": [
         "src/**/*",
         "tsconfig.json",
-        "vite.config.ts"
+        "vite.config.ts",
+        "README.md"
       ],
       "output": [
         "./dist"
@@ -90,7 +91,8 @@
   "exports": {
     ".": {
       "import": "./dist/index.js",
-      "require": "./dist/index.cjs"
+      "require": "./dist/index.cjs",
+      "default": "./dist/index.cjs"
     }
   },
   "sideEffects": false

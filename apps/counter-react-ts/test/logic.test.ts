@@ -1,4 +1,4 @@
-import { createStore } from "@lauf/store";
+import { createStore } from "@watchable/store";
 import { INITIAL_STATE, increment, decrement } from "../src/logic";
 
 import { describe, test, expect } from "vitest";

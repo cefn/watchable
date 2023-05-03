@@ -7,8 +7,8 @@ import { render, waitFor, screen, cleanup, act } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { vi, describe, test, expect, afterEach } from "vitest";
 
-import type { Immutable, Selector, Store, RootState } from "@lauf/store";
-import { createStore } from "@lauf/store";
+import type { Immutable, Selector, Store, RootState } from "@watchable/store";
+import { createStore } from "@watchable/store";
 
 import { useRootState, useSelected, useStore } from "../src";
 

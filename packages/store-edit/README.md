@@ -1,8 +1,8 @@
 ## Edit a store's immutable state
 
-An idiot-proof mechanism to write @lauf/store state without breaking immutability. Guarantees safe Immutable edits without needing to learn [Immutable update patterns](https://redux.js.org/usage/structuring-reducers/immutable-update-patterns)
+An idiot-proof mechanism to write @watchable/store state without breaking immutability. Guarantees safe Immutable edits without needing to learn [Immutable update patterns](https://redux.js.org/usage/structuring-reducers/immutable-update-patterns)
 
-Read the [API Reference](https://cefn.com/lauf/api/modules/_lauf_store_edit.html) or the reference usages below.
+Read the [API Reference](https://watchable.dev/api/modules/_watchable_store_edit.html) or the reference usages below, or [browse the source on Github](https://github.com/cefn/watchable/tree/main/packages/store-edit).
 
 ## Usage
 
@@ -26,8 +26,8 @@ leaving the old state intact. The new state is passed to `store.write(...)`.
 ### Import OR Require
 
 ```javascript
-import { edit } from "@lauf/store-edit"; // for esm
-const { edit } = require("@lauf/store-edit"); // for commonjs
+import { edit } from "@watchable/store-edit"; // for esm
+const { edit } = require("@watchable/store-edit"); // for commonjs
 ```
 
 ## Getting Started
@@ -35,12 +35,12 @@ const { edit } = require("@lauf/store-edit"); // for commonjs
 ### Install
 
 ```zsh
-npm install @lauf/store-edit
+npm install @watchable/store-edit
 ```
 
 ### Demonstration Apps
 
-Selected [Example Counter Apps](https://github.com/cefn/watchable/tree/main/apps) offer minimal demonstrations of `@lauf/store-edit`. See the following...
+Selected [Example Counter Apps](https://github.com/cefn/watchable/tree/main/apps) offer minimal demonstrations of `@watchable/store-edit`. See the following...
 
 - [counter-react-ts-edit](https://github.com/cefn/watchable/tree/main/apps/counter-react-ts-edit#readme)
 - [counter-react-ts-edit-context](https://github.com/cefn/watchable/tree/main/apps/counter-react-ts-edit-context#readme)

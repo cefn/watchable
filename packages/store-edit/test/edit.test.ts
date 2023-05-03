@@ -1,4 +1,4 @@
-import { createStore } from "@lauf/store";
+import { createStore } from "@watchable/store";
 import { edit } from "../src/edit";
 
 import { test, expect } from "vitest";

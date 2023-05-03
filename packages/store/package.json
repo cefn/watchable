@@ -1,6 +1,6 @@
 {
-  "name": "@lauf/store",
-  "version": "2.0.0-beta.3",
+  "name": "@watchable/store",
+  "version": "0.9.0-alpha.3",
   "description": "Store with compile-time-immutable state.",
   "homepage": "https://github.com/cefn/watchable/tree/main/packages/store#readme",
   "bugs": {
@@ -16,7 +16,8 @@
   "exports": {
     ".": {
       "import": "./dist/index.js",
-      "require": "./dist/index.cjs"
+      "require": "./dist/index.cjs",
+      "default": "./dist/index.cjs"
     }
   },
   "files": [
@@ -60,7 +61,8 @@
       "files": [
         "src/**/*",
         "tsconfig.json",
-        "vite.config.ts"
+        "vite.config.ts",
+        "README.md"
       ],
       "output": [
         "./dist"

@@ -1,4 +1,4 @@
-# Counter (Typescript with @lauf/store-edit)
+# Counter (Typescript with @watchable/store-edit)
 
 <<<<<<< HEAD
 This is identical to the [Edit counter app](https://github.com/cefn/watchable/tree/main/apps/counter-react-ts-edit) except it uses the [React Context API](https://react.dev/reference/react#context-hooks) to avoid [prop drilling](https://kentcdodds.com/blog/prop-drilling).

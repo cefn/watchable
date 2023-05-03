@@ -1,4 +1,4 @@
-import { createStore } from "@lauf/store";
+import { createStore } from "@watchable/store";
 
 const e = document.querySelector("#e") as HTMLElement;
 

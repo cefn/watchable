@@ -1,16 +1,16 @@
-import type { Store, Selector, Immutable, RootState } from "@lauf/store";
-import { createStore } from "@lauf/store";
+import type { Store, Selector, Immutable, RootState } from "@watchable/store";
+import { createStore } from "@watchable/store";
 import { useState, useEffect } from "react";
 
 /** When the component is first mounted, this hook creates and returns a a new
- * long-lived {@link @lauf/store!Store} initialised with `initialState`.
+ * long-lived {@link @watchable/store!Store} initialised with `initialState`.
  *
  * In later renders the hook will always return the same `Store`, It
  * deliberately doesn't force a component refresh when the Store state changes.
  * To track changes in the store, see {@link useSelected} or {@link useRootState}.
  *
  * @param initialState
- * @returns A lazily-created {@link @lauf/store!Store}
+ * @returns A lazily-created {@link @watchable/store!Store}
  */
 export function useStore<T extends RootState>(initialState: Immutable<T>) {
   const [store] = useState(() => {
@@ -20,23 +20,23 @@ export function useStore<T extends RootState>(initialState: Immutable<T>) {
 }
 
 /** A hook for tracking a subpart or a computed value derived from the
- * {@link @lauf/store!RootState} of a {@link @lauf/store!Store} by a
- * {@link @lauf/store!Selector} function.
+ * {@link @watchable/store!RootState} of a {@link @watchable/store!Store} by a
+ * {@link @watchable/store!Selector} function.
  *
  * This hook calls `selector` with the `Store`'s `RootState` and returns the
- * derived value. Then it {@link @lauf/store!Watcher watches} the store, calling
+ * derived value. Then it {@link @watchable/store!Watcher watches} the store, calling
  * the `selector` again for every change to the `RootState`. If the value
  * returned by `selector` is not identical to the last saved value, a re-render
  * will be triggered (and this hook will return the new value).
  *
  * If your `selector` constructs a new data structure based on the `RootState`,
- * (rather than just selecting some part of the {@link @lauf/store!Immutable} `RootState` or
+ * (rather than just selecting some part of the {@link @watchable/store!Immutable} `RootState` or
  * calculating a primitive value), then it might return a non-identical value
  * even when nothing has changed. Computed data structures should be
  * [memoized](https://github.com/reduxjs/reselect#creating-a-memoized-selector)
  * to minimise component refreshes.
  *
- * See {@link @lauf/store!Selector}
+ * See {@link @watchable/store!Selector}
  */
 export function useSelected<State extends RootState, Selected>(
   store: Store<State>,
@@ -60,11 +60,11 @@ export function useSelected<State extends RootState, Selected>(
 }
 
 /**
- * A hook for tracking the {@link @lauf/store!RootState} of a
- * {@link @lauf/store!Store}. Note, this forces a reload of the component when
+ * A hook for tracking the {@link @watchable/store!RootState} of a
+ * {@link @watchable/store!Store}. Note, this forces a reload of the component when
  * ***any*** part of the state tree changes. You probably want
  * {@link useSelected} instead.
- * @param store The {@link @lauf/store!Store} to track.
+ * @param store The {@link @watchable/store!Store} to track.
  */
 export function useRootState<State extends RootState>(store: Store<State>) {
   const { read, watch } = store;

@@ -1,6 +1,6 @@
 {
-  "name": "@lauf/queue",
-  "version": "2.0.0-beta.3",
+  "name": "@watchable/queue",
+  "version": "0.9.0-alpha.3",
   "description": "In-memory MessageQueue with compile-time-immutable state.",
   "homepage": "https://github.com/cefn/watchable/tree/main/packages/queue#readme",
   "bugs": {
@@ -54,7 +54,8 @@
       "files": [
         "src/**/*",
         "tsconfig.json",
-        "vite.config.ts"
+        "vite.config.ts",
+        "README.md"
       ],
       "output": [
         "./dist"
@@ -79,7 +80,8 @@
   "exports": {
     ".": {
       "import": "./dist/index.js",
-      "require": "./dist/index.cjs"
+      "require": "./dist/index.cjs",
+      "default": "./dist/index.cjs"
     }
   },
   "sideEffects": false
