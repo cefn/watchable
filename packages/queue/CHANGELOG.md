@@ -1,5 +1,11 @@
 # @watchable/queue
 
+## 0.9.0-alpha.3
+
+### Patch Changes
+
+- Ensure 'default' in exports.
+
 ## 0.9.0-alpha.2
 
 ### Patch Changes

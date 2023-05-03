@@ -1,6 +1,6 @@
 {
   "name": "counter-react-js",
-  "version": "0.9.0-alpha.2",
+  "version": "0.9.0-alpha.3",
   "private": true,
   "homepage": "https://github.com/cefn/watchable/tree/main/apps/counter-react-js#readme",
   "bugs": {
@@ -18,8 +18,8 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@watchable/store": "0.9.0-alpha.2",
-    "@watchable/store-react": "0.9.0-alpha.2",
+    "@watchable/store": "0.9.0-alpha.3",
+    "@watchable/store-react": "0.9.0-alpha.3",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "vite-plugin-react": "^4.0.1"
