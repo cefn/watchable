@@ -2,7 +2,7 @@
 
 **490 gzipped bytes** of powerful state-management!
 
-Read the [API Reference](https://watchable.dev/api/modules/_watchable_store.html) or the reference usages below.
+Read the [API Reference](https://watchable.dev/api/modules/_watchable_store.html) or the reference usages below, or [browse the source on Github](https://github.com/cefn/watchable/tree/main/packages/store).
 
 A [Store](https://watchable.dev/api/interfaces/_watchable_store.Store.html) maintains a protected reference to an Immutable array or object `state`. It brokers all changes to `state`, enabling app interfaces and business logic to track modifications through Selectors.
 
@@ -99,3 +99,5 @@ Our Example Counter [Apps](https://github.com/cefn/watchable/tree/main/apps#read
 - Counter Apps demonstrating **_Tips and Tricks_**:
   - Manage Immutability using [editable drafts](https://github.com/cefn/watchable/tree/main/apps/counter-react-ts-edit#readme) - eliminates [Immutable update patterns](https://redux.js.org/usage/structuring-reducers/immutable-update-patterns)
   - Share a store with multiple components using [React Context API](https://github.com/cefn/watchable/tree/main/apps/counter-react-ts-edit-context#readme) - eliminates [prop drilling](https://kentcdodds.com/blog/prop-drilling)
+  - The [fastest possible](https://github.com/cefn/watchable/tree/main/apps/fast) app using @watchable/store (32000 updates per second)
+  - The [smallest possible](https://github.com/cefn/watchable/tree/main/apps/tiny) app using @watchable/store-react (316 bytes)

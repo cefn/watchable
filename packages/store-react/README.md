@@ -3,7 +3,7 @@
 Enables React apps to use
 [@watchable/store](https://www.npmjs.com/package/@watchable/store) for state-management
 
-Read the [API Reference](https://watchable.dev/api/modules/_watchable_store_react.html) or the reference usages below.
+Read the [API Reference](https://watchable.dev/api/modules/_watchable_store_react.html) or the reference usages below, or [browse the source on Github](https://github.com/cefn/watchable/tree/main/packages/store-react).
 
 ## Usage
 
@@ -80,3 +80,21 @@ export const StateLog = (props: { store: Store<CounterState> }) => {
   return <h1>Counter is {counter}</h1>;
 };
 ```
+
+### Demonstration Apps
+
+Our Example Counter [Apps](https://github.com/cefn/watchable/tree/main/apps#readme) offer minimal demonstrations of `@watchable/store`
+
+- Counter Apps using various **_Web Frameworks_**:
+  - [with React](https://github.com/cefn/watchable/tree/main/apps/counter-react-ts) (using [@watchable/store-react](https://github.com/cefn/watchable/tree/main/packages/store-react#readme))
+  - [with no framework](https://github.com/cefn/watchable/tree/main/apps/counter-dom-ts#readme) (using [@watchable/store-follow](https://github.com/cefn/watchable/tree/main/packages/store-follow#readme))
+  - [with Preact](https://github.com/cefn/watchable/tree/main/apps/counter-preact-ts#readme) (using [@watchable/store-react](https://github.com/cefn/watchable/tree/main/packages/store-react#readme)) and aliased React
+- Counter Apps using various **_Bundling approaches_**:
+  - [via Commonjs](https://github.com/cefn/watchable/tree/main/apps/counter-dom-commonjs#readme)
+  - [via ESM](https://github.com/cefn/watchable/tree/main/apps/counter-dom-esm#readme)
+  - [for tiniest bundle](https://github.com/cefn/watchable/tree/main/apps/counter-dom-tiny#readme) (a tree-shaken counter app in just 406 bytes!)
+- Counter Apps demonstrating **_Tips and Tricks_**:
+  - Manage Immutability using [editable drafts](https://github.com/cefn/watchable/tree/main/apps/counter-react-ts-edit#readme) - eliminates [Immutable update patterns](https://redux.js.org/usage/structuring-reducers/immutable-update-patterns)
+  - Share a store with multiple components using [React Context API](https://github.com/cefn/watchable/tree/main/apps/counter-react-ts-edit-context#readme) - eliminates [prop drilling](https://kentcdodds.com/blog/prop-drilling)
+  - The [fastest possible](https://github.com/cefn/watchable/tree/main/apps/fast) app using @watchable/store (32000 updates per second)
+  - The [smallest possible](https://github.com/cefn/watchable/tree/main/apps/tiny) app using @watchable/store-react (316 bytes)

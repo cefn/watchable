@@ -2,7 +2,7 @@
 
 An idiot-proof mechanism to write @watchable/store state without breaking immutability. Guarantees safe Immutable edits without needing to learn [Immutable update patterns](https://redux.js.org/usage/structuring-reducers/immutable-update-patterns)
 
-Read the [API Reference](https://watchable.dev/api/modules/_watchable_store_edit.html) or the reference usages below.
+Read the [API Reference](https://watchable.dev/api/modules/_watchable_store_edit.html) or the reference usages below, or [browse the source on Github](https://github.com/cefn/watchable/tree/main/packages/store-edit).
 
 ## Usage
 
