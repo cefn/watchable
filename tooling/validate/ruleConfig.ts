@@ -175,6 +175,7 @@ export const PACKAGE_JSON_RULES = {
       ".": {
         import: "./dist/index.js",
         require: "./dist/index.cjs",
+        default: "./dist/index.cjs",
       },
     },
   }),
