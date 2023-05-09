@@ -1,38 +1,16 @@
-## Framework-independent, writable, trackable store
+# A minimal pattern for watchable state
 
-**490 gzipped bytes** of powerful state-management!
+[513 gzipped bytes](https://bundlephobia.com/package/@watchable/store) of powerful state-management!
 
-Read the [API Reference](https://watchable.dev/api/modules/_watchable_store.html) or the reference usages below, or [browse the source on Github](https://github.com/cefn/watchable/tree/main/packages/store).
+A [Store](https://watchable.dev/api/interfaces/_watchable_store.Store.html) maintains a protected reference to an array or object `state` that is treated as Immutable. When a new state is passed to {@link Store#write | store.write()}, user interfaces and business logic are notified of changes to state matching their {@link Selector | Selectors}.
 
-A [Store](https://watchable.dev/api/interfaces/_watchable_store.Store.html) maintains a protected reference to an Immutable array or object `state`. It brokers all changes to `state`, enabling app interfaces and business logic to track modifications through Selectors.
+@watchable/store is incredibly simple, lightweight and framework-independent, and therefore suited to manage state within almost any server-side or client-side Typescript or Javascript project.
 
-It is incredibly simple, lightweight and framework-independent, and therefore suited to manage state within almost any server-side or client-side Typescript or Javascript project.
+Read the [API Reference](https://watchable.dev/api/modules/_watchable_store.html), examine the example code below, or [browse the source on Github](https://github.com/cefn/watchable/tree/main/packages/store). There is also a [Medium article describing the approach](https://medium.com/codex/dumping-redux-wasnt-so-hard-578a0e0bf946)
 
-## Usage
+# Usage
 
-### Track State
-
-```typescript
-// using a watcher
-store.watch((state) => console.dir(state));
-
-// using a selector and a memoizing React Hook
-import { useSelected } from "@watchable/store-react";
-const counter = useSelected(store, (state) => state.counter);
-
-// using a selector and a memoizing event queue (framework independent)
-import { followSelector } from "@watchable/store-follow";
-followSelector(
-  store,
-  (state) => state.counter,
-  (counter, { exit }) => {
-    console.log(`Counter is ${counter}`);
-    if (counter > 10) return exit(counter);
-  }
-);
-```
-
-### Read and Write State
+## Read and Write State
 
 ```typescript
 // read state
@@ -44,25 +22,49 @@ store.write({
   counter: state.counter + 1,
 });
 
-// write state using drafted state object
+// create the next immutable state by
+// editing a draft (backed by Immer)
 import { edit } from "@watchable/store-edit";
 edit(store, (draft) => (draft.counter += 1));
 ```
 
-### Import OR Require
+## Track State
+
+```typescript
+// using a watcher
+store.watch((state) => console.log(`Counter is ${state.counter}`));
+
+// using selector and memoized Hook (React framework)
+// re-renders after the selected value changes
+import { useSelected } from "@watchable/store-react";
+const counter = useSelected(store, (state) => state.counter);
+
+// using selector and memoized callback (Framework independent)
+// invoked each time the selected value changes
+import { followSelector } from "@watchable/store-follow";
+followSelector(
+  store,
+  (state) => state.counter,
+  (counter) => {
+    console.log(`Counter is ${counter}`);
+  }
+);
+```
+
+## Import OR Require
 
 ```javascript
 import { createStore } from "@watchable/store"; // for esm
 const { createStore } = require("@watchable/store"); // for commonjs
 ```
 
-### Create a Store in Javascript
+## Create a Store in Javascript
 
 ```javascript
 const store = createStore({ counter: 0 });
 ```
 
-### Create a Store In Typescript
+## Create a Store In Typescript
 
 ```typescript
 interface CounterState {
@@ -76,17 +78,17 @@ const INITIAL_STATE = {
 const store = createStore<CounterState>(INITIAL_STATE);
 ```
 
-## Getting Started
+# Getting Started
 
-### Install
+## Install
 
 ```zsh
 npm install @watchable/store
 ```
 
-### Demonstration Apps
+## Demonstration Apps
 
-Our Example Counter [Apps](https://github.com/cefn/watchable/tree/main/apps#readme) offer minimal demonstrations of `@watchable/store`
+The Example Counter [Apps](https://github.com/cefn/watchable/tree/main/apps#readme) offer minimal demonstrations of `@watchable/store`
 
 - Counter Apps using various **_Web Frameworks_**:
   - [with React](https://github.com/cefn/watchable/tree/main/apps/counter-react-ts) (using [@watchable/store-react](https://github.com/cefn/watchable/tree/main/packages/store-react#readme))

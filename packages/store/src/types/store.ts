@@ -6,7 +6,7 @@ import type { WatchableState } from "./watchable";
  * a new `Store` by calling {@link createStore} with an `initialState`.
  *
  * Flagging all state references as {@link Immutable} guides IDEs to treat these
- * as {@link https://en.wikipedia.org/wiki/Immutable_object | Immutable Objects}
+ * as {@link https://en.wikipedia.org/wiki/Immutable_object | `Immutable Objects`}
  * to avoid programming errors.
  *
  * ## Watching State
