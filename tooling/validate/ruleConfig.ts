@@ -163,7 +163,7 @@ export const PACKAGE_JSON_RULES = {
   }),
   main: byPackageType({
     apps: undefined,
-    packages: "dist/index.js",
+    packages: "dist/index.cjs",
   }),
   types: byPackageType({
     apps: undefined,
