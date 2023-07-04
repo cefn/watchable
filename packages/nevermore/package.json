@@ -1,8 +1,8 @@
 {
-  "name": "@watchable/queue",
-  "version": "1.0.0-alpha.5",
-  "description": "In-memory MessageQueue with compile-time-immutable state.",
-  "homepage": "https://github.com/cefn/watchable/tree/main/packages/queue#readme",
+  "name": "@watchable/nevermore",
+  "version": "0.9.0-alpha.3",
+  "description": "Rate limits and concurrency using generators of promiseFactories",
+  "homepage": "https://github.com/cefn/watchable/tree/main/packages/nevermore#readme",
   "bugs": {
     "url": "https://github.com/cefn/watchable/issues",
     "email": "watchable@cefn.com"
@@ -21,18 +21,33 @@
   "scripts": {
     "build": "wireit",
     "lint": "wireit",
-    "test": "wireit"
+    "test": "wireit",
+    "test:watch": "wireit"
   },
   "devDependencies": {
+    "@vitest/coverage-v8": "^0.34.6",
     "typescript": "^5.0.4",
     "vite": "^4.2.1",
-    "vitest": "^0.30.1",
+    "vitest": "^0.34.6",
     "wireit": "^0.9.5"
   },
   "publishConfig": {
     "access": "public"
   },
   "wireit": {
+    "test:watch": {
+      "command": "vitest",
+      "dependencies": [
+        "build"
+      ],
+      "files": [
+        "src/**/*",
+        "test/**/*",
+        "tsconfig.json",
+        "tsconfig.test.json",
+        "vite.config.ts"
+      ]
+    },
     "test": {
       "dependencies": [
         "build"
@@ -50,6 +65,9 @@
       ]
     },
     "build": {
+      "dependencies": [
+        "../../packages/queue:build"
+      ],
       "command": "tsc --build && vite build",
       "files": [
         "src/**/*",
@@ -84,5 +102,8 @@
       "default": "./dist/index.cjs"
     }
   },
-  "sideEffects": false
+  "sideEffects": false,
+  "dependencies": {
+    "@watchable/queue": "^0.9.0-alpha.3"
+  }
 }

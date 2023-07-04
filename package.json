@@ -17,6 +17,7 @@
     "qa:watch": "npm run qa --watch",
     "build": "wireit",
     "docs": "wireit",
+    "playwright:download": "playwright install --with-deps",
     "apps:playwright:align": "find ./apps -maxdepth 1 -mindepth 1 -type d -name 'counter*react*ts*' -and -not -name 'counter-react-ts' | xargs -I{} zsh -c \"cp apps/counter-react-ts/playwright.config.ts {} && cp apps/counter-react-ts/test/playwright/index.test.ts {}/test/playwright/index.test.ts\"",
     "packages:sort": "npm exec sort-package-json package.json {apps,packages}/*/package.json",
     "packages:validate": "tsx tooling/validate/cli.ts",
@@ -59,8 +60,8 @@
     "zx": "^7.1.1"
   },
   "engines": {
-    "node": "^18",
-    "npm": "^9"
+    "node": "^20",
+    "npm": "^10"
   },
   "wireit": {
     "qa": {

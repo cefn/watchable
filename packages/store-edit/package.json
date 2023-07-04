@@ -45,7 +45,7 @@
       "dependencies": [
         "build"
       ],
-      "command": "vitest run",
+      "command": "vitest run --reporter verbose",
       "files": [
         "src/**/*",
         "test/**/*",
