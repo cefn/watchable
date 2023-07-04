@@ -1,5 +1,4 @@
 import type { MessageQueue } from "@watchable/queue";
-import type { Immutable } from "@watchable/store";
 
 /** Function to process a queue of values including an initial starting value, leading to
  * a final `Ending` result.
@@ -11,7 +10,7 @@ export type QueueHandler<Selected, Ending> = (
 
 /** A function to notify a series of changing values from a store. */
 export type Follower<Selected, Ending> = (
-  selected: Immutable<Selected>,
+  selected: Selected,
   controlHandle: Controls<Selected, Ending>
   // eslint-disable-next-line @typescript-eslint/no-invalid-void-type
 ) => Promise<void | ExitStatus>;
@@ -20,7 +19,7 @@ export type Follower<Selected, Ending> = (
  * exit behaviour, retrieve references.
  */
 export interface Controls<Selected, Ending> {
-  lastSelected: () => Immutable<Selected> | undefined;
+  lastSelected: () => Selected | undefined;
   exit: (ending: Ending) => ExitStatus;
 }
 
