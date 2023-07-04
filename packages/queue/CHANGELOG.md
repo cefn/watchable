@@ -1,5 +1,11 @@
 # @watchable/queue
 
+## 0.9.0-alpha.4
+
+### Minor Changes
+
+- d0335b4: Remove Immutable modifier from Selector definition.
+
 ## 0.9.0-alpha.3
 
 ### Patch Changes

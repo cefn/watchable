@@ -1,6 +1,6 @@
 {
   "name": "counter-dom-esm",
-  "version": "0.9.0-alpha.3",
+  "version": "0.9.0-alpha.4",
   "private": true,
   "description": "",
   "homepage": "https://github.com/cefn/watchable/tree/main/apps/counter-dom-esm#readme",
@@ -19,8 +19,8 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@watchable/store": "0.9.0-alpha.3",
-    "@watchable/store-follow": "0.9.0-alpha.3"
+    "@watchable/store": "0.9.0-alpha.4",
+    "@watchable/store-follow": "1.0.0-alpha.4"
   },
   "devDependencies": {
     "@vitejs/plugin-legacy": "^4.0.2",
