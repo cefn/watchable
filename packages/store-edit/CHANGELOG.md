@@ -1,5 +1,13 @@
 # @watchable/store-edit
 
+## 1.0.0-alpha.5
+
+### Patch Changes
+
+- Aligning version numbers
+- Updated dependencies
+  - @watchable/store@1.0.0-alpha.5
+
 ## 1.0.0-alpha.4
 
 ### Minor Changes

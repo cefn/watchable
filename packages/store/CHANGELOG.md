@@ -1,5 +1,11 @@
 # @watchable/store
 
+## 1.0.0-alpha.5
+
+### Major Changes
+
+- Aligning version numbers
+
 ## 0.9.0-alpha.4
 
 ### Minor Changes

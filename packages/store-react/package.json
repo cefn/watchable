@@ -1,6 +1,6 @@
 {
   "name": "@watchable/store-react",
-  "version": "1.0.0-alpha.4",
+  "version": "1.0.0-alpha.5",
   "description": "Update React components when @watchable/store state changes",
   "homepage": "https://github.com/cefn/watchable/tree/main/packages/store-react#readme",
   "bugs": {
@@ -24,7 +24,7 @@
     "test": "wireit"
   },
   "dependencies": {
-    "@watchable/store": "0.9.0-alpha.4"
+    "@watchable/store": "1.0.0-alpha.5"
   },
   "devDependencies": {
     "@testing-library/dom": "^9.2.0",
@@ -38,7 +38,7 @@
     "wireit": "^0.9.5"
   },
   "peerDependencies": {
-    "@watchable/store": "0.9.0-alpha.4",
+    "@watchable/store": "1.0.0-alpha.5",
     "react": "^18.2.0"
   },
   "publishConfig": {

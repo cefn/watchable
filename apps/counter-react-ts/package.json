@@ -1,6 +1,6 @@
 {
   "name": "counter-react-ts",
-  "version": "0.9.0-alpha.4",
+  "version": "0.9.0-alpha.5",
   "private": true,
   "homepage": "https://github.com/cefn/watchable/tree/main/apps/counter-react-ts#readme",
   "bugs": {
@@ -24,8 +24,8 @@
     "lint": "wireit"
   },
   "dependencies": {
-    "@watchable/store": "0.9.0-alpha.4",
-    "@watchable/store-react": "1.0.0-alpha.4",
+    "@watchable/store": "1.0.0-alpha.5",
+    "@watchable/store-react": "1.0.0-alpha.5",
     "react": "^18.2.0",
     "react-dom": "^18.2.0"
   },

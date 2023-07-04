@@ -1,5 +1,14 @@
 # counter-react-ts-edit
 
+## 0.9.0-alpha.5
+
+### Patch Changes
+
+- Updated dependencies
+  - @watchable/store@1.0.0-alpha.5
+  - @watchable/store-edit@1.0.0-alpha.5
+  - @watchable/store-react@1.0.0-alpha.5
+
 ## 0.9.0-alpha.4
 
 ### Patch Changes
