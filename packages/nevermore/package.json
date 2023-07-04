@@ -1,0 +1,88 @@
+{
+  "name": "@watchable/queue",
+  "version": "0.9.0-alpha.3",
+  "description": "In-memory MessageQueue with compile-time-immutable state.",
+  "homepage": "https://github.com/cefn/watchable/tree/main/packages/queue#readme",
+  "bugs": {
+    "url": "https://github.com/cefn/watchable/issues",
+    "email": "watchable@cefn.com"
+  },
+  "repository": "github:cefn/watchable",
+  "license": "MIT",
+  "author": "Cefn Hoile <github.com@cefn.com> (https://cefn.com)",
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "README.md",
+    "dist",
+    "src"
+  ],
+  "scripts": {
+    "build": "wireit",
+    "lint": "wireit",
+    "test": "wireit"
+  },
+  "devDependencies": {
+    "typescript": "^5.0.4",
+    "vite": "^4.2.1",
+    "vitest": "^0.30.1",
+    "wireit": "^0.9.5"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "wireit": {
+    "test": {
+      "dependencies": [
+        "build"
+      ],
+      "command": "vitest run",
+      "files": [
+        "src/**/*",
+        "test/**/*",
+        "tsconfig.json",
+        "tsconfig.test.json",
+        "vite.config.ts"
+      ],
+      "output": [
+        "./coverage"
+      ]
+    },
+    "build": {
+      "command": "tsc --build && vite build",
+      "files": [
+        "src/**/*",
+        "tsconfig.json",
+        "vite.config.ts",
+        "README.md"
+      ],
+      "output": [
+        "./dist"
+      ]
+    },
+    "lint": {
+      "command": "eslint -c .eslintrc.cjs .",
+      "files": [
+        "**/*.js",
+        "**/*.jsx",
+        "**/*.ts",
+        "**/*.jsx",
+        "!dist/**/*",
+        "!coverage/**/*"
+      ],
+      "output": [],
+      "dependencies": [
+        "build"
+      ]
+    }
+  },
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs",
+      "default": "./dist/index.cjs"
+    }
+  },
+  "sideEffects": false
+}
