@@ -54,7 +54,7 @@ export type RootState = object;
  * changed, defining when app logic should be re-run. */
 export type Selector<State extends RootState, Selected> = (
   state: Immutable<State>
-) => Immutable<Selected>;
+) => Selected;
 
 /** An item satisfying type constraints of {@link RootState} but where a child item
  * at `Key` ***also*** satisfies `RootState`. A Store with a
