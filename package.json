@@ -88,7 +88,8 @@
         "./packages/store:build",
         "./packages/store-edit:build",
         "./packages/store-follow:build",
-        "./packages/store-react:build"
+        "./packages/store-react:build",
+        "./packages/notesome:build"
       ]
     },
     "test": {
@@ -101,7 +102,8 @@
         "./packages/store:test",
         "./packages/store-edit:test",
         "./packages/store-follow:test",
-        "./packages/store-react:test"
+        "./packages/store-react:test",
+        "./packages/notesome:test"
       ]
     },
     "lint": {
@@ -119,7 +121,8 @@
         "./packages/store:lint",
         "./packages/store-edit:lint",
         "./packages/store-follow:lint",
-        "./packages/store-react:lint"
+        "./packages/store-react:lint",
+        "./packages/notesome:lint"
       ]
     }
   }

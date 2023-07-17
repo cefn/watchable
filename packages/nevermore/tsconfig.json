@@ -9,6 +9,12 @@
     "declarationMap": true,
     "emitDeclarationOnly": true
   },
+  "references": [
+    {
+      "path": "../queue"
+    }
+  ],
+
   "typedocOptions": {
     "entryPoints": ["src/index.ts"]
   }
