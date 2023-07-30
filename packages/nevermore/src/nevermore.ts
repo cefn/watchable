@@ -1,6 +1,11 @@
 import { createQueue } from "@watchable/queue";
 import type { Job, JobArgs, JobSettlement, Strategy } from "./types";
-import { pull, promiseMessage, createAwaitableFlag } from "./util";
+import {
+  pull,
+  promiseMessage,
+  createAwaitableFlag,
+  iterableToIterator,
+} from "./util";
 
 /**
  * @param jobs An array, generator or other Iterable. Nevermore will pull jobs from it just-in-time.
@@ -15,7 +20,7 @@ export async function* nevermore<T, J extends Job<T>>(options: {
 
   // if it's not an iterable, it's a zero-arg generator function
   // call generator to turn it into iterable
-  const jobIterator =
+  const launchIterable =
     Symbol.iterator in jobs || Symbol.asyncIterator in jobs ? jobs : jobs();
 
   // queue used by concurrently executing jobs to notify outcomes
@@ -26,12 +31,22 @@ export async function* nevermore<T, J extends Job<T>>(options: {
 
   // a coroutine for launching jobs which will notify queue
   async function* createSourceLaunches() {
-    // (generator creates+launches next job when next() is called
     // TODO CH ensure cancelPromise is monitored as well as the asynciterable
     // allowing cancellation of job iteration
+    const launchIterator = iterableToIterator(launchIterable);
     const jobArgs: JobArgs =
       cancelPromise !== undefined ? [{ cancelPromise }] : [];
-    for await (const job of jobIterator) {
+
+    // (generator creates+launches next job when next() is called
+    for (;;) {
+      const result = await launchIterator.next();
+      if (result.done === true) {
+        // launches are complete
+        launchesDone.flag();
+        return;
+      }
+      const job = result.value;
+
       // background the job, tracking its pending status
       pendingJobCount++;
       void job(...jobArgs)
@@ -56,8 +71,6 @@ export async function* nevermore<T, J extends Job<T>>(options: {
       // yield job reference to caller
       yield job;
     }
-    // launches are complete
-    launchesDone.flag();
   }
 
   // define an async sequence of settlements
