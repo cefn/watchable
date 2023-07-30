@@ -1,6 +1,6 @@
 import { createQueue } from "@watchable/queue";
-import type { Job, JobSettlement, Strategy } from "./types";
-import { createAwaitable, pull, promiseMessage } from "./util";
+import type { Job, JobArgs, JobSettlement, Strategy } from "./types";
+import { pull, promiseMessage, createAwaitableFlag } from "./util";
 
 /**
  *
@@ -23,16 +23,19 @@ export async function* nevermore<T, J extends Job<T>>(options: {
   const settlementQueue = createQueue<JobSettlement<T, J>>();
 
   let pendingJobCount = 0;
-  const launchesDone = createAwaitable();
+  const launchesDone = createAwaitableFlag();
 
   // a coroutine for launching jobs which will notify queue
   async function* createSourceLaunches() {
-    // generator only creates and launches next job
-    // once next() is called on it
+    // (generator creates+launches next job when next() is called
+    // TODO CH ensure cancelPromise is monitored as well as the asynciterable
+    // allowing cancellation of job iteration
+    const jobArgs: JobArgs =
+      cancelPromise !== undefined ? [{ cancelPromise }] : [];
     for await (const job of jobIterator) {
       // background the job, tracking its pending status
       pendingJobCount++;
-      void job()
+      void job(...jobArgs)
         .then((value) => {
           // notify job success
           pendingJobCount--;
@@ -55,35 +58,45 @@ export async function* nevermore<T, J extends Job<T>>(options: {
       yield job;
     }
     // launches are complete
-    launchesDone.callback();
+    launchesDone.flag();
   }
 
   // define an async sequence of settlements
   async function* createSourceSettlements() {
     let settlementPromise = settlementQueue.receive();
     for (;;) {
-      if (pendingJobCount === 0 && launchesDone.callback.invocation !== null) {
+      // check there are further settlements to await
+      if (launchesDone.flagged && pendingJobCount === 0) {
+        // job iterator completed, all jobs have settled - finish
         return;
       }
-      const racers: Array<Promise<"settlement" | "launchesDone" | "cancel">> = [
+
+      // wait for all possible termination conditions
+      const winner = await Promise.race([
+        // wait for settlement
         promiseMessage(settlementPromise, "settlement"),
-      ];
-      if (launchesDone.callback.invocation === null) {
-        racers.push(
-          promiseMessage(launchesDone.callbackPromise, "launchesDone")
-        );
-      }
-      if (cancelPromise !== undefined) {
-        racers.push(promiseMessage(cancelPromise, "cancel"));
-      }
-      const winner = await Promise.race(racers);
+        // wait for launchesDone (unless already fired)
+        ...(launchesDone.flagged
+          ? []
+          : [promiseMessage(launchesDone.promise, "launchesDone")]),
+        // wait for cancel (if caller provided it)
+        ...(cancelPromise === undefined
+          ? []
+          : [promiseMessage(cancelPromise, "cancel")]),
+      ]);
+
+      // either...
+      // * yield settled result
+      // * implicitly reset promise (no longer wait for launches to finish)
+      // * finalise with cancellation
       if (winner === "settlement") {
         yield await settlementPromise;
         // refresh settlement promise
         settlementPromise = settlementQueue.receive();
         continue;
       } else if (winner === "cancel") {
-        return;
+        // caller requested early termination
+        throw new Error(`Nevermore job sequence cancelled`);
       }
     }
   }
@@ -94,7 +107,7 @@ export async function* nevermore<T, J extends Job<T>>(options: {
   };
 
   // Run background routine creating and launching jobs as fast as possible
-  pull(sourceStrategy.launches, cancelPromise);
+  void pull(sourceStrategy.launches, cancelPromise);
 
   yield* sourceStrategy.settlements;
 }
