@@ -13,10 +13,19 @@ import {
  * @returns
  */
 export async function* nevermore<T, J extends Job<T>>(options: {
-  jobs: Iterable<J> | AsyncIterable<J> | (() => Generator<J>);
+  jobs:
+    | Iterable<J>
+    | AsyncIterable<J>
+    | (() => Generator<J>)
+    | (() => AsyncGenerator<J>);
   cancelPromise?: Promise<unknown>;
 }) {
   const { cancelPromise, jobs } = options;
+
+  const cancelMessagePromise =
+    cancelPromise === undefined
+      ? null
+      : promiseMessage(cancelPromise, "cancel");
 
   // if it's not an iterable, it's a zero-arg generator function
   // call generator to turn it into iterable
@@ -31,21 +40,32 @@ export async function* nevermore<T, J extends Job<T>>(options: {
 
   // a coroutine for launching jobs which will notify queue
   async function* createSourceLaunches() {
-    // TODO CH ensure cancelPromise is monitored as well as the asynciterable
-    // allowing cancellation of job iteration
     const launchIterator = iterableToIterator(launchIterable);
     const jobArgs: JobArgs =
       cancelPromise !== undefined ? [{ cancelPromise }] : [];
 
     // (generator creates+launches next job when next() is called
     for (;;) {
-      const result = await launchIterator.next();
-      if (result.done === true) {
+      const launchPromise = launchIterator.next();
+      let launchIteratorResult: IteratorResult<J> | "cancel";
+      if (cancelMessagePromise !== null) {
+        launchIteratorResult = await Promise.race([
+          launchPromise,
+          cancelMessagePromise,
+        ]);
+        if (launchIteratorResult === "cancel") {
+          // error terminates loop. Probably not handled anywhere as running in background
+          throw new Error(`Nevermore job sequence cancelled`);
+        }
+      } else {
+        launchIteratorResult = await launchPromise;
+      }
+      if (launchIteratorResult.done === true) {
         // launches are complete
         launchesDone.flag();
         return;
       }
-      const job = result.value;
+      const job = launchIteratorResult.value;
 
       // background the job, tracking its pending status
       pendingJobCount++;
@@ -78,9 +98,7 @@ export async function* nevermore<T, J extends Job<T>>(options: {
     let settlementPromise = settlementQueue.receive();
 
     const cancelMessagePromiseList =
-      cancelPromise === undefined
-        ? []
-        : [promiseMessage(cancelPromise, "cancel")];
+      cancelMessagePromise === null ? [] : [cancelMessagePromise];
 
     for (;;) {
       // check there are further settlements to await
