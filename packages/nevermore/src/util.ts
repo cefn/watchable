@@ -2,14 +2,22 @@
 import type { GNexted, GReturned } from "./types";
 
 export function namedRace<
-  NamedPromises extends Record<string, Promise<unknown>>
+  const NamedPromises extends Record<
+    string,
+    NonNullable<unknown> | Promise<unknown>
+  >
 >(namedPromises: NamedPromises) {
-  type Racer = {
-    [Name in keyof NamedPromises]: Promise<Name>;
-  }[keyof NamedPromises];
+  type Racer = Required<{
+    [Name in keyof NamedPromises]: Name | Promise<Name>;
+  }>[keyof NamedPromises];
 
-  const racers: Racer[] = Object.entries(namedPromises).map(([name, promise]) =>
-    promiseMessage(promise, name)
+  const racers: Racer[] = Object.entries(namedPromises).map(
+    ([name, promise]) => {
+      if ("then" in promise) {
+        return promiseMessage(promise, name);
+      }
+      return name;
+    }
   );
 
   return Promise.race(racers);

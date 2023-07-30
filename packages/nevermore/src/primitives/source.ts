@@ -1,10 +1,6 @@
 import { createQueue } from "../../../queue/src/queue";
 import type { Job, JobArgs, JobSettlement, Primitive } from "../types";
-import {
-  createAwaitableFlag,
-  iterableToIterator,
-  promiseMessage,
-} from "../util";
+import { createAwaitableFlag, iterableToIterator, namedRace } from "../util";
 
 export function createSourcePrimitive<T, J extends Job<T>>(options: {
   jobs:
@@ -14,12 +10,7 @@ export function createSourcePrimitive<T, J extends Job<T>>(options: {
     | (() => AsyncGenerator<J>);
   cancelPromise?: Promise<unknown>;
 }) {
-  const { cancelPromise, jobs } = options;
-
-  const cancelMessagePromise =
-    cancelPromise === undefined
-      ? null
-      : promiseMessage(cancelPromise, "cancel");
+  const { jobs, cancelPromise = null } = options;
 
   // if it's not an iterable, it's a zero-arg (async?) generator function
   // call it to turn it into iterable
@@ -36,36 +27,31 @@ export function createSourcePrimitive<T, J extends Job<T>>(options: {
   // updates the launchesDone flag when it has exhausted all launches.
   async function* createSourceLaunches() {
     const launchIterator = iterableToIterator(launchIterable);
-    const jobArgs: JobArgs =
-      cancelPromise !== undefined ? [{ cancelPromise }] : [];
+    const jobArgs: JobArgs = cancelPromise != null ? [{ cancelPromise }] : [];
 
     // (generator creates+launches next job when next() is called
     for (;;) {
-      const launchPromise = launchIterator.next();
-      let launchIteratorResult: IteratorResult<J> | "cancel";
+      const nextLaunch = launchIterator.next();
 
       // optionally wait for cancelPromise in parallel
-      if (cancelMessagePromise !== null) {
-        launchIteratorResult = await Promise.race([
-          launchPromise,
-          cancelMessagePromise,
-        ]);
-        if (launchIteratorResult === "cancel") {
-          // error terminates loop. Probably not handled anywhere given it's running in background
+      if (cancelPromise !== null) {
+        const winner = await namedRace({
+          nextLaunch,
+          cancelPromise,
+        });
+        if (winner === "cancelPromise") {
+          // throw to terminate loop, probably running in background so not handled anywhere
           throw new Error(`Nevermore job sequence cancelled`);
         }
-      } else {
-        launchIteratorResult = await launchPromise;
       }
 
-      // wasn't cancelled, so destructure result
-      const { done, value } = launchIteratorResult;
-
+      const { done, value } = await nextLaunch;
       if (done === true) {
-        // launches are complete
+        // no more launches will be yielded
         launchesDone.flag();
-        return;
+        return value;
       }
+      // a further launch was yielded
       const job = value;
 
       // background the job, tracking its pending status
@@ -98,44 +84,41 @@ export function createSourcePrimitive<T, J extends Job<T>>(options: {
   async function* createSourceSettlements() {
     let settlementPromise = settlementQueue.receive();
 
-    const cancelMessagePromiseList =
-      cancelMessagePromise === null ? [] : [cancelMessagePromise];
-
     for (;;) {
-      // check there are further settlements to await
-      if (launchesDone.flagged && pendingJobCount === 0) {
-        // job iterator completed, all jobs have settled - finish
-        return;
+      // don't wait on launchesDone by default
+      let launchesDonePromise: typeof launchesDone.promise | null = null;
+
+      // check further settlements exhausted
+      if (pendingJobCount === 0) {
+        if (launchesDone.flagged) {
+          // job iterator completed, all jobs have settled - finish
+          return;
+        }
+        // wait on launchesDone - they may finish while we await a settlement that will never come
+        launchesDonePromise = launchesDone.promise;
       }
 
-      // add launchesDone to monitored conditions (if not flagged since last cycle)
-      const launchesDonePromiseList = launchesDone.flagged
-        ? []
-        : [promiseMessage(launchesDone.promise, "launchesDone")];
-
-      // wait for all possible termination conditions
-      const winner = await Promise.race([
-        // wait for settlement
-        promiseMessage(settlementPromise, "settlement"),
-        // wait for launchesDone (unless already fired)
-        ...launchesDonePromiseList,
-        // wait for cancel (if caller provided cancelPromise)
-        ...cancelMessagePromiseList,
-      ]);
-
-      // either...
-      // * yield settled result
-      // * implicitly reset promise (no longer wait for launches to finish)
-      // * finalise with cancellation
-      if (winner === "settlement") {
-        yield await settlementPromise;
-        // refresh settlement promise
-        settlementPromise = settlementQueue.receive();
-        continue;
-      } else if (winner === "cancel") {
-        // caller requested early termination
-        throw new Error(`Nevermore job sequence cancelled`);
+      if (launchesDonePromise !== null || cancelPromise !== null) {
+        const winner = await namedRace({
+          settlementPromise,
+          // wait on launchesDonePromise (pendingJobCount was 0 and may never increment)
+          ...(launchesDonePromise !== null && { launchesDonePromise }),
+          // wait on cancelPromise (provided by original caller)
+          ...(cancelPromise !== null && { cancelPromise }),
+        });
+        if (winner === "cancelPromise") {
+          // caller requested early termination
+          throw new Error(`Nevermore job sequence cancelled`);
+        }
+        if (winner === "launchesDonePromise") {
+          // check again if any future settlements are pending
+          continue;
+        }
       }
+      // yield settled result
+      yield await settlementPromise;
+      // refresh settlement promise
+      settlementPromise = settlementQueue.receive();
     }
   }
 
