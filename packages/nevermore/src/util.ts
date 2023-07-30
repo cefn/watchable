@@ -82,50 +82,11 @@ export async function pull<T>(
         return;
       }
     }
-    if (iteratorResult.done ?? false) {
+    if (iteratorResult.done === true) {
       // done
       return;
     }
   }
-}
-
-export function decorateSequence<
-  G extends Generator<Yielded>,
-  Yielded,
-  Decorated
->(
-  generator: G,
-  decorate: (yielded: Yielded) => Decorated
-): Generator<Decorated, GReturned<G>, GNexted<G>> {
-  function mapResult(
-    result: IteratorResult<Yielded, GReturned<G>>
-  ): IteratorResult<Decorated, GReturned<G>> {
-    const decoratedResult: IteratorResult<
-      Decorated,
-      GReturned<G>
-    > = result.done === true
-      ? result
-      : {
-          done: result.done,
-          value: decorate(result.value),
-        };
-    return decoratedResult;
-  }
-
-  return {
-    [Symbol.iterator]() {
-      return this;
-    },
-    next(...args) {
-      return mapResult(generator.next(...args));
-    },
-    return(value) {
-      return mapResult(generator.return(value));
-    },
-    throw(e) {
-      return mapResult(generator.throw(e));
-    },
-  };
 }
 
 /** Begin iteration, (agnostic to Async or Sync iterators). */
