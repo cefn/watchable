@@ -21,7 +21,8 @@
   "scripts": {
     "build": "wireit",
     "lint": "wireit",
-    "test": "wireit"
+    "test": "wireit",
+    "test:watch": "wireit"
   },
   "devDependencies": {
     "@vitest/coverage-c8": "^0.33.0",
@@ -34,11 +35,24 @@
     "access": "public"
   },
   "wireit": {
-    "test": {
+    "test:watch": {
+      "command": "vitest",
       "dependencies": [
         "build"
       ],
+      "files": [
+        "src/**/*",
+        "test/**/*",
+        "tsconfig.json",
+        "tsconfig.test.json",
+        "vite.config.ts"
+      ]
+    },
+    "test": {
       "command": "vitest run --coverage",
+      "dependencies": [
+        "build"
+      ],
       "files": [
         "src/**/*",
         "test/**/*",

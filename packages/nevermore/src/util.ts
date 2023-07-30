@@ -1,4 +1,19 @@
+/* eslint-disable @typescript-eslint/promise-function-async */
 import type { GNexted, GReturned } from "./types";
+
+export function namedRace<
+  NamedPromises extends Record<string, Promise<unknown>>
+>(namedPromises: NamedPromises) {
+  type Racer = {
+    [Name in keyof NamedPromises]: Promise<Name>;
+  }[keyof NamedPromises];
+
+  const racers: Racer[] = Object.entries(namedPromises).map(([name, promise]) =>
+    promiseMessage(promise, name)
+  );
+
+  return Promise.race(racers);
+}
 
 /** Reference implementation to give access to a Promise callback outside the
  * scope of a Promise constructor function. By default, Args is a zero-length
@@ -113,51 +128,6 @@ export function iterableToIterator<T>(
     return sequence[Symbol.asyncIterator]();
   }
   return sequence[Symbol.iterator]();
-}
-
-/** Creates a callback having specified Args referenced from a Promise that resolves when it is called.
- * The callback has an `invocation` member that is initially null, and stores the callback's args
- * when it is first invoked. Invoking the callback twice is an error. Args are empty by default,
- * creating an eventually notified 'flag' you can wait on. */
-// eslint-disable-next-line @typescript-eslint/promise-function-async
-export function createCallable<Args extends unknown[] = []>() {
-  // reference that can be assigned in Promise scope, then returned
-  let callback!: (...args: Args) => void;
-
-  // promise of eventual callback invocation
-  const awaitable: Promise<Args> & {
-    invocation: null | Args;
-    callback: typeof callback;
-    wasCalled: () => boolean;
-  } = Object.assign(
-    new Promise<Args>((resolve) => {
-      // assign callback in promise ascope
-      // first call stores args and resolves promise
-      // second call is an error
-      callback = (...args: Args) => {
-        if (awaitable.invocation === null) {
-          awaitable.invocation = args;
-          resolve(args);
-        }
-        throw new Error(
-          `Callback already called once with ${awaitable.invocation.toString()}`
-        );
-      };
-    }),
-    {
-      /** Member variable for storing args */
-      invocation: null,
-      /** Callback to resolve promise */
-      callback,
-      /** Convenience method to check if it was invoked */
-      wasCalled() {
-        return awaitable.invocation !== null;
-      },
-    }
-  );
-
-  // Compound return
-  return awaitable;
 }
 
 export async function promiseMessage<Message extends string>(

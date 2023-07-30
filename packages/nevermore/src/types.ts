@@ -15,10 +15,6 @@ export type JobArgs =
 
 export type Job<T> = (...args: JobArgs) => Promise<T>;
 
-export type Sequence<T> = Iterable<T> | AsyncIterable<T>;
-// | Iterator<T>
-// | AsyncIterator<T>;
-
 export interface JobResolution<T, J extends Job<T>> {
   job: J;
   kind: "resolved";
@@ -39,14 +35,10 @@ export type JobSettlement<T, J extends Job<T>> =
 // since the job could be re-used, but the launch request is unique
 // maps could use the launch itself or an auto-incrementing id as a key
 // to manage launch records?
-export interface Strategy<T, J extends Job<T>> {
+export interface Primitive<T, J extends Job<T>> {
   launches: AsyncGenerator<J>;
   settlements: AsyncGenerator<JobSettlement<T, J>>;
 }
-
-export type Nevermore<T, J extends Job<T>> = (
-  jobSequence: Sequence<J>
-) => AsyncIterator<JobSettlement<T, J>>;
 
 /** Infers the yielded value from a generator type */
 export type GYielded<G extends Generator> = G extends Generator<infer yielded>
