@@ -3,7 +3,6 @@ import type { Job, JobArgs, JobSettlement, Strategy } from "./types";
 import { pull, promiseMessage, createAwaitableFlag } from "./util";
 
 /**
- *
  * @param jobs An array, generator or other Iterable. Nevermore will pull jobs from it just-in-time.
  * @param cancelPromise If provided, Nevermore will cease launching jobs whenever this promise settles.
  * @returns
@@ -64,6 +63,12 @@ export async function* nevermore<T, J extends Job<T>>(options: {
   // define an async sequence of settlements
   async function* createSourceSettlements() {
     let settlementPromise = settlementQueue.receive();
+
+    const cancelMessagePromiseList =
+      cancelPromise === undefined
+        ? []
+        : [promiseMessage(cancelPromise, "cancel")];
+
     for (;;) {
       // check there are further settlements to await
       if (launchesDone.flagged && pendingJobCount === 0) {
@@ -71,18 +76,19 @@ export async function* nevermore<T, J extends Job<T>>(options: {
         return;
       }
 
+      // add launchesDone to monitored conditions (if not flagged since last cycle)
+      const launchesDonePromiseList = launchesDone.flagged
+        ? []
+        : [promiseMessage(launchesDone.promise, "launchesDone")];
+
       // wait for all possible termination conditions
       const winner = await Promise.race([
         // wait for settlement
         promiseMessage(settlementPromise, "settlement"),
         // wait for launchesDone (unless already fired)
-        ...(launchesDone.flagged
-          ? []
-          : [promiseMessage(launchesDone.promise, "launchesDone")]),
-        // wait for cancel (if caller provided it)
-        ...(cancelPromise === undefined
-          ? []
-          : [promiseMessage(cancelPromise, "cancel")]),
+        ...launchesDonePromiseList,
+        // wait for cancel (if caller provided cancelPromise)
+        ...cancelMessagePromiseList,
       ]);
 
       // either...

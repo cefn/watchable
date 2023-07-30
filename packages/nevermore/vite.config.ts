@@ -1,5 +1,5 @@
 import { resolve } from "path";
-import { defineConfig } from "vite";
+import { defineConfig } from "vitest/config";
 // import nodeResolve from "@rollup/plugin-node-resolve";
 
 import packageJson from "./package.json";
