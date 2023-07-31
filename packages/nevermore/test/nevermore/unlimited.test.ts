@@ -6,26 +6,12 @@
 import { describe, test, expect, vi } from "vitest";
 import { nevermore } from "../../src/";
 import { createAwaitableFlag } from "../../src/util";
+import type { NevermoreOptions } from "../../src/types";
+import { delay, gen2array } from "../testutil";
 
-function delay<T>(ms: number, value: T): Promise<T> {
-  return new Promise<T>((resolve) => {
-    setTimeout(
-      (value) => {
-        resolve(value);
-      },
-      ms,
-      value
-    );
-  });
-}
-
-export async function gen2array<T>(gen: AsyncGenerator<T>): Promise<T[]> {
-  const out: T[] = [];
-  for await (const x of gen) {
-    out.push(x);
-  }
-  return out;
-}
+const PASSTHRU_OPTIONS: NevermoreOptions = {
+  concurrency: Number.MAX_SAFE_INTEGER,
+};
 
 describe("Nevermore pipelines without limits", () => {
   // create a successful job function with associated config metadata
@@ -47,16 +33,11 @@ describe("Nevermore pipelines without limits", () => {
   }
 
   test("Job sequence can be generator", async () => {
-    const settlementSequence = nevermore(
-      {
-        concurrency: Number.MAX_SAFE_INTEGER,
-      },
-      function* () {
-        for (const msg of ["one", "two", "three"]) {
-          yield createMessageJob(msg);
-        }
+    const settlementSequence = nevermore(PASSTHRU_OPTIONS, function* () {
+      for (const msg of ["one", "two", "three"]) {
+        yield createMessageJob(msg);
       }
-    );
+    });
 
     // flatten async iterator to an eventual array of settlements
     const settlements = await gen2array(settlementSequence);
@@ -90,17 +71,12 @@ describe("Nevermore pipelines without limits", () => {
 
   test("Job sequence can be async generator", async () => {
     // when job input is a normal iterable
-    const settlementSequence = nevermore(
-      {
-        concurrency: Number.MAX_SAFE_INTEGER,
-      },
-      async function* () {
-        for (const msg of ["one", "two", "three"]) {
-          await delay(10, undefined);
-          yield createMessageJob(msg);
-        }
+    const settlementSequence = nevermore(PASSTHRU_OPTIONS, async function* () {
+      for (const msg of ["one", "two", "three"]) {
+        await delay(10, undefined);
+        yield createMessageJob(msg);
       }
-    );
+    });
 
     // results in settlements as normal
     expect(await gen2array(settlementSequence)).toMatchObject([
@@ -124,16 +100,11 @@ describe("Nevermore pipelines without limits", () => {
 
   test("Job sequence can be an ordinary iterable", async () => {
     // when job input is a normal iterable
-    const settlementSequence = nevermore(
-      {
-        concurrency: Number.MAX_SAFE_INTEGER,
-      },
-      [
-        createMessageJob("one"),
-        createMessageJob("two"),
-        createMessageJob("three"),
-      ]
-    );
+    const settlementSequence = nevermore(PASSTHRU_OPTIONS, [
+      createMessageJob("one"),
+      createMessageJob("two"),
+      createMessageJob("three"),
+    ]);
 
     // results in settlements as normal
     expect(await gen2array(settlementSequence)).toMatchObject([
@@ -156,16 +127,11 @@ describe("Nevermore pipelines without limits", () => {
   });
 
   test("Settlements allow Generic job with caller-provided metadata", async () => {
-    const settlementSequence = nevermore(
-      {
-        concurrency: Number.MAX_SAFE_INTEGER,
-      },
-      function* () {
-        for (const msg of ["one", "two", "three"]) {
-          yield createMessageJob(msg);
-        }
+    const settlementSequence = nevermore(PASSTHRU_OPTIONS, function* () {
+      for (const msg of ["one", "two", "three"]) {
+        yield createMessageJob(msg);
       }
-    );
+    });
 
     // flatten async iterator to an eventual array of settlements
     const settlements = await gen2array(settlementSequence);
@@ -179,20 +145,15 @@ describe("Nevermore pipelines without limits", () => {
   });
 
   test("Settlements can include a record of failure", async () => {
-    const settlementSequence = nevermore(
-      {
-        concurrency: Number.MAX_SAFE_INTEGER,
-      },
-      function* () {
-        for (const msg of ["one", "two", "three"]) {
-          if (msg === "two") {
-            yield createFailingMessageJob(msg);
-          } else {
-            yield createMessageJob(msg);
-          }
+    const settlementSequence = nevermore(PASSTHRU_OPTIONS, function* () {
+      for (const msg of ["one", "two", "three"]) {
+        if (msg === "two") {
+          yield createFailingMessageJob(msg);
+        } else {
+          yield createMessageJob(msg);
         }
       }
-    );
+    });
 
     // flatten async iterator to an eventual array of settlements
     const settlements = await gen2array(settlementSequence);
