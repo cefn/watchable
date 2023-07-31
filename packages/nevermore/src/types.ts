@@ -81,7 +81,7 @@ export type NevermoreOptions = AnyOptions & OnePropertyFrom<AnyOptions>;
 // maps could use the launch itself or an auto-incrementing id as a key
 // to manage launch records?
 // TODO rename to Feed ?
-export interface Primitive<T, J extends Job<T>> {
+export interface Feed<T, J extends Job<T>> {
   launches: AsyncGenerator<J>;
   settlements: AsyncGenerator<JobSettlement<T, J>>;
 }

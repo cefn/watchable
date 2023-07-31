@@ -1,9 +1,9 @@
-import type { ConcurrencyOptions, Job, Primitive } from "../types";
+import type { ConcurrencyOptions, Job, Feed } from "../types";
 import { createAwaitableFlag } from "../util";
 
-export function createConcurrencyPrimitive<T, J extends Job<T>>(
-  source: Primitive<T, J>,
-  options: ConcurrencyOptions
+export function createConcurrencyFeed<T, J extends Job<T>>(
+  options: ConcurrencyOptions,
+  source: Feed<T, J>
 ) {
   const { concurrency } = options;
   if (concurrency < 1) {
@@ -19,7 +19,7 @@ export function createConcurrencyPrimitive<T, J extends Job<T>>(
     for await (const job of source.launches) {
       concurrentJobs++;
       yield job;
-      if (concurrentJobs >= concurrency) {
+      if (concurrentJobs === concurrency) {
         notifier = createAwaitableFlag();
         await notifier.promise;
       }
@@ -37,10 +37,10 @@ export function createConcurrencyPrimitive<T, J extends Job<T>>(
     }
   }
 
-  const concurrencyPrimitive = {
+  const concurrencyFeed: Feed<T, J> = {
     launches: createLaunches(),
     settlements: createSettlements(),
   };
 
-  return concurrencyPrimitive;
+  return concurrencyFeed;
 }

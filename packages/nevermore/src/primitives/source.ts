@@ -4,11 +4,11 @@ import type {
   Job,
   JobArgs,
   JobSettlement,
-  Primitive,
+  Feed,
 } from "../types";
 import { createAwaitableFlag, iterableToIterator, namedRace } from "../util";
 
-export function createSourcePrimitive<T, J extends Job<T>>(
+export function sourceFeed<T, J extends Job<T>>(
   options: Partial<CancelOptions>,
   jobs:
     | Iterable<J>
@@ -128,10 +128,10 @@ export function createSourcePrimitive<T, J extends Job<T>>(
     }
   }
 
-  const sourceStrategy: Primitive<T, J> = {
+  const sourceFeed: Feed<T, J> = {
     launches: createLaunches(),
     settlements: createSettlements(),
   };
 
-  return sourceStrategy;
+  return sourceFeed;
 }
