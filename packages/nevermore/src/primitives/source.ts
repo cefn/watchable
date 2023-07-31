@@ -25,7 +25,7 @@ export function createSourcePrimitive<T, J extends Job<T>>(options: {
 
   // a coroutine for launching jobs that will notify queue of their result
   // updates the launchesDone flag when it has exhausted all launches.
-  async function* createSourceLaunches() {
+  async function* createLaunches() {
     const launchIterator = iterableToIterator(launchIterable);
     const jobArgs: JobArgs = cancelPromise != null ? [{ cancelPromise }] : [];
 
@@ -81,7 +81,7 @@ export function createSourcePrimitive<T, J extends Job<T>>(options: {
   }
 
   // define an async sequence of settlements
-  async function* createSourceSettlements() {
+  async function* createSettlements() {
     let settlementPromise = settlementQueue.receive();
 
     for (;;) {
@@ -123,8 +123,8 @@ export function createSourcePrimitive<T, J extends Job<T>>(options: {
   }
 
   const sourceStrategy: Primitive<T, J> = {
-    launches: createSourceLaunches(),
-    settlements: createSourceSettlements(),
+    launches: createLaunches(),
+    settlements: createSettlements(),
   };
 
   return sourceStrategy;
