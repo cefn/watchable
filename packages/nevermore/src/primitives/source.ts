@@ -1,16 +1,22 @@
 import { createQueue } from "../../../queue/src/queue";
-import type { Job, JobArgs, JobSettlement, Primitive } from "../types";
+import type {
+  CancelOptions,
+  Job,
+  JobArgs,
+  JobSettlement,
+  Primitive,
+} from "../types";
 import { createAwaitableFlag, iterableToIterator, namedRace } from "../util";
 
-export function createSourcePrimitive<T, J extends Job<T>>(options: {
+export function createSourcePrimitive<T, J extends Job<T>>(
+  options: Partial<CancelOptions>,
   jobs:
     | Iterable<J>
     | AsyncIterable<J>
     | (() => Generator<J>)
-    | (() => AsyncGenerator<J>);
-  cancelPromise?: Promise<unknown>;
-}) {
-  const { jobs, cancelPromise = null } = options;
+    | (() => AsyncGenerator<J>)
+) {
+  const { cancelPromise = null } = options;
 
   // if it's not an iterable, it's a zero-arg (async?) generator function
   // call it to turn it into iterable

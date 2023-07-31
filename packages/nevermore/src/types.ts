@@ -51,6 +51,10 @@ export interface RetryOptions {
   retries: number;
 }
 
+export interface CancelOptions {
+  cancelPromise: Promise<unknown>;
+}
+
 /** Require a type's properties to be either fully present, or fully absent */
 type AllOrNothing<T> =
   | T
@@ -67,9 +71,10 @@ type OnePropertyFrom<T> = {
 type AnyOptions = AllOrNothing<ConcurrencyOptions> &
   AllOrNothing<TimeoutOptions> &
   AllOrNothing<RateOptions> &
-  AllOrNothing<RateOptions>;
+  AllOrNothing<RetryOptions> &
+  AllOrNothing<CancelOptions>;
 
-export type LimitOptions = AnyOptions & OnePropertyFrom<AnyOptions>;
+export type NevermoreOptions = AnyOptions & OnePropertyFrom<AnyOptions>;
 
 // TODO `launches` should track a uniquely-identified object per launch
 // since the job could be re-used, but the launch request is unique

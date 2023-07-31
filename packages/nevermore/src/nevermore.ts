@@ -1,4 +1,4 @@
-import type { Job, LimitOptions } from "./types";
+import type { Job, NevermoreOptions } from "./types";
 import { pull } from "./util";
 import { createSourcePrimitive } from "./primitives/source";
 import { createConcurrencyPrimitive } from "./primitives/concurrency";
@@ -8,22 +8,21 @@ import { createConcurrencyPrimitive } from "./primitives/concurrency";
  * @param cancelPromise If provided, Nevermore will cease launching jobs whenever this promise settles.
  * @returns
  */
-export async function* nevermore<T, J extends Job<T>>(options: {
+export async function* nevermore<T, J extends Job<T>>(
+  options: NevermoreOptions,
   jobs:
     | Iterable<J>
     | AsyncIterable<J>
     | (() => Generator<J>)
-    | (() => AsyncGenerator<J>);
-  cancelPromise?: Promise<unknown>;
-  limitOptions?: LimitOptions;
-}) {
-  const concurrency = options.limitOptions?.concurrency;
+    | (() => AsyncGenerator<J>)
+) {
+  const { concurrency, cancelPromise } = options;
 
-  let primitive = createSourcePrimitive(options);
+  let primitive = createSourcePrimitive({ cancelPromise }, jobs);
 
-  if (typeof concurrency === "number") {
-    primitive = createConcurrencyPrimitive(primitive, { concurrency });
-  }
+  // if (typeof concurrency === "number") {
+  //   primitive = createConcurrencyPrimitive(primitive, { concurrency });
+  // }
 
   // Run background routine creating and launching jobs as fast as possible
   void pull(primitive.launches, options.cancelPromise);
