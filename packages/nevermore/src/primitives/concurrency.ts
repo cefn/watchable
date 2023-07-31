@@ -27,12 +27,13 @@ export function createConcurrencyPrimitive<T, J extends Job<T>>(
   }
 
   async function* createSettlements() {
-    for await (const _settlement of source.settlements) {
+    for await (const settlement of source.settlements) {
       concurrentJobs--;
       if (notifier !== null) {
         notifier.flag();
         notifier = null;
       }
+      yield settlement;
     }
   }
 

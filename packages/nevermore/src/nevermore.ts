@@ -20,9 +20,9 @@ export async function* nevermore<T, J extends Job<T>>(
 
   let primitive = createSourcePrimitive({ cancelPromise }, jobs);
 
-  // if (typeof concurrency === "number") {
-  //   primitive = createConcurrencyPrimitive(primitive, { concurrency });
-  // }
+  if (typeof concurrency === "number") {
+    primitive = createConcurrencyPrimitive(primitive, { concurrency });
+  }
 
   // Run background routine creating and launching jobs as fast as possible
   void pull(primitive.launches, options.cancelPromise);
