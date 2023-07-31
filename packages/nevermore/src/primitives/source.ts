@@ -18,22 +18,45 @@ export function sourceFeed<T, J extends Job<T>>(
 ) {
   const { cancelPromise = null } = options;
 
-  // if it's not an iterable, it's a zero-arg (async?) generator function
-  // call it to turn it into iterable
-  const launchIterable =
-    Symbol.iterator in jobs || Symbol.asyncIterator in jobs ? jobs : jobs();
+  const jobArgs: JobArgs = cancelPromise != null ? [{ cancelPromise }] : [];
 
+  // flag to track when launch iteration has finished
+  const launchesDone = createAwaitableFlag();
+  // count to track when settlement iteration has finished)
+  let pendingJobCount = 0;
   // queue used by concurrently executing jobs to notify outcomes
   const settlementQueue = createQueue<JobSettlement<T, J>>();
 
-  let pendingJobCount = 0;
-  const launchesDone = createAwaitableFlag();
+  async function launchJob(job: J) {
+    pendingJobCount++;
+    try {
+      const value = await job(...jobArgs);
+      // notify job success
+      pendingJobCount--;
+      settlementQueue.send({
+        job,
+        kind: "resolved",
+        value,
+      });
+    } catch (error) {
+      // notify job failure
+      pendingJobCount--;
+      settlementQueue.send({
+        job,
+        kind: "rejected",
+        error,
+      });
+    }
+  }
 
   // a coroutine for launching jobs that will notify queue of their result
   // updates the launchesDone flag when it has exhausted all launches.
   async function* createLaunches() {
+    // zero-arg (async?) generator functions should be called to create an iterable
+    const launchIterable =
+      Symbol.iterator in jobs || Symbol.asyncIterator in jobs ? jobs : jobs();
+    // now create an iterator from the iterable
     const launchIterator = iterableToIterator(launchIterable);
-    const jobArgs: JobArgs = cancelPromise != null ? [{ cancelPromise }] : [];
 
     // (generator creates+launches next job when next() is called
     for (;;) {
@@ -53,34 +76,14 @@ export function sourceFeed<T, J extends Job<T>>(
 
       const { done, value } = await nextLaunch;
       if (done === true) {
-        // no more launches will be yielded
+        // launches have finished
         launchesDone.flag();
         return value;
       }
-      // a further launch was yielded
+      // a job was yielded to be launched
       const job = value;
-
-      // background the job, tracking its pending status
-      pendingJobCount++;
-      void job(...jobArgs)
-        .then((value) => {
-          // notify job success
-          pendingJobCount--;
-          settlementQueue.send({
-            job,
-            kind: "resolved",
-            value,
-          });
-        })
-        .catch((error) => {
-          // notify job failure
-          pendingJobCount--;
-          settlementQueue.send({
-            job,
-            kind: "rejected",
-            error,
-          });
-        });
+      // background the job, (will notify result to queue)
+      void launchJob(job);
       // yield job reference to caller
       yield job;
     }
@@ -97,10 +100,10 @@ export function sourceFeed<T, J extends Job<T>>(
       // check further settlements exhausted
       if (pendingJobCount === 0) {
         if (launchesDone.flagged) {
-          // job iterator completed, all jobs have settled - finish
+          // no more settlements, no more launches - iteration has finished
           return;
         }
-        // wait on launchesDone - they may finish while we await a settlement that will never come
+        // wait on launchesDone, else launches may finish while we await a settlement that will never come
         launchesDonePromise = launchesDone.promise;
       }
 
