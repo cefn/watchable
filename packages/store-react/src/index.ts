@@ -1,6 +1,6 @@
 import type { Store, Selector, Immutable, RootState } from "@watchable/store";
 import { createStore } from "@watchable/store";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 
 /** When the component is first mounted, this hook creates and returns a a new
  * long-lived {@link @watchable/store!Store} initialised with `initialState`.
@@ -76,4 +76,24 @@ export function useRootState<State extends RootState>(store: Store<State>) {
     return unwatch;
   }, [store]);
   return rootState;
+}
+
+/** Hook with a [value, setter] signature that parallels React.useState. Reads
+ *  and writes an individual keyed property of a store's RootState. */
+export function useStateProperty<
+  S extends Record<PropertyKey, unknown>,
+  K extends keyof S
+>(store: Store<S>, key: K) {
+  const setter = useCallback(
+    (value: S[K]) => {
+      store.write({
+        ...store.read(),
+        [key]: value,
+      });
+    },
+    [store, key]
+  );
+  const selector = useCallback((state: Immutable<S>) => state[key], [key]);
+  const value = useSelected(store, selector);
+  return [value, setter] as const;
 }

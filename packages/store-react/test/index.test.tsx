@@ -2,7 +2,7 @@
  * @vitest-environment jsdom
  */
 
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { render, waitFor, screen, cleanup, act } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { vi, describe, test, expect, afterEach } from "vitest";
@@ -10,14 +10,13 @@ import { vi, describe, test, expect, afterEach } from "vitest";
 import type { Immutable, Selector, Store, RootState } from "@watchable/store";
 import { createStore } from "@watchable/store";
 
-import { useRootState, useSelected, useStore } from "../src";
-
-/** A promise of the next state change in a store. Watchers are notified in
- * order of subscription, so notifications to any previously-subscribed watchers
- * happen before this is resolved. */
+import { useRootState, useSelected, useStateProperty, useStore } from "../src";
 
 /** Wait until after the next write to a Store. */
 async function nextStateWritten<T extends RootState>(store: Store<T>) {
+  /** A promise of the next state change in a store. Watchers are notified in
+   * order of subscription, so notifications to any previously-subscribed watchers
+   * happen before this is resolved. */
   return await new Promise<Immutable<T>>((resolve) => {
     const unwatch = store.watch((state) => {
       resolve(state);
@@ -26,11 +25,18 @@ async function nextStateWritten<T extends RootState>(store: Store<T>) {
   });
 }
 
+/** Adds an event to the javascript VM event loop and (therefore implicitly)
+ * waits for all previous _due_ events to have completed. Future events are not
+ * awaited (e.g. those on a timeout which haven't yet come due) */
+async function eventsDueCompleted() {
+  return await new Promise((resolve) => setTimeout(resolve, 0));
+}
+
 /** Wait for the event loop after the next write to finish (allowing
  * change to propagate). */
 async function nextStatePropagated<T extends RootState>(store: Store<T>) {
   const state = await nextStateWritten(store); // wait for async operations to be triggered
-  await new Promise((resolve) => setTimeout(resolve, 0)); // wait for change to propagate
+  await eventsDueCompleted(); // wait for change to propagate
   return state;
 }
 
@@ -90,7 +96,7 @@ describe("store-react :", () => {
     });
   });
 
-  describe("useSelected : (re)render using subset of store", () => {
+  describe("useSelected : ", () => {
     /** DEFINE STATE, STORE, UI */
 
     type Coord = [number, number];
@@ -98,7 +104,7 @@ describe("store-react :", () => {
       readonly coord: Coord;
     }
 
-    const selectCoord: Selector<TestState, Coord> = (state) => {
+    const selectCoord: Selector<TestState, Immutable<Coord>> = (state) => {
       return state.coord;
     };
 
@@ -127,7 +133,7 @@ describe("store-react :", () => {
       });
 
       test("State change between render and useEffect is detected", async () => {
-        const selectCoord: Selector<TestState, Coord> = (state) => {
+        const selectCoord: Selector<TestState, Immutable<Coord>> = (state) => {
           return state.coord;
         };
 
@@ -161,7 +167,7 @@ describe("store-react :", () => {
 
       const StoreSelectionComponent = (props: {
         store: Store<TestState>;
-        selector: Selector<TestState, Coord>;
+        selector: Selector<TestState, Immutable<Coord>>;
       }) => {
         renderSpy();
         const coord = useSelected(props.store, props.selector);
@@ -178,7 +184,8 @@ describe("store-react :", () => {
         } as const);
 
         // construct a selector
-        let selector: Selector<TestState, Coord> = (state) => state.coord;
+        let selector: Selector<TestState, Immutable<Coord>> = (state) =>
+          state.coord;
 
         // render with the selector
         const { rerender } = render(
@@ -197,7 +204,8 @@ describe("store-react :", () => {
       });
 
       test("Skip render if selected value identical after store replaced", async () => {
-        const selector: Selector<TestState, Coord> = (state) => state.coord;
+        const selector: Selector<TestState, Immutable<Coord>> = (state) =>
+          state.coord;
 
         // construct a store
         let store = createStore<TestState>({
@@ -288,6 +296,123 @@ describe("store-react :", () => {
       await new Promise((resolve) => setTimeout(resolve, 50));
       expect(rootRenderSpy).toHaveBeenCalledTimes(0); // root not re-rendered
       expect(branchRenderSpy).toHaveBeenCalledTimes(0); // branch not re-rendered
+    });
+  });
+
+  describe("useStateProperty : ", () => {
+    test("renders the property", () => {
+      const renderSpy = vi.fn();
+      const store = createStore({ roses: "red" });
+      const Component = () => {
+        renderSpy();
+        const [roseColor, _setRoseColor] = useStateProperty(store, "roses");
+        return <p>{roseColor}</p>;
+      };
+      render(<Component />);
+      // property was rendered
+      screen.getByText("red");
+      // render should have been triggered once
+      expect(renderSpy).toHaveBeenCalledTimes(1);
+    });
+
+    test("re-renders when property changes", async () => {
+      const renderSpy = vi.fn();
+      const store = createStore({ roses: "red" });
+      const Component = () => {
+        renderSpy();
+        const [roseColor, _setRoseColor] = useStateProperty(store, "roses");
+        return <p>{roseColor}</p>;
+      };
+      render(<Component />);
+      screen.getByText("red");
+      renderSpy.mockClear();
+      // write a change and wait for all listeners to be notified
+      await promiseWritePropagated(store, { roses: "white" });
+      // expect the component to have changed
+      screen.getByText("white");
+      // render should have been triggered once
+      expect(renderSpy).toHaveBeenCalledTimes(1);
+    });
+
+    test("re-renders when key changes", async () => {
+      const renderSpy = vi.fn();
+      const initialState = { roses: "red", violets: "blue" };
+      const store = createStore(initialState);
+      // render a component that renders once then
+      // changes the key it is watching in the state
+      const Component = () => {
+        renderSpy();
+        const [renderedKey, setRenderedKey] =
+          useState<keyof typeof initialState>("roses");
+        const [value, _setter] = useStateProperty(store, renderedKey);
+        useEffect(() => {
+          void (async () => {
+            await Promise.resolve();
+            setRenderedKey("violets");
+          })();
+        }, []);
+        return <p>{value}</p>;
+      };
+      render(<Component />);
+      screen.getByText("red");
+      expect(renderSpy).toHaveBeenCalledTimes(1);
+      renderSpy.mockClear();
+      await eventsDueCompleted(); // await for useEffect to set Rendered Key
+      await eventsDueCompleted(); // await for consequent render
+      // expect the component to render the different keyed property
+      screen.getByText("blue");
+      // render will have been triggered twice more
+      // once after useEffect changed key (passed to the useStateProperty call)
+      // once more for the useSelected inside useStateProperty to propagate its internal state
+      expect(renderSpy).toHaveBeenCalledTimes(2);
+    });
+
+    test("ignores untracked property of store", async () => {
+      const renderSpy = vi.fn();
+      const store = createStore({ roses: "red", violets: "blue" });
+      const Component = () => {
+        renderSpy();
+        const [roseColor, _setRoseColor] = useStateProperty(store, "roses");
+        return <p>{roseColor}</p>;
+      };
+      render(<Component />);
+      screen.getByText("red");
+      // write the untracked property
+      renderSpy.mockClear();
+      await promiseWritePropagated(store, {
+        ...store.read(),
+        violets: "yellow",
+      });
+      screen.getByText("red");
+      // render shouldn't have been triggered again
+      expect(renderSpy).toHaveBeenCalledTimes(0);
+    });
+
+    test("setter changes property", async () => {
+      const renderSpy = vi.fn();
+      const store = createStore({ roses: "red" });
+      const Component = () => {
+        renderSpy();
+        const [roseColor, setRoseColor] = useStateProperty(store, "roses");
+        useEffect(() => {
+          setRoseColor("white");
+        }, []);
+        return <p>{roseColor}</p>;
+      };
+
+      // promise to detect setter being called
+      const writtenPromise = nextStateWritten(store);
+      // renders initial value (setter is called in useEffect after render)
+      render(<Component />);
+      screen.getByText("red");
+      expect(renderSpy).toHaveBeenCalledTimes(1);
+      renderSpy.mockClear();
+      // wait for setter to be called
+      await writtenPromise;
+      screen.getByText("white");
+      await eventsDueCompleted();
+      // render should have been triggered just once more
+      expect(renderSpy).toHaveBeenCalledTimes(1);
     });
   });
 });
