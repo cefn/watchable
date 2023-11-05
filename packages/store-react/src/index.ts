@@ -1,12 +1,41 @@
+/* eslint-disable symbol-description */
 import type { Store, Selector, Immutable, RootState } from "@watchable/store";
 import { createStore } from "@watchable/store";
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useMemo, useCallback } from "react";
+
+/** A hook that uses a dummy state to force a render on request. */
+function useRenderTrigger() {
+  const [_, setTrigger] = useState(0);
+  return useCallback(() => {
+    setTrigger((trigger) => trigger + 1);
+  }, [setTrigger]);
+}
+
+/** Memoizes a single argument function. Re-uses the previous result whenever
+ * previous argument is identical (according to `Object.is`).
+ */
+function memoizeUnaryFn<Arg, Ret>(unaryFn: (arg: Arg) => Ret) {
+  let previousRun: [Arg, Ret] | null = null;
+  const memoizedFn = (arg: Arg) => {
+    if (previousRun !== null) {
+      const [prevArg, prevRet] = previousRun;
+      if (Object.is(arg, prevArg)) {
+        return prevRet;
+      }
+    }
+    const ret = unaryFn(arg);
+    previousRun = [arg, ret];
+    return ret;
+  };
+  return memoizedFn;
+}
 
 /** When the component is first mounted, this hook creates and returns a a new
  * long-lived {@link @watchable/store!Store} initialised with `initialState`.
  *
  * In later renders the hook will always return the same `Store`, It
  * deliberately doesn't force a component refresh when the Store state changes.
+ * Any changes to `initialState` after the first render are therefore ignored.
  * To track changes in the store, see {@link useSelected} or {@link useRootState}.
  *
  * @param initialState
@@ -24,17 +53,25 @@ export function useStore<T extends RootState>(initialState: Immutable<T>) {
  * {@link @watchable/store!Selector} function.
  *
  * This hook calls `selector` with the `Store`'s `RootState` and returns the
- * derived value. Then it {@link @watchable/store!Watcher watches} the store, calling
- * the `selector` again for every change to the `RootState`. If the value
- * returned by `selector` is not identical to the last saved value, a re-render
- * will be triggered (and this hook will return the new value).
+ * derived value. Then it {@link @watchable/store!Watcher watches} the store,
+ * calling the `selector` again for every change to the `RootState`. If the
+ * value returned by `selector` is not identical to the last saved value, a
+ * re-render will be triggered (and this hook will return the new value).
+ *
+ * This hook recomputes its state when the `selector` changes. You should avoid
+ * unnecessarily creating a new selector on every render. Selectors can usually
+ * be created outside the component to avoid this. If your selector has some
+ * prop dependencies, then wrap the selector in a React
+ * [useCallback](https://react.dev/reference/react/useCallback) to ensure the
+ * reference stays the same as much as possible.
  *
  * If your `selector` constructs a new data structure based on the `RootState`,
- * (rather than just selecting some part of the {@link @watchable/store!Immutable} `RootState` or
- * calculating a primitive value), then it might return a non-identical value
- * even when nothing has changed. Computed data structures should be
- * [memoized](https://github.com/reduxjs/reselect#creating-a-memoized-selector)
- * to minimise component refreshes.
+ * (rather than just selecting some part of the
+ * {@link @watchable/store!Immutable} `RootState` or calculating a primitive
+ * value), then it might return a non-identical value even when nothing has
+ * changed. This is now prevented because we add a memoizing wrapper to your
+ * selector. If state arguments remain the same, we will use the previous value
+ * returned _**without executing your selector**_.
  *
  * See {@link @watchable/store!Selector}
  */
@@ -42,20 +79,28 @@ export function useSelected<State extends RootState, Selected>(
   store: Store<State>,
   selector: Selector<State, Selected>
 ) {
-  let [selected, setSelected] = useState(() => selector(store.read()));
+  // selected is evaluated both in store watcher and here in component
+  // memoizing its args ensures selector is executed maximum once per state change
+  const memoizedSelector = useMemo(() => memoizeUnaryFn(selector), [selector]);
+  // lazy calculate selected
+  let selected = memoizedSelector(store.read());
+  // create renderTrigger for use in useEffect
+  const renderTrigger = useRenderTrigger();
   useEffect(() => {
-    const maybeSetSelected = (nextState: Immutable<State>) => {
-      const nextSelected = selector(nextState); // what's the selected now?
+    const maybeRender = (nextState: Immutable<State>) => {
+      // store state was written - reevaluate selected
+      const nextSelected = memoizedSelector(nextState);
+      // refresh only when selected is different
       if (!Object.is(selected, nextSelected)) {
-        selected = nextSelected; // sync value in maybeSetSelected closure
-        setSelected(nextSelected); // notify changed value
+        selected = nextSelected; // update selected in useEffect closure
+        renderTrigger(); // update selected in hook re-render
       }
     };
-    // handle changes between first render and useEffect
-    maybeSetSelected(store.read());
-    // handle future changes (returning unwatch function)
-    return store.watch(maybeSetSelected);
-  }, [store, selector]);
+    // don't miss edits between initial render and (useEffect) store.watch
+    maybeRender(store.read());
+    // watch store, (returning unwatch function)
+    return store.watch(maybeRender);
+  }, [store, memoizedSelector, renderTrigger]);
   return selected;
 }
 
@@ -67,15 +112,12 @@ export function useSelected<State extends RootState, Selected>(
  * @param store The {@link @watchable/store!Store} to track.
  */
 export function useRootState<State extends RootState>(store: Store<State>) {
-  const { read, watch } = store;
-  const [rootState, setRootState] = useState(read);
+  // trigger for store watcher to force a render
+  const renderTrigger = useRenderTrigger();
   useEffect(() => {
-    const unwatch = watch((nextRootState) => {
-      setRootState(nextRootState); // set version in state
-    });
-    return unwatch;
+    return store.watch(renderTrigger);
   }, [store]);
-  return rootState;
+  return store.read();
 }
 
 /** Hook with a [value, setter] signature that parallels React.useState. Reads
