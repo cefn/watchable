@@ -1,5 +1,4 @@
-import type { Immutable } from "@watchable/store";
-import { createStore } from "@watchable/store";
+import { type Immutable, createStore } from "@watchable/store";
 import { followSelector } from "@watchable/store-follow";
 
 import { manyTicks } from "./util";
@@ -11,15 +10,15 @@ interface Location {
   distance: number;
 }
 
-interface CounterState {
+type CounterState = Immutable<{
   near: Location;
   far: Location;
-}
+}>;
 
-const INITIAL_STATE: Immutable<CounterState> = {
+const INITIAL_STATE: CounterState = {
   near: { name: "London", distance: 100 },
   far: { name: "Sydney", distance: 10000 },
-};
+} as const;
 
 const timbuktu = {
   name: "Timbuktu",

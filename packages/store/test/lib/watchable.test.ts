@@ -1,5 +1,5 @@
 import { DefaultWatchable } from "../../src/lib/watchable";
-import { DefaultWatchableState } from "../../src/lib/watchableState";
+import { DefaultStore } from "../../src/lib/store";
 
 import { vi, describe, test, expect } from "vitest";
 
@@ -35,40 +35,38 @@ describe("BasicWatchable behaviour", () => {
   });
 });
 
-describe("BasicWatchableValue behaviour", () => {
-  test("Can create BasicWatchableValue", () => {
-    expect(new DefaultWatchableState<string>("foo")).toBeDefined();
-    expect(new DefaultWatchableState<number>(3)).toBeDefined();
-    expect(new DefaultWatchableState<boolean>(true)).toBeDefined();
-    expect(new DefaultWatchableState<unknown[]>([])).toBeDefined();
-    expect(
-      new DefaultWatchableState<Record<string, unknown>>({})
-    ).toBeDefined();
+describe("Store behaviour", () => {
+  test("Can create Store", () => {
+    expect(new DefaultStore<string>("foo")).toBeDefined();
+    expect(new DefaultStore<number>(3)).toBeDefined();
+    expect(new DefaultStore<boolean>(true)).toBeDefined();
+    expect(new DefaultStore<unknown[]>([])).toBeDefined();
+    expect(new DefaultStore<Record<string, unknown>>({})).toBeDefined();
   });
 
-  test("Can watch BasicWatchableValue", async () => {
-    const watchableValue = new DefaultWatchableState<string>("foo");
+  test("Can watch Store", async () => {
+    const store = new DefaultStore<string>("foo");
     const watcher = vi.fn();
-    watchableValue.watch(watcher);
-    watchableValue.write("bar");
+    store.watch(watcher);
+    store.write("bar");
     await Promise.resolve(); // wait one tick for notifications
     expect(watcher).toHaveBeenCalledWith("bar");
   });
 
-  test("Can watch BasicWatchableValue from moment of construction", async () => {
+  test("Can watch Store from moment of construction", async () => {
     const watcher = vi.fn();
     const watchers = [watcher];
-    const watchableValue = new DefaultWatchableState<string>("foo", watchers);
+    const store = new DefaultStore<string>("foo", watchers);
     await Promise.resolve(); // wait one tick for notifications
     expect(watcher).toHaveBeenCalledWith("foo");
     watcher.mockClear();
-    watchableValue.write("bar");
+    store.write("bar");
     await Promise.resolve(); // wait one tick for notifications
     expect(watcher).toHaveBeenCalledWith("bar");
   });
 
-  test("Can construct BasicWatchableValue with value", () => {
-    const watchableValue = new DefaultWatchableState<string>("foo");
-    expect(watchableValue.read()).toBe("foo");
+  test("Can construct Store with value", () => {
+    const store = new DefaultStore<string>("foo");
+    expect(store.read()).toBe("foo");
   });
 });

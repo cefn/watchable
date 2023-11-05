@@ -1,5 +1,4 @@
-/* eslint-disable symbol-description */
-import type { Store, Selector, Immutable, RootState } from "@watchable/store";
+import type { Store, Selector, RootState } from "@watchable/store";
 import { createStore } from "@watchable/store";
 import { useState, useEffect, useMemo, useCallback } from "react";
 
@@ -41,7 +40,7 @@ function memoizeUnaryFn<Arg, Ret>(unaryFn: (arg: Arg) => Ret) {
  * @param initialState
  * @returns A lazily-created {@link @watchable/store!Store}
  */
-export function useStore<T extends RootState>(initialState: Immutable<T>) {
+export function useStore<T extends RootState>(initialState: T) {
   const [store] = useState(() => {
     return createStore(initialState);
   });
@@ -66,12 +65,11 @@ export function useStore<T extends RootState>(initialState: Immutable<T>) {
  * reference stays the same as much as possible.
  *
  * If your `selector` constructs a new data structure based on the `RootState`,
- * (rather than just selecting some part of the
- * {@link @watchable/store!Immutable} `RootState` or calculating a primitive
- * value), then it might return a non-identical value even when nothing has
- * changed. This is now prevented because we add a memoizing wrapper to your
- * selector. If state arguments remain the same, we will use the previous value
- * returned _**without executing your selector**_.
+ * (rather than just selecting some part of the `RootState` or calculating a
+ * primitive value), then it might return a non-identical value even when
+ * nothing has changed. This is now prevented because we add a memoizing wrapper
+ * to your selector. If state arguments remain the same, we will use the
+ * previous value returned _**without executing your selector**_.
  *
  * See {@link @watchable/store!Selector}
  */
@@ -87,7 +85,7 @@ export function useSelected<State extends RootState, Selected>(
   // create renderTrigger for use in useEffect
   const renderTrigger = useRenderTrigger();
   useEffect(() => {
-    const maybeRender = (nextState: Immutable<State>) => {
+    const maybeRender = (nextState: State) => {
       // store state was written - reevaluate selected
       const nextSelected = memoizedSelector(nextState);
       // refresh only when selected is different
@@ -135,7 +133,7 @@ export function useStateProperty<
     },
     [store, key]
   );
-  const selector = useCallback((state: Immutable<S>) => state[key], [key]);
+  const selector = useCallback((state: S) => state[key], [key]);
   const value = useSelected(store, selector);
   return [value, setter] as const;
 }

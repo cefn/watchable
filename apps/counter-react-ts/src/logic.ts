@@ -1,10 +1,10 @@
-import type { Immutable, Store } from "@watchable/store";
+import type { Store, Immutable } from "@watchable/store";
 
-export interface CounterState {
+export type CounterState = Immutable<{
   counter: number;
-}
+}>;
 
-export const INITIAL_STATE: Immutable<CounterState> = {
+export const INITIAL_STATE: CounterState = {
   counter: 0,
 } as const;
 

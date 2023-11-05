@@ -1,12 +1,12 @@
-import type { Immutable, RootState, Store, Watcher } from "../src/types";
+import type { RootState, Store, Watcher } from "../src/types";
 import { createDeferred, safeEntries } from "./util";
 
 import { describe, test, expect } from "vitest";
 
 /** Defining a factory allows us to run the same test suite across stores and partitioned stores. */
 export type StoreFactory = <State extends RootState>(
-  state: Immutable<State>,
-  watchers?: ReadonlyArray<Watcher<Immutable<State>>>
+  state: State,
+  watchers?: ReadonlyArray<Watcher<State>>
 ) => Store<State>;
 
 export function createStoreSuite(
@@ -87,7 +87,7 @@ export function createStoreSuite(
 
     test("Watchers notified of writes", async () => {
       type State = Record<string, string[]>;
-      const { deferred, deferredResolve } = createDeferred<Immutable<State>>();
+      const { deferred, deferredResolve } = createDeferred<State>();
       const store = storeFactory<State>({
         ancient: ["Roses are red", "Violets are blue"],
       });

@@ -1,4 +1,4 @@
-import type { Immutable, RootState, Watcher } from "../../src/types";
+import type { RootState, Watcher } from "../../src/types";
 import type { StoreFactory } from "../storeSuite";
 import { createStore, createStorePartition } from "../../src/lib";
 import { createStoreSuite } from "../storeSuite";
@@ -10,13 +10,13 @@ import { vi, describe, test, expect } from "vitest";
 
 /** Creates a store as an object property in a parent store. */
 const partitionedMapStoreFactory: StoreFactory = <ChildState extends RootState>(
-  childState: Immutable<ChildState>,
-  watchers?: ReadonlyArray<Watcher<Immutable<ChildState>>>
+  childState: ChildState,
+  watchers?: ReadonlyArray<Watcher<ChildState>>
 ) => {
   interface ParentState {
     foo: ChildState;
   }
-  const parentState: Immutable<ParentState> = { foo: childState } as const;
+  const parentState: ParentState = { foo: childState } as const;
   const parentStore = createStore<ParentState>(parentState);
   const childStore = createStorePartition(parentStore, "foo", watchers);
   return childStore;
@@ -26,11 +26,11 @@ const partitionedMapStoreFactory: StoreFactory = <ChildState extends RootState>(
 const partitionedListStoreFactory: StoreFactory = <
   ChildState extends RootState
 >(
-  childState: Immutable<ChildState>,
-  watchers?: ReadonlyArray<Watcher<Immutable<ChildState>>>
+  childState: ChildState,
+  watchers?: ReadonlyArray<Watcher<ChildState>>
 ) => {
   type ParentState = [ChildState];
-  const parentState: Immutable<ParentState> = [childState] as const;
+  const parentState: ParentState = [childState];
   const parentStore = createStore<ParentState>(parentState);
   const childStore = createStorePartition(parentStore, 0, watchers);
   return childStore;
