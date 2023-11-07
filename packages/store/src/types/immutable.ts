@@ -1,3 +1,54 @@
+/* eslint-disable @typescript-eslint/ban-types */
+
+/** Copied under MIT License from
+ * https://github.com/immerjs/immer/blob/f6736a4beef727c6e5b41c312ce1b202ad3afb23/src/types/types-external.ts#L51 */
+
+/** Typescript primitive types */
+type PrimitiveType = number | string | boolean;
+
+/** Object types that should never be mapped */
+type AtomicObject = Function | Promise<any> | Date | RegExp;
+
+/**
+ * If the lib "ES2015.Collection" is not included in tsconfig.json,
+ * types like ReadonlyArray, WeakMap etc. fall back to `any` (specified nowhere)
+ * or `{}` (from the node types), in both cases entering an infinite recursion in
+ * pattern matching type mappings
+ * This type can be used to cast these types to `void` in these cases.
+ */
+type IfAvailable<T, Fallback = void> =
+  // fallback if any
+  true | false extends (T extends never ? true : false)
+    ? Fallback // fallback if empty type
+    : keyof T extends never
+    ? Fallback // original type
+    : T;
+
+/**
+ * These should also never be mapped but must be tested after regular Map and
+ * Set
+ */
+type WeakReferences =
+  | IfAvailable<WeakMap<any, any>>
+  | IfAvailable<WeakSet<any>>;
+
+type WritableDraft<T> = { -readonly [K in keyof T]: Draft<T[K]> };
+
+/** Convert a readonly type into a mutable type, if possible */
+export type Draft<T> = T extends PrimitiveType
+  ? T
+  : T extends AtomicObject
+  ? T
+  : T extends ReadonlyMap<infer K, infer V> // Map extends ReadonlyMap
+  ? Map<Draft<K>, Draft<V>>
+  : T extends ReadonlySet<infer V> // Set extends ReadonlySet
+  ? Set<Draft<V>>
+  : T extends WeakReferences
+  ? T
+  : T extends object
+  ? WritableDraft<T>
+  : T;
+
 /** `Immutable<T>` is used to flag and enforce immutability of a
  * {@link RootState} and its descendants - typically values assigned to a
  * {@link Store} ({@link @watchable/store.Store#write}) or retrieved from it
@@ -23,14 +74,16 @@
  * `Readonly` contract.
  *
  */
-export type Immutable<T> = T extends (...args: unknown[]) => unknown
+export type Immutable<T> = T extends PrimitiveType
+  ? T
+  : T extends AtomicObject
+  ? T
+  : T extends ReadonlyMap<infer K, infer V> // Map extends ReadonlyMap
+  ? ReadonlyMap<Immutable<K>, Immutable<V>>
+  : T extends ReadonlySet<infer V> // Set extends ReadonlySet
+  ? ReadonlySet<Immutable<V>>
+  : T extends WeakReferences
   ? T
   : T extends object
-  ? ImmutableObject<T>
+  ? { readonly [K in keyof T]: Immutable<T[K]> }
   : T;
-
-/** Recursive Readonly implementation for any (indexable) {@link RootState} such as
- * an array or object */
-export type ImmutableObject<T extends object> = Readonly<{
-  [K in keyof T]: Immutable<T[K]>;
-}>;

@@ -1,4 +1,4 @@
-import type { Immutable, RootState, Selector, Store } from "@watchable/store";
+import type { RootState, Selector, Store } from "@watchable/store";
 import type { Controls, Follower, QueueHandler, ExitStatus } from "./types";
 
 import { createQueue } from "@watchable/queue";
@@ -27,7 +27,7 @@ export async function withSelectorQueue<
   const queue = createQueue<Selected>();
   // Could be hoisted as a 'SelectorWatchable'
   let prevSelected: Selected = selector(store.read());
-  const selectedNotifier = (value: Immutable<State>) => {
+  const selectedNotifier = (value: State) => {
     const nextSelected = selector(value);
     if (!Object.is(nextSelected, prevSelected)) {
       prevSelected = nextSelected;
