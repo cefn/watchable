@@ -29,7 +29,7 @@
     "prerelease:enter": "changeset pre enter alpha",
     "prerelease:exit": "changeset pre exit alpha",
     "npm:login": "npm whoami || npm login",
-    "publish": "run-s npm:login git:ensureclean qa changeset:create changeset:version changeset:publish git:commit:release"
+    "publish": "run-s npm:login git:ensureclean qa changeset:version changeset:publish git:commit:release"
   },
   "devDependencies": {
     "@changesets/cli": "^2.26.1",
