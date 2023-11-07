@@ -13,7 +13,7 @@
   ],
   "scripts": {
     "qa": "wireit",
-    "qa:clean": "find . -depth -not -path '*/node_modules/*' -and -type d -and \\( -name '*.tsbuildinfo' -or -iname '.wireit' -or -iname 'dist' \\) | xargs -n1 rm -rf ",
+    "qa:clean": "find . -depth -not -path '*/node_modules/*' -and \\( \\( -type f -and -iname '*.tsbuildinfo' \\) -or \\( -type d -and \\( -iname '.wireit' -or -iname 'dist' \\) \\) \\) | xargs -n1 rm -rf ",
     "qa:watch": "npm run qa --watch",
     "build": "wireit",
     "docs": "typedoc",
