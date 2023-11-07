@@ -1,6 +1,6 @@
 {
   "name": "counter-dom-tiny",
-  "version": "0.9.0-alpha.5",
+  "version": "0.9.0-alpha.6",
   "private": true,
   "description": "",
   "homepage": "https://github.com/cefn/watchable/tree/main/apps/counter-dom-tiny#readme",
@@ -19,7 +19,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@watchable/store": "1.0.0-alpha.5"
+    "@watchable/store": "1.0.0-alpha.6"
   },
   "devDependencies": {
     "vite": "^4.2.1",

@@ -5,8 +5,8 @@ import { describe, test, expect } from "vitest";
 
 /** Defining a factory allows us to run the same test suite across stores and partitioned stores. */
 export type StoreFactory = <State extends RootState>(
-  state: Immutable<State>,
-  watchers?: ReadonlyArray<Watcher<Immutable<State>>>
+  state: State,
+  watchers?: ReadonlyArray<Watcher<State>>
 ) => Store<State>;
 
 export function createStoreSuite(
@@ -15,12 +15,12 @@ export function createStoreSuite(
 ) {
   describe(`${suiteName}: Core behaviour`, () => {
     test("Create Store with Array root", () => {
-      const state: number[] = [3, 4, 5];
+      const state: Immutable<number[]> = [3, 4, 5];
       expect(storeFactory<typeof state>(state).read()).toEqual(state);
     });
 
     test("Create Store with Record root", () => {
-      const state: Record<string, number> = { pi: 3.1415926 };
+      const state: Immutable<Record<string, number>> = { pi: 3.1415926 };
       expect(storeFactory<typeof state>(state).read()).toEqual(state);
     });
 
@@ -63,7 +63,7 @@ export function createStoreSuite(
     });
 
     test("Create Store and pass watchers who are notified", async () => {
-      type State = Record<string, number>;
+      type State = Immutable<Record<string, number>>;
       const state: State = { pi: 3.1415926 };
       const { deferredResolve, deferred } = createDeferred<State>();
       const watchers = [deferredResolve] as const;
@@ -72,7 +72,7 @@ export function createStoreSuite(
     });
 
     test("Can write Store state", () => {
-      const store = storeFactory<Record<string, string[]>>({
+      const store = storeFactory<Immutable<Record<string, string[]>>>({
         ancient: ["Roses are red", "Violets are blue"],
       });
       const state = store.write({
@@ -86,8 +86,8 @@ export function createStoreSuite(
     });
 
     test("Watchers notified of writes", async () => {
-      type State = Record<string, string[]>;
-      const { deferred, deferredResolve } = createDeferred<Immutable<State>>();
+      type State = Immutable<Record<string, string[]>>;
+      const { deferred, deferredResolve } = createDeferred<State>();
       const store = storeFactory<State>({
         ancient: ["Roses are red", "Violets are blue"],
       });
@@ -105,7 +105,7 @@ export function createStoreSuite(
 
     test("Store methods are bound to store", async () => {
       const state = { pi: 3.1415926 };
-      const store = storeFactory<Record<string, number>>(state);
+      const store = storeFactory<Immutable<Record<string, number>>>(state);
 
       // it should be possible to destructure every method
       // and use it on its own

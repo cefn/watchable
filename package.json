@@ -13,10 +13,10 @@
   ],
   "scripts": {
     "qa": "wireit",
-    "qa:clean": "find . -depth -not -path '*/node_modules/*' -and -type d -and \\( -name '*.tsbuildinfo' -or -iname '.wireit' -or -iname 'dist' \\) | xargs -n1 rm -rf ",
+    "qa:clean": "find . -depth -not -path '*/node_modules/*' -and \\( \\( -type f -and -iname '*.tsbuildinfo' \\) -or \\( -type d -and \\( -iname '.wireit' -or -iname 'dist' \\) \\) \\) | xargs -n1 rm -rf ",
     "qa:watch": "npm run qa --watch",
     "build": "wireit",
-    "docs": "typedoc",
+    "docs": "wireit",
     "apps:playwright:align": "find ./apps -maxdepth 1 -mindepth 1 -type d -name 'counter*react*ts*' -and -not -name 'counter-react-ts' | xargs -I{} zsh -c \"cp apps/counter-react-ts/playwright.config.ts {} && cp apps/counter-react-ts/test/playwright/index.test.ts {}/test/playwright/index.test.ts\"",
     "packages:sort": "npm exec sort-package-json package.json {apps,packages}/*/package.json",
     "packages:validate": "tsx tooling/validate/cli.ts",
@@ -29,7 +29,7 @@
     "prerelease:enter": "changeset pre enter alpha",
     "prerelease:exit": "changeset pre exit alpha",
     "npm:login": "npm whoami || npm login",
-    "publish": "run-s npm:login git:ensureclean qa changeset:create changeset:version changeset:publish git:commit:release"
+    "publish": "run-s npm:login git:ensureclean qa:clean qa changeset:version changeset:publish git:commit:release"
   },
   "devDependencies": {
     "@changesets/cli": "^2.26.1",
@@ -119,6 +119,16 @@
         "./packages/store-edit:lint",
         "./packages/store-follow:lint",
         "./packages/store-react:lint"
+      ]
+    },
+    "docs": {
+      "command": "typedoc",
+      "dependencies": [
+        "./packages/queue:build",
+        "./packages/store:build",
+        "./packages/store-edit:build",
+        "./packages/store-follow:build",
+        "./packages/store-react:build"
       ]
     }
   }

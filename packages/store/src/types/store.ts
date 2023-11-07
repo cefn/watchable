@@ -1,8 +1,8 @@
-import type { Immutable } from "./immutable";
-import type { WatchableState } from "./watchable";
+import type { Watchable } from "./watchable";
 
-/** A `Store` keeps an Immutable {@link RootState}, (any array, tuple or
- * object), which can be changed and monitored for changes to drive an app. Make
+/** A `Store` keeps an immutable {@link RootState}, (any array, tuple or
+ * object), which can be replaced by a new state. Monitoring for state replacement
+ * can indentify changes in state to drive an app. Make
  * a new `Store` by calling {@link createStore} with an `initialState`.
  *
  * Flagging all state references as {@link Immutable} guides IDEs to treat these
@@ -11,8 +11,8 @@ import type { WatchableState } from "./watchable";
  *
  * ## Watching State
  *
- * Assigning a new {@link @watchable/store!Immutable} `RootState` using
- * {@link @watchable/store!WatchableState.write} notifies {@link Watcher | Watchers}
+ * Assigning a new `RootState` using
+ * {@link @watchable/store!Store.write} notifies {@link Watcher | Watchers}
  * previously subscribed using {@link @watchable/store!Watchable.watch}. This
  * mechanism ensures that app logic and renderers can track the latest state.
  *
@@ -41,7 +41,12 @@ import type { WatchableState } from "./watchable";
  * a momentary snapshot of the app state which can be stored indefinitely.
  * @interface
  */
-export type Store<State extends RootState> = WatchableState<Immutable<State>>;
+export interface Store<State extends RootState> extends Watchable<State> {
+  /** Store a new state. */
+  write: (state: State) => State;
+  /** Retrieve the current state. */
+  read: () => State;
+}
 
 /** Defines the set of possible state types for a {@link Store}. Now permits
  * any value. However, usually the top level State 'container' is either an
@@ -54,7 +59,7 @@ export type RootState = unknown;
  * with the previous resultfrom the same Selector to monitor if some part has
  * changed, defining when app logic should be re-run. */
 export type Selector<State extends RootState, Selected> = (
-  state: Immutable<State>
+  state: State
 ) => Selected;
 
 /** An item satisfying type constraints of {@link RootState} but where a child item

@@ -14,13 +14,3 @@ export interface Watchable<T> {
    */
   watch: (watcher: Watcher<T>) => Unwatch;
 }
-
-/** A {@link Watchable} encapsulating a changing value which you can {@link write} and {@link read}.
- * @typeParam T The value stored, retrieved and watched.
- */
-export interface WatchableState<T> extends Watchable<T> {
-  /** Store a new state. */
-  write: (state: T) => T;
-  /** Retrieve the current state. */
-  read: () => T;
-}

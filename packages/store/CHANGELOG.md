@@ -1,5 +1,11 @@
 # @watchable/store
 
+## 1.0.0-alpha.6
+
+### Patch Changes
+
+- 00f1f2a: Loosen RootState type. Add useStateProperty hook.
+
 ## 1.0.0-alpha.5
 
 ### Major Changes

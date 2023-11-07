@@ -2,7 +2,7 @@
 
 [513 gzipped bytes](https://bundlephobia.com/package/@watchable/store) of powerful state-management!
 
-A [Store](https://watchable.dev/api/interfaces/_watchable_store.Store.html) maintains a protected reference to an array or object `state` that is treated as Immutable. When a new state is passed to {@link Store#write | store.write()}, user interfaces and business logic are notified of changes to state matching their {@link Selector | Selectors}.
+A [Store](https://watchable.dev/api/interfaces/_watchable_store.Store.html) maintains a protected reference to an array or object `state` that is treated as immutable. When a new state is passed to {@link Store#write | store.write()}, user interfaces and business logic are notified of changes to state matching their {@link Selector | Selectors}.
 
 @watchable/store is incredibly simple, lightweight and framework-independent, and therefore suited to manage state within almost any server-side or client-side Typescript or Javascript project.
 

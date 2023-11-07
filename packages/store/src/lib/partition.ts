@@ -1,10 +1,4 @@
-import type {
-  Immutable,
-  PartitionableState,
-  Selector,
-  Store,
-  Watcher,
-} from "../types";
+import type { PartitionableState, Selector, Store, Watcher } from "../types";
 import { DefaultWatchable } from "./watchable";
 
 /** Utility class for partitioning of a Store. See {@link createStorePartition}. */
@@ -12,13 +6,13 @@ class DefaultStorePartition<
     ParentState extends PartitionableState<Key>,
     Key extends keyof ParentState
   >
-  extends DefaultWatchable<Immutable<ParentState[Key]>>
+  extends DefaultWatchable<ParentState[Key]>
   implements Store<ParentState[Key]>
 {
   constructor(
     readonly store: Store<ParentState>,
     readonly key: Key,
-    watchers?: ReadonlyArray<Watcher<Immutable<ParentState[Key]>>>
+    watchers?: ReadonlyArray<Watcher<ParentState[Key]>>
   ) {
     super(watchers);
     void this.notify(this.read());
@@ -26,22 +20,22 @@ class DefaultStorePartition<
   }
 
   private readonly track = () => {
-    let lastSubState: Immutable<ParentState>[Key] = this.store.read()[this.key];
+    let lastSubState: ParentState[Key] = this.store.read()[this.key];
     this.store.watch((state) => {
       const subState = state[this.key];
       if (Object.is(subState, lastSubState)) {
         return;
       }
       lastSubState = subState;
-      void this.notify(subState as Immutable<ParentState[Key]>);
+      void this.notify(subState);
     });
   };
 
   read = () => {
-    return this.store.read()[this.key] as Immutable<ParentState[Key]>;
+    return this.store.read()[this.key];
   };
 
-  write = (state: Immutable<ParentState[Key]>) => {
+  write = (state: ParentState[Key]) => {
     const parentState = this.store.read();
     this.store.write({
       ...parentState,
@@ -70,7 +64,7 @@ export function createStorePartition<
 >(
   store: Store<State>,
   key: Key,
-  watchers?: ReadonlyArray<Watcher<Immutable<State[Key]>>>
+  watchers?: ReadonlyArray<Watcher<State[Key]>>
 ): Store<State[Key]> {
   return new DefaultStorePartition(store, key, watchers);
 }
