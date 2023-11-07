@@ -1,5 +1,13 @@
 # @watchable/store-react
 
+## 1.0.0-alpha.6
+
+### Patch Changes
+
+- 00f1f2a: Loosen RootState type. Add useStateProperty hook.
+- Updated dependencies [00f1f2a]
+  - @watchable/store@1.0.0-alpha.6
+
 ## 1.0.0-alpha.5
 
 ### Patch Changes
