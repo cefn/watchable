@@ -353,18 +353,16 @@ describe("store-react :", () => {
         }, []);
         return <p>{value}</p>;
       };
+      // bind component
       render(<Component />);
+      // validate first render
       screen.getByText("red");
       expect(renderSpy).toHaveBeenCalledTimes(1);
       renderSpy.mockClear();
-      await eventsDueCompleted(); // await for useEffect to set Rendered Key
-      await eventsDueCompleted(); // await for consequent render
-      // expect the component to render the different keyed property
+      // wait for useEffect key change to propagate
+      await eventsDueCompleted();
+      expect(renderSpy).toHaveBeenCalledTimes(1);
       screen.getByText("blue");
-      // render will have been triggered twice more
-      // once after useEffect changed key (passed to the useStateProperty call)
-      // once more for the useSelected inside useStateProperty to propagate its internal state
-      expect(renderSpy).toHaveBeenCalledTimes(2);
     });
 
     test("ignores untracked property of store", async () => {
