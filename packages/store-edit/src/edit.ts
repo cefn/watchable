@@ -15,6 +15,6 @@ export function edit<State extends RootState>(
 ) {
   const nextState = produce<State>(store.read() as State, (draft) => {
     editor(draft);
-  }) as unknown as Immutable<State>;
+  }) as Immutable<State>;
   return store.write(nextState);
 }
