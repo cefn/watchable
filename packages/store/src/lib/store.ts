@@ -1,4 +1,4 @@
-import type { Immutable, RootState, Store, Watcher } from "../types";
+import type { RootState, Store, Watcher } from "../types";
 import { DefaultWatchable } from "./watchable";
 
 /** Reference implementation of watchable {@link Store}  */
