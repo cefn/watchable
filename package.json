@@ -13,7 +13,7 @@
   ],
   "scripts": {
     "qa": "wireit",
-    "qa:clean": "find . -name '*.tsbuildinfo' -or -iname '.wireit' -type d | xargs -I{} rm -rf {}",
+    "qa:clean": "find . -depth -not -path '*/node_modules/*' -and -type d -and \\( -name '*.tsbuildinfo' -or -iname '.wireit' -or -iname 'dist' \\) | xargs -n1 rm -rf ",
     "qa:watch": "npm run qa --watch",
     "build": "wireit",
     "docs": "typedoc",
@@ -59,8 +59,8 @@
     "zx": "^7.1.1"
   },
   "engines": {
-    "node": "^18.12.1",
-    "npm": "^9.1.1"
+    "node": "^18",
+    "npm": "^9"
   },
   "wireit": {
     "qa": {
@@ -74,6 +74,11 @@
     },
     "build": {
       "dependencies": [
+        "./packages/queue:build",
+        "./packages/store:build",
+        "./packages/store-edit:build",
+        "./packages/store-follow:build",
+        "./packages/store-react:build",
         "./apps/counter-dom-commonjs:build",
         "./apps/counter-dom-esm:build",
         "./apps/counter-dom-tiny:build",
@@ -82,12 +87,7 @@
         "./apps/counter-react-js:build",
         "./apps/counter-react-ts:build",
         "./apps/counter-react-ts-edit:build",
-        "./apps/counter-react-ts-edit-context:build",
-        "./packages/queue:build",
-        "./packages/store:build",
-        "./packages/store-edit:build",
-        "./packages/store-follow:build",
-        "./packages/store-react:build"
+        "./apps/counter-react-ts-edit-context:build"
       ]
     },
     "test": {
