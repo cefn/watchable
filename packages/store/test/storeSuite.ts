@@ -14,14 +14,52 @@ export function createStoreSuite(
   storeFactory: StoreFactory
 ) {
   describe(`${suiteName}: Core behaviour`, () => {
-    test("Create Store with list root", () => {
-      const state = [3, 4, 5];
-      expect(storeFactory<number[]>(state).read()).toEqual(state);
+    test("Create Store with Array root", () => {
+      const state: number[] = [3, 4, 5];
+      expect(storeFactory<typeof state>(state).read()).toEqual(state);
     });
 
-    test("Create Store with map root", () => {
-      const state = { pi: 3.1415926 };
-      expect(storeFactory<Record<string, number>>(state).read()).toEqual(state);
+    test("Create Store with Record root", () => {
+      const state: Record<string, number> = { pi: 3.1415926 };
+      expect(storeFactory<typeof state>(state).read()).toEqual(state);
+    });
+
+    test("Create Store with string root", () => {
+      const state: string = "hello world";
+      expect(storeFactory<typeof state>(state).read()).toEqual(state);
+    });
+
+    test("Create Store with number root", () => {
+      const state: number = 42;
+      expect(storeFactory<typeof state>(state).read()).toEqual(state);
+    });
+
+    test("Create Store with boolean root", () => {
+      const state: boolean = true;
+      expect(storeFactory<boolean>(state).read()).toEqual(state);
+    });
+
+    test("Create Store with null root", () => {
+      // a null root is not normal but this test
+      // should reveal issues with the now very broad typing of RootState
+      const state = null;
+      expect(storeFactory<null>(state).read()).toEqual(state);
+    });
+
+    test("Create Store with undefined root", () => {
+      // an undefined root is not normal but this test
+      // should reveal issues with the now very broad typing of RootState
+      const state = undefined;
+      // eslint-disable-next-line @typescript-eslint/no-confusing-void-expression
+      expect(storeFactory<typeof state>(state).read()).toEqual(state);
+    });
+
+    test("Store with optional root handles state transition to undefined", () => {
+      let state = "foo" satisfies string | undefined as string | undefined;
+      const store = storeFactory<typeof state>(state);
+      expect(store.read()).toEqual(state);
+      state = undefined;
+      store.write(state);
     });
 
     test("Create Store and pass watchers who are notified", async () => {

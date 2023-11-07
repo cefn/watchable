@@ -33,14 +33,12 @@ class DefaultStorePartition<
         return;
       }
       lastSubState = subState;
-      void this.notify(subState as unknown as Immutable<ParentState[Key]>);
+      void this.notify(subState as Immutable<ParentState[Key]>);
     });
   };
 
   read = () => {
-    return this.store.read()[this.key] as unknown as Immutable<
-      ParentState[Key]
-    >;
+    return this.store.read()[this.key] as Immutable<ParentState[Key]>;
   };
 
   write = (state: Immutable<ParentState[Key]>) => {

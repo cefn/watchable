@@ -43,10 +43,11 @@ import type { WatchableState } from "./watchable";
  */
 export type Store<State extends RootState> = WatchableState<Immutable<State>>;
 
-/** Defines the set of possible state types for a {@link Store},
- * usually the top level State 'container' is either an
- * Array, Tuple, or keyed Object */
-export type RootState = object;
+/** Defines the set of possible state types for a {@link Store}. Now permits
+ * any value. However, usually the top level State 'container' is either an
+ * Array, Tuple, or other keyed Object (primitive values are already
+ * Immutable in javascript). */
+export type RootState = unknown;
 
 /** A Selector derives some sub-part or computed value from a {@link RootState} in a
  * @watchable/store {@link Store}. `Object.is(prev, next)` is normally used to compare
@@ -73,5 +74,6 @@ export type Selector<State extends RootState, Selected> = (
  *
  * See also {@link createStorePartition}.
  */
-export type PartitionableState<Key extends string | number | symbol> =
-  RootState & { [k in Key]: RootState };
+export type PartitionableState<Key extends PropertyKey> = object & {
+  [k in Key]: RootState;
+};
