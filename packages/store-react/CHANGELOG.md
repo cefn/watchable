@@ -1,5 +1,11 @@
 # @watchable/store-react
 
+## 1.0.0-alpha.7
+
+### Patch Changes
+
+- 32a95a5: Optimise useSelected to detect state change within render.
+
 ## 1.0.0-alpha.6
 
 ### Patch Changes

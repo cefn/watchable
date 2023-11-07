@@ -1,6 +1,6 @@
 {
   "name": "counter-react-ts-edit",
-  "version": "0.9.0-alpha.6",
+  "version": "0.9.0-alpha.7",
   "private": true,
   "homepage": "https://github.com/cefn/watchable/tree/main/apps/counter-react-ts-edit#readme",
   "bugs": {
@@ -26,7 +26,7 @@
   "dependencies": {
     "@watchable/store": "1.0.0-alpha.6",
     "@watchable/store-edit": "1.0.0-alpha.6",
-    "@watchable/store-react": "1.0.0-alpha.6",
+    "@watchable/store-react": "1.0.0-alpha.7",
     "immer": "^10.0.1",
     "react": "^18.2.0",
     "react-dom": "^18.2.0"
