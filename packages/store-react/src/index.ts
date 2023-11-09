@@ -118,8 +118,21 @@ export function useRootState<State extends RootState>(store: Store<State>) {
   return store.read();
 }
 
-/** Hook with a [value, setter] signature that parallels React.useState. Reads
- *  and writes an individual keyed property of a store's RootState. */
+/** Hook returning a `[value, setter]` pair, like React.useState. Reads
+ *  and writes an individual keyed property of a store's RootState.
+ *
+ * Example:
+ *
+ * ```typescript
+ * const Component = () => {
+ *   const [roseColor, setRoseColor] = useStateProperty(store, "roses");
+ *   useEffect(() => {
+ *     setRoseColor("red");
+ *   }, []);
+ *   return <p>{roseColor}</p>;
+ * };
+ * ```
+ * */
 export function useStateProperty<
   S extends Record<PropertyKey, unknown>,
   K extends keyof S
