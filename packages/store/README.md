@@ -10,6 +10,29 @@ Read the [API Reference](https://watchable.dev/api/modules/_watchable_store.html
 
 # Usage
 
+## Create a Store - Javascript
+
+```javascript
+const store = createStore({ counter: 0 });
+```
+
+## Create a Store - Typescript
+
+```typescript
+import { createStore, type Immutable} from "@watchable/store"
+
+// `Immutable` blocks inadvertent state edits - recommended but optional.
+type CounterState = Immutable<{
+  counter: number;
+}>
+
+const INITIAL_STATE : CounterState = {
+  counter: 0,
+} as const;
+
+const store = createStore(INITIAL_STATE);
+```
+
 ## Read and Write State
 
 ```typescript
@@ -31,13 +54,20 @@ edit(store, (draft) => (draft.counter += 1));
 ## Track State
 
 ```typescript
-// using a watcher
-store.watch((state) => console.log(`Counter is ${state.counter}`));
+/* REACT-BASED */
 
 // using selector and memoized Hook (React framework)
 // re-renders after the selected value changes
 import { useSelected } from "@watchable/store-react";
 const counter = useSelected(store, (state) => state.counter);
+
+// get and set keyed property, (like React useState), with intellisense for valid keys 
+const [counter, setCounter] = useStateProperty(store, "counter");
+
+/* FRAMEWORK AGNOSTIC */
+
+// using a watcher
+store.watch((state) => console.log(`Counter is ${state.counter}`));
 
 // using selector and memoized callback (Framework independent)
 // invoked each time the selected value changes
@@ -49,33 +79,14 @@ followSelector(
     console.log(`Counter is ${counter}`);
   }
 );
+
 ```
 
 ## Import OR Require
 
 ```javascript
-import { createStore } from "@watchable/store"; // for esm
-const { createStore } = require("@watchable/store"); // for commonjs
-```
-
-## Create a Store in Javascript
-
-```javascript
-const store = createStore({ counter: 0 });
-```
-
-## Create a Store In Typescript
-
-```typescript
-interface CounterState {
-  counter: number;
-}
-
-const INITIAL_STATE = {
-  counter: 0,
-} as const;
-
-const store = createStore<CounterState>(INITIAL_STATE);
+import { createStore } from "@watchable/store"; // gets esm build
+const { createStore } = require("@watchable/store"); // gets commonjs build
 ```
 
 # Getting Started
