@@ -165,14 +165,16 @@ within this interval (until the number of launches within the interval matches
 `intervalLaunches`). When the limit is hit, it can work out when the next slot
 will become free, and sleeps for that duration.
 
-A _**timeout**_ `Feed` always accepts jobs and passes them on immediately.
-However it passes on a modified job to the next layer that throws an error if it
-hasn't settled in time. It unwraps settlements, making sure that the yielded
-`JobSettlement` points to the original job, rather than the modified one.
+A _**timeout**_ `Feed` always accepts jobs, wraps them in a timeout job that
+throws an error if it hasn't settled in time. On receiving a settlement it
+unwraps it, so the `JobSettlement` points to the original job, rather than the
+modified one.
 
-A _**retry**_ `Feed` always accepts jobs and passes them on immediately, and
-always yields `JobSettlements` directly back when they are of kind `'resolved'`.
-However `JobSettlements` with kind `'rejected'` will cause it to
+A _**retry**_ `Feed` always accepts jobs, wraps them in a retry job, storing
+extra metadata describing the count of retries attempted. `JobResolved`
+settlements are unwrapped to create a `JobResolved` for the original job.
+However `JobRejected` events are re-attempted until reaching the maximum number
+of retries for that job.
 
 ### Reference 'Identity' Feed Implementation
 

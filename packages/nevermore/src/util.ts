@@ -1,5 +1,4 @@
 /* eslint-disable @typescript-eslint/promise-function-async */
-import type { GNexted, GReturned } from "./types";
 
 export function namedRace<
   const NamedPromises extends Record<

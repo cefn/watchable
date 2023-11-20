@@ -6,15 +6,11 @@ import type {
   JobSettlement,
   Feed,
 } from "../types";
-import { createAwaitableFlag, iterableToIterator, namedRace } from "../util";
+import { createAwaitableFlag, namedRace } from "../util";
 
-export function sourceFeed<T, J extends Job<T>>(
-  options: Partial<CancelOptions>,
-  jobs:
-    | Iterable<J>
-    | AsyncIterable<J>
-    | (() => Generator<J>)
-    | (() => AsyncGenerator<J>)
+/** Creates a Feed that accepts jobs  */
+export function createSourceFeed<T, J extends Job<T>>(
+  options: Partial<CancelOptions>
 ) {
   const { cancelPromise = null } = options;
 
@@ -51,41 +47,17 @@ export function sourceFeed<T, J extends Job<T>>(
 
   // a coroutine for launching jobs that will notify queue of their result
   // updates the launchesDone flag when it has exhausted all launches.
-  async function* createLaunches() {
-    // zero-arg (async?) generator functions should be called to create an iterable
-    const launchIterable =
-      Symbol.iterator in jobs || Symbol.asyncIterator in jobs ? jobs : jobs();
-    // now create an iterator from the iterable
-    const launchIterator = iterableToIterator(launchIterable);
-
+  async function* createLaunches(): AsyncGenerator<void, void, J> {
     // (generator creates+launches next job when next() is called
-    for (;;) {
-      const nextLaunch = launchIterator.next();
-
-      // optionally wait for cancelPromise in parallel
-      if (cancelPromise !== null) {
-        const winner = await namedRace({
-          nextLaunch,
-          cancelPromise,
-        });
-        if (winner === "cancelPromise") {
-          // throw to terminate loop, probably running in background so not handled anywhere
-          throw new Error(`Nevermore job sequence cancelled`);
-        }
+    try {
+      for (;;) {
+        // a job was yielded to be launched
+        const job = yield;
+        // background the job, (will eventually notify result to queue)
+        void launchJob(job);
       }
-
-      const { done, value } = await nextLaunch;
-      if (done === true) {
-        // launches have finished
-        launchesDone.flag();
-        return value;
-      }
-      // a job was yielded to be launched
-      const job = value;
-      // background the job, (will notify result to queue)
-      void launchJob(job);
-      // yield job reference to caller
-      yield job;
+    } finally {
+      launchesDone.flag();
     }
   }
 

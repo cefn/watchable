@@ -1,6 +1,6 @@
 import type { Job, NevermoreOptions } from "./types";
-import { pull } from "./util";
-import { sourceFeed } from "./primitives/source";
+import { namedRace } from "./util";
+import { createSourceFeed } from "./primitives/source";
 import { createConcurrencyFeed } from "./primitives/concurrency";
 
 /**
@@ -18,14 +18,36 @@ export async function* nevermore<T, J extends Job<T>>(
 ) {
   const { concurrency, cancelPromise } = options;
 
-  let feed = sourceFeed({ cancelPromise }, jobs);
+  let feed = createSourceFeed({ cancelPromise });
 
   if (typeof concurrency === "number") {
     feed = createConcurrencyFeed({ concurrency }, feed);
   }
 
-  // Run background routine creating and launching jobs as fast as possible
-  void pull(feed.launches, options.cancelPromise);
+  // zero-arg (async?) generator functions should be called to create an iterable
+  const jobIterable =
+    Symbol.iterator in jobs || Symbol.asyncIterator in jobs ? jobs : jobs();
+
+  // Feeds jobs one by one, awaits launch resolution before feeding the next
+  async function triggerLaunches() {
+    for await (const job of jobIterable) {
+      const launchPromise = feed.launches.next(job);
+      if (cancelPromise !== undefined) {
+        const result = await namedRace({
+          launchPromise,
+          cancelPromise,
+        });
+        if (result === "cancelPromise") {
+          throw new Error(`Cancelled`);
+        }
+      } else {
+        await launchPromise;
+      }
+    }
+    void feed.launches.return(); // completion of feed launches generator
+  }
+
+  void triggerLaunches();
 
   yield* feed.settlements;
 }

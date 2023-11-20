@@ -15,10 +15,11 @@ export function createConcurrencyFeed<T, J extends Job<T>>(
   let concurrentJobs = 0;
   let notifier: ReturnType<typeof createAwaitableFlag> | null = null;
 
-  async function* createLaunches() {
-    for await (const job of source.launches) {
+  async function* createLaunches(): AsyncGenerator<void, void, J> {
+    for (;;) {
+      const job = yield;
+      await source.launches.next(job);
       concurrentJobs++;
-      yield job;
       if (concurrentJobs === concurrency) {
         notifier = createAwaitableFlag();
         await notifier.promise;

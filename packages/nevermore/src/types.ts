@@ -31,20 +31,20 @@ export type JobSettlement<T, J extends Job<T>> =
   | JobResolution<T, J>
   | JobRejection<T, J>;
 
-/** A limit on the number of pending promises (created but not yet settled) */
+/** Limit pending promises (launched but not yet settled) */
 export interface ConcurrencyOptions {
   concurrency: number;
 }
 
-/** A limit on the number of pending promises (created but not yet settled) */
+/** Patience before abandoning pending promises (launched but not yet settled) */
 export interface TimeoutOptions {
   timeoutMs: number;
 }
 
-/** A limit on the number of promises created within a millisecond interval */
-export interface RateOptions {
-  rateLimit: number;
-  rateIntervalMs: number;
+/** A limit on job launches made within each second, (or chosen interval) */
+export interface IntervalOptions {
+  intervalLaunches: number;
+  intervalMs?: number;
 }
 
 export interface RetryOptions {
@@ -70,7 +70,7 @@ type OnePropertyFrom<T> = {
 /** Presence and absence of all configs (implicitly includes case of no limits) */
 type AnyOptions = AllOrNothing<ConcurrencyOptions> &
   AllOrNothing<TimeoutOptions> &
-  AllOrNothing<RateOptions> &
+  AllOrNothing<IntervalOptions> &
   AllOrNothing<RetryOptions> &
   AllOrNothing<CancelOptions>;
 
@@ -80,19 +80,20 @@ export type NevermoreOptions = AnyOptions & OnePropertyFrom<AnyOptions>;
 // since the job could be re-used, but the launch request is unique
 // maps could use the launch itself or an auto-incrementing id as a key
 // to manage launch records?
-// TODO rename to Feed ?
 export interface Feed<T, J extends Job<T>> {
-  launches: AsyncGenerator<J>;
+  launches: AsyncGenerator<void, void, J>;
   settlements: AsyncGenerator<JobSettlement<T, J>>;
 }
 
 /** Infers the yielded value from a generator type */
-export type GYielded<G extends Generator> = G extends Generator<infer yielded>
+export type Yielded<I extends Iterator<unknown>> = I extends Iterator<
+  infer yielded
+>
   ? yielded
   : never;
 
 /** Infers the next() argument from a generator type */
-export type GReturned<G extends Generator> = G extends Generator<
+export type Returned<I extends Iterator<unknown>> = I extends Iterator<
   any,
   infer returned
 >
@@ -100,7 +101,7 @@ export type GReturned<G extends Generator> = G extends Generator<
   : never;
 
 /** Infers the returned value from a generator type */
-export type GNexted<G extends Generator> = G extends Generator<
+export type Nexted<I extends Iterator<unknown>> = I extends Iterator<
   any,
   any,
   infer nexted
