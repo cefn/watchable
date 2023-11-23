@@ -35,7 +35,7 @@ export function createSettlerStrategy<T, J extends Job<T>>(
         // yields immediately to accept a new job
         // limits are expected to be 'upstream'
         return {
-          settlement: undefined,
+          value: undefined,
           done: false,
         } satisfies IteratorResult<void>;
       },
@@ -46,7 +46,7 @@ export function createSettlerStrategy<T, J extends Job<T>>(
         const value = await queue.receive();
         // yields immediately
         return {
-          settlement: value,
+          value,
           done: false,
         } satisfies IteratorResult<JobSettlement<T, J>>;
       },

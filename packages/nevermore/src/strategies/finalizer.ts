@@ -73,7 +73,7 @@ export function createFinalizerStrategy<T, J extends Job<T>>(
         // complete: settlements ended
         break;
       }
-      yield result.settlement;
+      yield result.value;
     }
   }
 

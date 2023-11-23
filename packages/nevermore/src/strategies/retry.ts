@@ -21,7 +21,7 @@ export function createRetryStrategy<T, J extends Job<T>>(
 ): Strategy<T, J> {
   const { retries } = options;
 
-  // TODO what pipe order will help to constrain this growing backlog?
+  // TODO what pipe order/checks should constrain this growing backlog?
   const failedRetryJobs: Array<RetryJob<T, J>> = [];
 
   async function* createLaunches(): AsyncGenerator<void, void, J> {
@@ -29,7 +29,7 @@ export function createRetryStrategy<T, J extends Job<T>>(
       for (;;) {
         const retryJob =
           failedRetryJobs.length > 0
-            ? (failedRetryJobs.shift() as RetryJob<T, J>) // prioritise retries
+            ? (failedRetryJobs.shift() as RetryJob<T, J>) // prioritise clearing retries
             : createRetryJob<T, J>(yield); // else pull from upstream
         const launchResult = await downstream.launches.next(retryJob);
         if (launchResult.done === true) {
