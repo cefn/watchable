@@ -11,19 +11,18 @@ export function createSettlerStrategy<T, J extends Job<T>>(
 
   async function triggerJob(job: J) {
     try {
-      const value = await job(
-        ...(cancelPromise !== null ? [{ cancelPromise }] : [])
-      );
+      const value =
+        cancelPromise !== null ? await job({ cancelPromise }) : await job();
       queue.send({
-        kind: "fulfilled",
         job,
+        status: "fulfilled",
         value,
       });
     } catch (error) {
       queue.send({
-        kind: "rejected",
         job,
-        error,
+        status: "rejected",
+        reason: error,
       });
     }
   }
@@ -36,7 +35,7 @@ export function createSettlerStrategy<T, J extends Job<T>>(
         // yields immediately to accept a new job
         // limits are expected to be 'upstream'
         return {
-          value: undefined,
+          settlement: undefined,
           done: false,
         } satisfies IteratorResult<void>;
       },
@@ -47,7 +46,7 @@ export function createSettlerStrategy<T, J extends Job<T>>(
         const value = await queue.receive();
         // yields immediately
         return {
-          value,
+          settlement: value,
           done: false,
         } satisfies IteratorResult<JobSettlement<T, J>>;
       },

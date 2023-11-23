@@ -7,7 +7,7 @@ import {
 import { createFinalizerPipe } from "./strategies/finalizer";
 import { asyncIterable } from "./util";
 
-// sequence the pipes (strategy wrappers) specified by caller
+/** Sequence the pipes (strategy wrappers) specified by caller. */
 function* pipesFromOptions(
   options: NevermoreOptions & {
     pipes?: Pipe[];

@@ -17,14 +17,14 @@ export type Job<T> = (...args: JobArgs) => Promise<T>;
 
 export interface JobFulfilment<T, J extends Job<T>> {
   job: J;
-  kind: "fulfilled";
+  status: "fulfilled";
   value: T;
 }
 
 export interface JobRejection<T, J extends Job<T>> {
   job: J;
-  kind: "rejected";
-  error: unknown;
+  status: "rejected";
+  reason: unknown;
 }
 
 export type JobSettlement<T, J extends Job<T>> =
@@ -89,8 +89,14 @@ export interface Strategy<T, J extends Job<T>> {
  * (facilitating inference from its outputs) */
 export type StrategyFactory = <T, J extends Job<T>>() => Strategy<T, J>;
 
-/** Wrap a StrategyFactory inside another */
-export type Pipe = (createStrategy: StrategyFactory) => StrategyFactory;
+/** Formalism for composing strategies that wire to each other. Allows for the
+ * fact the upstream strategy needs to dictate the downstream Job<T> type (e.g.
+ * TimeoutStrategy, RetryStrategy wrap jobs). Factory-wrapper
+ * approach avoids polluting the signature with strategy-specific parameters.
+ */
+export type Pipe = (
+  createDownstreamStrategy: StrategyFactory
+) => StrategyFactory;
 
 /** Infers the yielded value from a generator type */
 export type Yielded<I extends Iterator<unknown>> = I extends Iterator<

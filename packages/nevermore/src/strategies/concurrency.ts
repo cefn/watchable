@@ -80,6 +80,7 @@ export function createConcurrencyPipe(options: ConcurrencyOptions): Pipe {
   return (createStrategy: StrategyFactory) =>
     <T, J extends Job<T>>() => {
       const downstream: Strategy<T, J> = createStrategy();
+
       return createConcurrencyStrategy<T, J>({
         concurrency,
         downstream,
