@@ -185,30 +185,33 @@ through them.
 
 ```ts
 export function createIdentityFeed<T, J extends Job<T>>(feed: Feed<T, J>) {
-  async function* createLaunchSequence() {
-    let value: undefined | GYielded<typeof field.launches> = undefined;
-    for (;;) {
-      const job = yield value;
-      const result = await feed.launches.next(job);
-      if (result.done) {
-        return result.value;
-      }
-      ({ value } = result);
-    }
-  }
+    const launches = {
+        next(...args) {
+            return feed.launches.next(...args);
+        }
+        return(...args){
+            return feed.launches.return(...args);
+        }
+        throw(...args){
+            return feed.launches.throw(...args);
+        }
+    };
 
-  async function* createSettlementSequence() {
-    for await (const settlement of feed.settlements) {
-      yield settlement;
-    }
-  }
+    const settlements = {
+        next(...args) {
+            return feed.settlements.next(...args);
+        }
+        return(...args){
+            return feed.settlements.return(...args);
+        }
+        throw(...args){
+            return feed.settlements.throw(...args);
+        }
+    };
 
-  const launches = createLaunchSequence();
-  const settlements = createSettlementSequence();
-
-  return {
-    launches,
-    settlements,
-  };
+    return {
+        launches,
+        settlements,
+    };
 }
 ```

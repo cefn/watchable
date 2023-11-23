@@ -1,53 +1,84 @@
-import type { Job, NevermoreOptions } from "./types";
-import { namedRace } from "./util";
-import { createSourceFeed } from "./primitives/source";
-import { createConcurrencyFeed } from "./primitives/concurrency";
+import type { Job, JobSettlement, NevermoreOptions, Pipe } from "./types";
+import { createSettlerStrategy } from "./strategies/settler";
+import {
+  createConcurrencyPipe,
+  validateConcurrency,
+} from "./strategies/concurrency";
+import { createFinalizerPipe } from "./strategies/finalizer";
+import { asyncIterable } from "./util";
+
+// sequence the pipes (strategy wrappers) specified by caller
+function* pipesFromOptions(
+  options: NevermoreOptions & {
+    pipes?: Pipe[];
+  }
+) {
+  if (validateConcurrency(options)) {
+    // limit number of simultaneously pending promises
+    yield createConcurrencyPipe(options);
+  }
+  // wire pipes passed by caller before finalizing
+  if (typeof options.pipes !== "undefined") {
+    yield* options.pipes;
+  }
+  // finalizer tracks events, notifies when sequence is done
+  yield createFinalizerPipe();
+}
 
 /**
  * @param jobs An array, generator or other Iterable. Nevermore will pull jobs from it just-in-time.
- * @param cancelPromise If provided, Nevermore will cease launching jobs whenever this promise settles.
+ * @param options.cancelPromise If provided, Nevermore will cease launching jobs whenever this promise settles.
  * @returns
  */
 export async function* nevermore<T, J extends Job<T>>(
-  options: NevermoreOptions,
+  options: NevermoreOptions & {
+    pipes?: Pipe[];
+  },
   jobs:
     | Iterable<J>
     | AsyncIterable<J>
     | (() => Generator<J>)
     | (() => AsyncGenerator<J>)
-) {
-  const { concurrency, cancelPromise } = options;
+): AsyncIterable<JobSettlement<T, J>> {
+  const { cancelPromise } = options;
 
-  let feed = createSourceFeed({ cancelPromise });
+  /** COMPOSE STRATEGY */
 
-  if (typeof concurrency === "number") {
-    feed = createConcurrencyFeed({ concurrency }, feed);
+  // define a factory that creates a settler strategy
+  // (a strategy that attempts to immediately settle every job)
+  let createStrategy = <T, J extends Job<T>>() =>
+    createSettlerStrategy<T, J>(cancelPromise);
+
+  // compose further factories specified by caller (wrapping settler factory)
+  for (const pipe of pipesFromOptions(options)) {
+    createStrategy = pipe(createStrategy);
   }
 
-  // zero-arg (async?) generator functions should be called to create an iterable
+  // execute all wrapped factories, creating a composed strategy
+  const strategy = createStrategy<T, J>();
+
+  /** PUSH JOBS */
+
+  // if jobs is a generator function, create an iterable from it
   const jobIterable =
     Symbol.iterator in jobs || Symbol.asyncIterator in jobs ? jobs : jobs();
 
-  // Feeds jobs one by one, awaits launch resolution before feeding the next
-  async function triggerLaunches() {
+  // push jobs into strategy as fast as possible
+  async function pushJobs() {
     for await (const job of jobIterable) {
-      const launchPromise = feed.launches.next(job);
-      if (cancelPromise !== undefined) {
-        const result = await namedRace({
-          launchPromise,
-          cancelPromise,
-        });
-        if (result === "cancelPromise") {
-          throw new Error(`Cancelled`);
-        }
-      } else {
-        await launchPromise;
-      }
+      await strategy.launches.next(job);
     }
-    void feed.launches.return(); // completion of feed launches generator
+    await strategy.launches.return?.();
   }
 
-  void triggerLaunches();
+  // run in background
+  void pushJobs();
 
-  yield* feed.settlements;
+  /** PULL SETTLEMENTS */
+
+  // make iterable from iterator
+  const pulledSettlements = asyncIterable(strategy.settlements);
+
+  // yield settlements
+  yield* pulledSettlements;
 }

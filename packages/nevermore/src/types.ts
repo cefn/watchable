@@ -15,9 +15,9 @@ export type JobArgs =
 
 export type Job<T> = (...args: JobArgs) => Promise<T>;
 
-export interface JobResolution<T, J extends Job<T>> {
+export interface JobFulfilment<T, J extends Job<T>> {
   job: J;
-  kind: "resolved";
+  kind: "fulfilled";
   value: T;
 }
 
@@ -28,7 +28,7 @@ export interface JobRejection<T, J extends Job<T>> {
 }
 
 export type JobSettlement<T, J extends Job<T>> =
-  | JobResolution<T, J>
+  | JobFulfilment<T, J>
   | JobRejection<T, J>;
 
 /** Limit pending promises (launched but not yet settled) */
@@ -80,10 +80,17 @@ export type NevermoreOptions = AnyOptions & OnePropertyFrom<AnyOptions>;
 // since the job could be re-used, but the launch request is unique
 // maps could use the launch itself or an auto-incrementing id as a key
 // to manage launch records?
-export interface Feed<T, J extends Job<T>> {
-  launches: AsyncGenerator<void, void, J>;
-  settlements: AsyncGenerator<JobSettlement<T, J>>;
+export interface Strategy<T, J extends Job<T>> {
+  launches: AsyncIterator<void, void, J>;
+  settlements: AsyncIterator<JobSettlement<T, J>>;
 }
+
+/** Function defining a Generic binding for a Strategy
+ * (facilitating inference from its outputs) */
+export type StrategyFactory = <T, J extends Job<T>>() => Strategy<T, J>;
+
+/** Wrap a StrategyFactory inside another */
+export type Pipe = (createStrategy: StrategyFactory) => StrategyFactory;
 
 /** Infers the yielded value from a generator type */
 export type Yielded<I extends Iterator<unknown>> = I extends Iterator<

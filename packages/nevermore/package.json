@@ -99,5 +99,8 @@
       "default": "./dist/index.cjs"
     }
   },
-  "sideEffects": false
+  "sideEffects": false,
+  "dependencies": {
+    "@watchable/queue": "^0.9.0-alpha.3"
+  }
 }

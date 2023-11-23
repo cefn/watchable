@@ -27,31 +27,32 @@ export function namedRace<
  * array, meaning `callback` is `() => void` and `promise` is Promise<[]> - an
  * awaitable flag having no value.
  */
-export function promiseWithCallback<Args extends unknown[] = []>() {
-  let callback!: (...args: Args) => void; // non-null required as per https://github.com/microsoft/TypeScript/issues/42910
+export function promiseWithFulfil<Args extends unknown[] = []>() {
+  // non-null required as per https://github.com/microsoft/TypeScript/issues/42910
+  let fulfil!: (...args: Args) => void;
   const promise = new Promise<Args>((resolve) => {
-    callback = (...args) => {
+    fulfil = (...args) => {
       resolve(args);
     };
   });
   return {
     promise,
-    callback,
+    fulfil,
   };
 }
 
-/** Construct for an awaitable `flag()` callback, with `flagged` indicating whether it has been called. */
-export function createAwaitableFlag() {
-  const { promise, callback } = promiseWithCallback();
-  const awaitableFlag = {
+/** Construct for an awaitable `notify()` callback, with `notified` indicating whether it has been called. */
+export function createNotifiable<Args extends unknown[] = []>() {
+  const { promise, fulfil } = promiseWithFulfil<Args>();
+  const notifiable = {
     promise,
-    flagged: false,
-    flag: () => {
-      awaitableFlag.flagged = true;
-      callback();
+    notified: false,
+    notify: (...args: Args) => {
+      notifiable.notified = true;
+      fulfil(...args);
     },
   };
-  return awaitableFlag;
+  return notifiable;
 }
 
 /** A loop that consumes an async iterator's values strictly in
@@ -89,13 +90,17 @@ export async function pull<T>(
 }
 
 /** Begin iteration, (agnostic to Async or Sync iterators). */
-export function iterableToIterator<T>(
+export function iterator<T>(
   sequence: Iterable<T> | AsyncIterable<T>
 ): Iterator<T> | AsyncIterator<T> {
   if (Symbol.asyncIterator in sequence) {
     return sequence[Symbol.asyncIterator]();
   }
   return sequence[Symbol.iterator]();
+}
+
+export function asyncIterable<T>(iterator: AsyncIterator<T>): AsyncIterable<T> {
+  return { [Symbol.asyncIterator]: () => iterator };
 }
 
 export async function promiseMessage<Message extends string>(
