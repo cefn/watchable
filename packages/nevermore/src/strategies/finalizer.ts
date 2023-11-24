@@ -9,10 +9,10 @@ import type {
 } from "../types";
 import { createNotifiable, namedRace } from "../util";
 
-/** A strategy that tracks launches and settlements, responsible
- * for making the settlements iterator return. When launches are exhausted
- * and all active launches have yielded their settlements, this notifies
- * the consumer that the sequence of settlements has ended.
+/** A strategy that tracks launches and settlements. When launches are exhausted
+ * and all active launches have yielded their settlements, makes the settlements
+ * iterator return, notifying the consumer that the sequence of settlements has
+ * ended.
  */
 export function createFinalizerStrategy<T, J extends Job<T>>(
   downstream: Strategy<T, J>
@@ -36,7 +36,7 @@ export function createFinalizerStrategy<T, J extends Job<T>>(
       }
     } finally {
       launchesFinalized.notify();
-      await downstream.launches.return?.();
+      await downstream.launches.return();
     }
   }
 

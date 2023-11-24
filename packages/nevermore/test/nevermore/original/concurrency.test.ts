@@ -1,6 +1,6 @@
 import { describe, test, expect } from "vitest";
-import { nevermore } from "../../src";
-import { gen2array } from "../testutil";
+import { nevermore } from "../../../src";
+import { gen2array } from "../../testutil";
 
 describe("Nevermore with concurrency", () => {
   test("concurrency<1 throws an error", async () => {

@@ -65,12 +65,15 @@ export async function* nevermore<T, J extends Job<T>>(
 
   // push jobs into strategy as fast as possible
   async function pushJobs() {
-    // prime the generator (progress to the first yield)
-    await strategy.launches.next();
-    for await (const job of jobIterable) {
-      await strategy.launches.next(job);
+    try {
+      // prime the generator (progress to the first yield)
+      await strategy.launches.next();
+      for await (const job of jobIterable) {
+        await strategy.launches.next(job);
+      }
+    } finally {
+      await strategy.launches.return();
     }
-    await strategy.launches.return();
   }
 
   // run in background

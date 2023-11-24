@@ -42,9 +42,9 @@ export interface TimeoutOptions {
 }
 
 /** A limit on job launches made within each second, (or chosen interval) */
-export interface IntervalOptions {
-  intervalLaunches: number;
-  intervalMs?: number;
+export interface RateOptions {
+  intervalSlots?: number; // assume one job per interval
+  intervalMs: number;
 }
 
 export interface RetryOptions {
@@ -70,7 +70,7 @@ type OnePropertyFrom<T> = {
 /** Presence and absence of all configs (implicitly includes case of no limits) */
 type AnyOptions = AllOrNothing<ConcurrencyOptions> &
   AllOrNothing<TimeoutOptions> &
-  AllOrNothing<IntervalOptions> &
+  AllOrNothing<RateOptions> &
   AllOrNothing<RetryOptions> &
   AllOrNothing<CancelOptions>;
 

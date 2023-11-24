@@ -3,7 +3,6 @@
 /* eslint-disable @typescript-eslint/promise-function-async */
 import type {
   Job,
-  JobSettlement,
   LaunchesGenerator,
   RetryOptions,
   SettlementsGenerator,
@@ -30,7 +29,7 @@ export function createRetryStrategy<T, J extends Job<T>>(
 ): Strategy<T, J> {
   const { retries } = options;
 
-  // TODO what pipe order/checks should constrain this growing backlog?
+  // TODO CH what pipe order/checks should constrain this growing backlog?
   const failedRetryJobs: Array<RetryJob<T, J>> = [];
 
   async function* createLaunches(): LaunchesGenerator<T, J> {
@@ -39,8 +38,8 @@ export function createRetryStrategy<T, J extends Job<T>>(
       for (;;) {
         const retryJob =
           failedRetryJobs.length > 0
-            ? (failedRetryJobs.shift() as RetryJob<T, J>) // prioritise clearing retries
-            : createRetryJob<T, J>(yield); // else pull from upstream
+            ? (failedRetryJobs.shift() as RetryJob<T, J>) // prioritise clearing existing retries
+            : createRetryJob<T, J>(yield); // else wrap a new upstream job
         const launchResult = await downstream.launches.next(retryJob);
         if (launchResult.done === true) {
           break; // sequence ended downstream
@@ -48,7 +47,7 @@ export function createRetryStrategy<T, J extends Job<T>>(
       }
     } finally {
       // handle upstream or downstream closure
-      await downstream.launches.return?.();
+      await downstream.launches.return();
     }
   }
 
@@ -61,16 +60,21 @@ export function createRetryStrategy<T, J extends Job<T>>(
         }
         const { value: retrySettlement } = iteratorResult;
         const retryJob = retrySettlement.job;
+        // intercept failures needing a retry
         if (
           retrySettlement.status === "rejected" &&
           retryJob.jobFailures < retries
         ) {
+          // record failure and schedule retry
           retryJob.jobFailures++;
           failedRetryJobs.push(retryJob);
+          continue;
         }
+        // pass back other fulfilled or rejected events
+        // but reference the original job
         yield {
           ...retrySettlement,
-          job: retryJob.jobToRetry, // same notification, but unwrap the 'nested' job
+          job: retryJob.jobToRetry,
         };
       }
     } finally {
