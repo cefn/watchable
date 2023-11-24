@@ -14,8 +14,8 @@ import { createNotifiable, namedRace } from "../util";
  * iterator return, notifying the consumer that the sequence of settlements has
  * ended.
  */
-export function createFinalizerStrategy<T, J extends Job<T>>(
-  downstream: Strategy<T, J>
+export function createFinalizerStrategy<J extends Job<unknown>>(
+  downstream: Strategy<J>
 ) {
   const launchesFinalized = createNotifiable();
   let activeJobs = 0;
@@ -23,7 +23,7 @@ export function createFinalizerStrategy<T, J extends Job<T>>(
   // pass jobs downstream
   // track active count
   // move to finalizing settlements when upstream or downstream 'return'
-  async function* createLaunches(): LaunchesGenerator<T, J> {
+  async function* createLaunches(): LaunchesGenerator<J> {
     await downstream.launches.next(); // prime downstream generator (to reach yield point)
     try {
       for (;;) {
@@ -43,9 +43,9 @@ export function createFinalizerStrategy<T, J extends Job<T>>(
   // pass settlements upstream
   // query launches finalization and count outstanding settlements
   // when no more launches and no more settlements, end the sequence
-  async function* createSettlements(): SettlementsGenerator<T, J> {
+  async function* createSettlements(): SettlementsGenerator<J> {
     let settlementResultPromise: Promise<
-      IteratorResult<JobSettlement<T, J>>
+      IteratorResult<JobSettlement<J>>
     > | null = null;
     try {
       for (;;) {
@@ -88,13 +88,13 @@ export function createFinalizerStrategy<T, J extends Job<T>>(
   return {
     launches: createLaunches(),
     settlements: createSettlements(),
-  } as const satisfies Strategy<T, J>;
+  } as const satisfies Strategy<J>;
 }
 
 export function createFinalizerPipe(): Pipe {
   return (createStrategy: StrategyFactory) =>
-    <T, J extends Job<T>>() => {
-      const downstream: Strategy<T, J> = createStrategy();
-      return createFinalizerStrategy<T, J>(downstream);
+    <J extends Job<unknown>>() => {
+      const downstream: Strategy<J> = createStrategy();
+      return createFinalizerStrategy<J>(downstream);
     };
 }

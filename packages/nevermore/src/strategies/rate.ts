@@ -16,9 +16,9 @@ function sleep(delayMs: number) {
   return new Promise((resolve) => setTimeout(resolve, delayMs));
 }
 
-export function createRateStrategy<T, J extends Job<T>>(
+export function createRateStrategy<J extends Job<unknown>>(
   options: RateOptions,
-  downstream: Strategy<T, J>
+  downstream: Strategy<J>
 ) {
   const { intervalMs, intervalSlots = 1 } = options;
 
@@ -57,7 +57,7 @@ export function createRateStrategy<T, J extends Job<T>>(
     countsByMs.set(nowMs, countNow + 1);
   }
 
-  async function* createLaunches(): LaunchesGenerator<T, J> {
+  async function* createLaunches(): LaunchesGenerator<J> {
     try {
       await downstream.launches.next(); // prime generator to yield point
       for (;;) {
@@ -82,7 +82,7 @@ export function createRateStrategy<T, J extends Job<T>>(
 export function createRatePipe(options: RateOptions): Pipe {
   return (createStrategy: StrategyFactory) =>
     <T, J extends Job<T>>() => {
-      const downstream: Strategy<T, J> = createStrategy();
-      return createRateStrategy<T, J>(options, downstream);
+      const downstream: Strategy<J> = createStrategy();
+      return createRateStrategy<J>(options, downstream);
     };
 }

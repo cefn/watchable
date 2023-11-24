@@ -5,7 +5,6 @@ import type {
   Pipe,
   NevermoreOptions,
   StrategyFactory,
-  JobSettlement,
   LaunchesGenerator,
   SettlementsGenerator,
 } from "../types";
@@ -26,17 +25,17 @@ export function validateConcurrency(
   return result;
 }
 
-export function createConcurrencyStrategy<T, J extends Job<T>>(
+export function createConcurrencyStrategy<J extends Job<unknown>>(
   options: ConcurrencyOptions & {
-    downstream: Strategy<T, J>;
+    downstream: Strategy<J>;
   }
-): Strategy<T, J> {
+): Strategy<J> {
   const { concurrency, downstream } = options;
 
   let pendingJobs = 0;
   let slotAnnouncement: ReturnType<typeof promiseWithFulfil> | null = null;
 
-  async function* createLaunches(): LaunchesGenerator<T, J> {
+  async function* createLaunches(): LaunchesGenerator<J> {
     try {
       await downstream.launches.next(); // prime downstream generator
       for (;;) {
@@ -65,7 +64,7 @@ export function createConcurrencyStrategy<T, J extends Job<T>>(
     }
   }
 
-  async function* createSettlements(): SettlementsGenerator<T, J> {
+  async function* createSettlements(): SettlementsGenerator<J> {
     try {
       for (;;) {
         // wait for downstream to yield a settlement
@@ -98,10 +97,10 @@ export function createConcurrencyPipe(options: ConcurrencyOptions): Pipe {
   const { concurrency } = options;
 
   return (createStrategy: StrategyFactory) =>
-    <T, J extends Job<T>>() => {
-      const downstream: Strategy<T, J> = createStrategy();
+    <J extends Job<unknown>>() => {
+      const downstream: Strategy<J> = createStrategy();
 
-      return createConcurrencyStrategy<T, J>({
+      return createConcurrencyStrategy<J>({
         concurrency,
         downstream,
       });

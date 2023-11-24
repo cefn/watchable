@@ -15,10 +15,10 @@ import type {
 /** Creates a Promise<T> from every job passed to `launches.next(job)`. Tracks
  *  Promise resolution or rejection. Passes back JobSettlements via
  *  `settlements.next()`. */
-export function createSettlerStrategy<T, J extends Job<T>>(
+export function createSettlerStrategy<J extends Job<unknown>>(
   cancelPromise: Promise<unknown> | null = null
-): Strategy<T, J> {
-  const queue: MessageQueue<JobSettlement<T, J>> = createQueue();
+): Strategy<J> {
+  const queue: MessageQueue<JobSettlement<J>> = createQueue();
 
   async function triggerJob(job: J) {
     try {
@@ -38,7 +38,7 @@ export function createSettlerStrategy<T, J extends Job<T>>(
     }
   }
 
-  async function* createLaunches(): LaunchesGenerator<T, J> {
+  async function* createLaunches(): LaunchesGenerator<J> {
     for (;;) {
       // yields immediately to accept a new job
       // spawns job in background without waiting
@@ -47,7 +47,7 @@ export function createSettlerStrategy<T, J extends Job<T>>(
     }
   }
 
-  async function* createSettlements(): SettlementsGenerator<T, J> {
+  async function* createSettlements(): SettlementsGenerator<J> {
     for (;;) {
       // immediately yield any job settlement
       yield await queue.receive();

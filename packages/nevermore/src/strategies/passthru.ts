@@ -7,10 +7,10 @@ import type {
   StrategyFactory,
 } from "../types";
 
-export function createPassthruStrategy<T, J extends Job<T>>(
-  downstream: Strategy<T, J>
+export function createPassthruStrategy<J extends Job<unknown>>(
+  downstream: Strategy<J>
 ) {
-  async function* createLaunches(): LaunchesGenerator<T, J> {
+  async function* createLaunches(): LaunchesGenerator<J> {
     try {
       await downstream.launches.next(); // prime generator to yield point
       for (;;) {
@@ -25,7 +25,7 @@ export function createPassthruStrategy<T, J extends Job<T>>(
     }
   }
 
-  async function* createSettlements(): SettlementsGenerator<T, J> {
+  async function* createSettlements(): SettlementsGenerator<J> {
     try {
       for (;;) {
         const settlementResult = await downstream.settlements.next();
@@ -48,7 +48,7 @@ export function createPassthruStrategy<T, J extends Job<T>>(
 export function createPassthruPipe(): Pipe {
   return (createStrategy: StrategyFactory) =>
     <T, J extends Job<T>>() => {
-      const downstream: Strategy<T, J> = createStrategy();
-      return createPassthruStrategy<T, J>(downstream);
+      const downstream: Strategy<J> = createStrategy();
+      return createPassthruStrategy<J>(downstream);
     };
 }

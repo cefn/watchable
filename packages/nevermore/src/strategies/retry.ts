@@ -9,36 +9,39 @@ import type {
   Strategy,
 } from "../types";
 
-type RetryJob<T, J extends Job<T>> = (() => Promise<T>) & {
+type RetryJob<J extends Job<unknown>> = (() => ReturnType<J>) & {
   jobToRetry: J;
   jobFailures: number;
 };
 
-function createRetryJob<T, J extends Job<T>>(jobToRetry: J): RetryJob<T, J> {
-  const retryJob = Object.assign(() => jobToRetry(), {
-    jobToRetry,
-    jobFailures: 0,
-  });
+function createRetryJob<T, J extends Job<T>>(jobToRetry: J): RetryJob<J> {
+  const retryJob: RetryJob<J> = Object.assign(
+    () => jobToRetry() as ReturnType<J>,
+    {
+      jobToRetry,
+      jobFailures: 0,
+    }
+  );
 
   return retryJob;
 }
 
 export function createRetryStrategy<T, J extends Job<T>>(
   options: RetryOptions,
-  downstream: Strategy<T, RetryJob<T, J>>
-): Strategy<T, J> {
+  downstream: Strategy<RetryJob<J>>
+): Strategy<J> {
   const { retries } = options;
 
   // TODO CH what pipe order/checks should constrain this growing backlog?
-  const failedRetryJobs: Array<RetryJob<T, J>> = [];
+  const failedRetryJobs: Array<RetryJob<J>> = [];
 
-  async function* createLaunches(): LaunchesGenerator<T, J> {
+  async function* createLaunches(): LaunchesGenerator<J> {
     await downstream.launches.next(); // prime downstream generator
     try {
       for (;;) {
         const retryJob =
           failedRetryJobs.length > 0
-            ? (failedRetryJobs.shift() as RetryJob<T, J>) // prioritise clearing existing retries
+            ? (failedRetryJobs.shift() as RetryJob<J>) // prioritise clearing existing retries
             : createRetryJob<T, J>(yield); // else wrap a new upstream job
         const launchResult = await downstream.launches.next(retryJob);
         if (launchResult.done === true) {
@@ -51,7 +54,7 @@ export function createRetryStrategy<T, J extends Job<T>>(
     }
   }
 
-  async function* createSettlements(): SettlementsGenerator<T, J> {
+  async function* createSettlements(): SettlementsGenerator<J> {
     try {
       for (;;) {
         const iteratorResult = await downstream.settlements.next();
@@ -72,10 +75,15 @@ export function createRetryStrategy<T, J extends Job<T>>(
         }
         // pass back other fulfilled or rejected events
         // but reference the original job
-        yield {
-          ...retrySettlement,
-          job: retryJob.jobToRetry,
-        };
+        const { status } = retrySettlement;
+        if (status === "fulfilled") {
+          const { value } = retrySettlement;
+          yield {
+            status,
+            value,
+            job: retryJob.jobToRetry,
+          };
+        }
       }
     } finally {
       await downstream.settlements.return();
