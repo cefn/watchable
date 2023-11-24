@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-base-to-string */
 /* eslint-disable @typescript-eslint/promise-function-async */
 
 export function namedRace<
@@ -108,4 +109,17 @@ export async function promiseMessage<Message extends string>(
   message: Message
 ): Promise<Message> {
   return await promise.then(() => message);
+}
+
+export function serializeError(err: unknown) {
+  if (err instanceof Error) {
+    return err.message;
+  }
+  if (typeof err?.toString === "function") {
+    const stringValue = err.toString();
+    if (stringValue !== "" && stringValue !== "[object Object]") {
+      return stringValue;
+    }
+  }
+  return JSON.stringify(err);
 }

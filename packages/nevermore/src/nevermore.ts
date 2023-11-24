@@ -30,7 +30,7 @@ function* pipesFromOptions(
  * @param options.cancelPromise If provided, Nevermore will cease launching jobs whenever this promise settles.
  * @returns
  */
-export async function* nevermore<T, J extends Job<T>>(
+export async function* nevermore<J extends Job<unknown>>(
   options: NevermoreOptions & {
     pipes?: Pipe[];
   },
@@ -39,15 +39,15 @@ export async function* nevermore<T, J extends Job<T>>(
     | AsyncIterable<J>
     | (() => Generator<J>)
     | (() => AsyncGenerator<J>)
-): AsyncIterable<JobSettlement<T, J>> {
+): AsyncIterable<JobSettlement<J>> {
   const { cancelPromise } = options;
 
   /** COMPOSE STRATEGY */
 
   // define a factory that creates a settler strategy
   // (a strategy that attempts to immediately settle every job)
-  let createStrategy = <T, J extends Job<T>>() =>
-    createSettlerStrategy<T, J>(cancelPromise);
+  let createStrategy = <J extends Job<unknown>>() =>
+    createSettlerStrategy<J>(cancelPromise);
 
   // compose further factories specified by caller (wrapping settler factory)
   for (const pipe of pipesFromOptions(options)) {
@@ -55,7 +55,7 @@ export async function* nevermore<T, J extends Job<T>>(
   }
 
   // execute all wrapped factories, creating a composed strategy
-  const strategy = createStrategy<T, J>();
+  const strategy = createStrategy<J>();
 
   /** PUSH JOBS */
 

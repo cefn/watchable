@@ -15,13 +15,11 @@ export type JobArgs =
 
 export type Job<T> = (...args: JobArgs) => Promise<T>;
 
-export type JobFulfilment<J extends Job<unknown>> = J extends Job<infer T>
-  ? {
-      job: J;
-      status: "fulfilled";
-      value: T;
-    }
-  : never;
+export interface JobFulfilment<J extends Job<unknown>> {
+  job: J;
+  status: "fulfilled";
+  value: Awaited<ReturnType<J>>;
+}
 
 export interface JobRejection<J extends Job<unknown>> {
   job: J;

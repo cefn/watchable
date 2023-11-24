@@ -10,21 +10,23 @@ import type {
   TimeoutOptions,
 } from "../types";
 
-type TimeoutJob<T, J extends Job<T>> = (() => Promise<T>) & {
+type TimeoutJob<J extends Job<unknown>> = (() => Promise<ReturnType<J>>) & {
   jobToTimeout: J;
   timeoutMs: number;
 };
 
-function createTimeoutJob<T, J extends Job<T>>(
+function createTimeoutJob<J extends Job<unknown>>(
   jobToTimeout: J,
   timeoutMs: number
-): TimeoutJob<T, J> {
+): TimeoutJob<J> {
   return Object.assign(
     async () => {
       let timeoutId: ReturnType<typeof setTimeout> | null = null;
 
       try {
-        const jobPromise = jobToTimeout();
+        const jobPromise = jobToTimeout() as Promise<
+          Awaited<ReturnType<typeof jobToTimeout>>
+        >;
 
         const timeoutPromise = new Promise<never>((_resolve, reject) => {
           timeoutId = setTimeout(() => {
@@ -47,18 +49,18 @@ function createTimeoutJob<T, J extends Job<T>>(
   );
 }
 
-export function createTimeoutStrategy<T, J extends Job<T>>(
+export function createTimeoutStrategy<J extends Job<unknown>>(
   options: TimeoutOptions,
-  downstream: Strategy<T, TimeoutJob<T, J>>
+  downstream: Strategy<TimeoutJob<J>>
 ) {
   const { timeoutMs } = options;
 
-  async function* createLaunches(): LaunchesGenerator<T, J> {
+  async function* createLaunches(): LaunchesGenerator<J> {
     try {
       await downstream.launches.next(); // prime generator to yield point
       for (;;) {
         const job = yield;
-        const timeoutJob = createTimeoutJob<T, J>(job, timeoutMs);
+        const timeoutJob = createTimeoutJob<J>(job, timeoutMs);
         const launchResult = await downstream.launches.next(timeoutJob);
         if (launchResult.done === true) {
           break;
@@ -69,7 +71,7 @@ export function createTimeoutStrategy<T, J extends Job<T>>(
     }
   }
 
-  async function* createSettlements(): SettlementsGenerator<T, J> {
+  async function* createSettlements(): SettlementsGenerator<J> {
     try {
       for (;;) {
         const settlementResult = await downstream.settlements.next();
@@ -100,8 +102,8 @@ export function createTimeoutStrategy<T, J extends Job<T>>(
 
 export function createTimeoutPipe(options: TimeoutOptions): Pipe {
   return (createStrategy: StrategyFactory) =>
-    <T, J extends Job<T>>() => {
-      const downstream: Strategy<T, TimeoutJob<T, J>> = createStrategy();
-      return createTimeoutStrategy<T, J>(options, downstream);
+    <J extends Job<unknown>>() => {
+      const downstream: Strategy<TimeoutJob<J>> = createStrategy();
+      return createTimeoutStrategy<J>(options, downstream);
     };
 }

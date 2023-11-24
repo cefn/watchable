@@ -23,7 +23,7 @@ export function createSettlerStrategy<J extends Job<unknown>>(
   async function triggerJob(job: J) {
     try {
       const value =
-        cancelPromise !== null ? await job({ cancelPromise }) : await job();
+        (cancelPromise !== null ? await job({ cancelPromise }) : await job()) as Awaited<ReturnType<typeof job>>;
       queue.send({
         job,
         status: "fulfilled",
