@@ -4,7 +4,13 @@
  */
 
 import { type MessageQueue, createQueue } from "@watchable/queue";
-import type { Job, JobSettlement, Strategy } from "../types";
+import type {
+  Job,
+  JobSettlement,
+  LaunchesGenerator,
+  SettlementsGenerator,
+  Strategy,
+} from "../types";
 
 /** Creates a Promise<T> from every job passed to `launches.next(job)`. Tracks
  *  Promise resolution or rejection. Passes back JobSettlements via
@@ -32,7 +38,7 @@ export function createSettlerStrategy<T, J extends Job<T>>(
     }
   }
 
-  async function* createLaunches(): AsyncGenerator<void, void, J> {
+  async function* createLaunches(): LaunchesGenerator<T, J> {
     for (;;) {
       // yields immediately to accept a new job
       // spawns job in background without waiting
@@ -41,11 +47,7 @@ export function createSettlerStrategy<T, J extends Job<T>>(
     }
   }
 
-  async function* createSettlements(): AsyncGenerator<
-    JobSettlement<T, J>,
-    void,
-    void
-  > {
+  async function* createSettlements(): SettlementsGenerator<T, J> {
     for (;;) {
       // immediately yield any job settlement
       yield await queue.receive();

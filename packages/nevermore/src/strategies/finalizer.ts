@@ -1,7 +1,9 @@
 import type {
   Job,
   JobSettlement,
+  LaunchesGenerator,
   Pipe,
+  SettlementsGenerator,
   Strategy,
   StrategyFactory,
 } from "../types";
@@ -21,7 +23,7 @@ export function createFinalizerStrategy<T, J extends Job<T>>(
   // pass jobs downstream
   // track active count
   // move to finalizing settlements when upstream or downstream 'return'
-  async function* createLaunches(): AsyncGenerator<void, void, J> {
+  async function* createLaunches(): LaunchesGenerator<T, J> {
     await downstream.launches.next(); // prime downstream generator (to reach yield point)
     try {
       for (;;) {
@@ -41,7 +43,7 @@ export function createFinalizerStrategy<T, J extends Job<T>>(
   // pass settlements upstream
   // query launches finalization and count outstanding settlements
   // when no more launches and no more settlements, end the sequence
-  async function* createSettlements(): AsyncGenerator<JobSettlement<T, J>> {
+  async function* createSettlements(): SettlementsGenerator<T, J> {
     let settlementResultPromise: Promise<
       IteratorResult<JobSettlement<T, J>>
     > | null = null;

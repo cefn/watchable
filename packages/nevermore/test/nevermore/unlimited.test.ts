@@ -5,7 +5,7 @@ import type { NevermoreOptions } from "../../src/types";
 import { delay, gen2array } from "../testutil";
 import { createNotifiable } from "../../src/util";
 
-const OPTIONS_INFINITE_CONCURRENCY: NevermoreOptions = {
+const INFINITE_CONCURRENCY: NevermoreOptions = {
   concurrency: Number.MAX_SAFE_INTEGER,
 };
 
@@ -29,14 +29,11 @@ describe("Nevermore pipelines without limits", () => {
   }
 
   test("Job sequence can be generator", async () => {
-    const settlementSequence = nevermore(
-      OPTIONS_INFINITE_CONCURRENCY,
-      function* () {
-        for (const msg of ["one", "two", "three"]) {
-          yield createMessageJob(msg);
-        }
+    const settlementSequence = nevermore(INFINITE_CONCURRENCY, function* () {
+      for (const msg of ["one", "two", "three"]) {
+        yield createMessageJob(msg);
       }
-    );
+    });
 
     // flatten async iterator to an eventual array of settlements
     const settlements = await gen2array(settlementSequence);
@@ -44,18 +41,18 @@ describe("Nevermore pipelines without limits", () => {
     // settlements include jobs and outcomes
     expect(settlements).toMatchObject([
       {
-        job: expect.any(Function),
-        kind: "resolved",
+        job: expect.anything(),
+        status: "fulfilled",
         value: "one",
       },
       {
-        job: expect.any(Function),
-        kind: "resolved",
+        job: expect.anything(),
+        status: "fulfilled",
         value: "two",
       },
       {
-        job: expect.any(Function),
-        kind: "resolved",
+        job: expect.anything(),
+        status: "fulfilled",
         value: "three",
       },
     ]);
@@ -71,7 +68,7 @@ describe("Nevermore pipelines without limits", () => {
   test("Job sequence can be async generator", async () => {
     // when job input is a normal iterable
     const settlementSequence = nevermore(
-      OPTIONS_INFINITE_CONCURRENCY,
+      INFINITE_CONCURRENCY,
       async function* () {
         for (const msg of ["one", "two", "three"]) {
           await delay(10, undefined);
@@ -83,18 +80,18 @@ describe("Nevermore pipelines without limits", () => {
     // results in settlements as normal
     expect(await gen2array(settlementSequence)).toMatchObject([
       {
-        job: expect.any(Function),
-        kind: "resolved",
+        job: expect.anything(),
+        status: "fulfilled",
         value: "one",
       },
       {
-        job: expect.any(Function),
-        kind: "resolved",
+        job: expect.anything(),
+        status: "fulfilled",
         value: "two",
       },
       {
-        job: expect.any(Function),
-        kind: "resolved",
+        job: expect.anything(),
+        status: "fulfilled",
         value: "three",
       },
     ]);
@@ -102,7 +99,7 @@ describe("Nevermore pipelines without limits", () => {
 
   test("Job sequence can be an ordinary iterable", async () => {
     // when job input is a normal iterable
-    const settlementSequence = nevermore(OPTIONS_INFINITE_CONCURRENCY, [
+    const settlementSequence = nevermore(INFINITE_CONCURRENCY, [
       createMessageJob("one"),
       createMessageJob("two"),
       createMessageJob("three"),
@@ -111,32 +108,29 @@ describe("Nevermore pipelines without limits", () => {
     // results in settlements as normal
     expect(await gen2array(settlementSequence)).toMatchObject([
       {
-        job: expect.any(Function),
-        kind: "resolved",
+        job: expect.anything(),
+        status: "fulfilled",
         value: "one",
       },
       {
-        job: expect.any(Function),
-        kind: "resolved",
+        job: expect.anything(),
+        status: "fulfilled",
         value: "two",
       },
       {
-        job: expect.any(Function),
-        kind: "resolved",
+        job: expect.anything(),
+        status: "fulfilled",
         value: "three",
       },
     ]);
   });
 
   test("Settlements allow Generic job with caller-provided metadata", async () => {
-    const settlementSequence = nevermore(
-      OPTIONS_INFINITE_CONCURRENCY,
-      function* () {
-        for (const msg of ["one", "two", "three"]) {
-          yield createMessageJob(msg);
-        }
+    const settlementSequence = nevermore(INFINITE_CONCURRENCY, function* () {
+      for (const msg of ["one", "two", "three"]) {
+        yield createMessageJob(msg);
       }
-    );
+    });
 
     // flatten async iterator to an eventual array of settlements
     const settlements = await gen2array(settlementSequence);
@@ -150,18 +144,15 @@ describe("Nevermore pipelines without limits", () => {
   });
 
   test("Settlements can include a record of failure", async () => {
-    const settlementSequence = nevermore(
-      OPTIONS_INFINITE_CONCURRENCY,
-      function* () {
-        for (const msg of ["one", "two", "three"]) {
-          if (msg === "two") {
-            yield createFailingMessageJob(msg);
-          } else {
-            yield createMessageJob(msg);
-          }
+    const settlementSequence = nevermore(INFINITE_CONCURRENCY, function* () {
+      for (const msg of ["one", "two", "three"]) {
+        if (msg === "two") {
+          yield createFailingMessageJob(msg);
+        } else {
+          yield createMessageJob(msg);
         }
       }
-    );
+    });
 
     // flatten async iterator to an eventual array of settlements
     const settlements = await gen2array(settlementSequence);
@@ -169,18 +160,18 @@ describe("Nevermore pipelines without limits", () => {
     // settlements include jobs and outcomes
     expect(settlements).toMatchObject([
       {
-        job: expect.any(Function),
-        kind: "resolved",
+        job: expect.anything(),
+        status: "fulfilled",
         value: "one",
       },
       {
-        job: expect.any(Function),
-        kind: "rejected",
-        error: new Error(`Emulated message failure`),
+        job: expect.anything(),
+        status: "rejected",
+        reason: new Error(`Emulated message failure`),
       },
       {
-        job: expect.any(Function),
-        kind: "resolved",
+        job: expect.anything(),
+        status: "fulfilled",
         value: "three",
       },
     ]);

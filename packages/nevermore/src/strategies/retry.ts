@@ -1,7 +1,14 @@
 /** This strategy retries all failing jobs for a specified number of retries before passing them back as rejected */
 
 /* eslint-disable @typescript-eslint/promise-function-async */
-import type { Job, JobSettlement, RetryOptions, Strategy } from "../types";
+import type {
+  Job,
+  JobSettlement,
+  LaunchesGenerator,
+  RetryOptions,
+  SettlementsGenerator,
+  Strategy,
+} from "../types";
 
 type RetryJob<T, J extends Job<T>> = (() => Promise<T>) & {
   jobToRetry: J;
@@ -26,7 +33,7 @@ export function createRetryStrategy<T, J extends Job<T>>(
   // TODO what pipe order/checks should constrain this growing backlog?
   const failedRetryJobs: Array<RetryJob<T, J>> = [];
 
-  async function* createLaunches(): AsyncGenerator<void, void, J> {
+  async function* createLaunches(): LaunchesGenerator<T, J> {
     await downstream.launches.next(); // prime downstream generator
     try {
       for (;;) {
@@ -45,7 +52,7 @@ export function createRetryStrategy<T, J extends Job<T>>(
     }
   }
 
-  async function* createSettlements(): AsyncGenerator<JobSettlement<T, J>> {
+  async function* createSettlements(): SettlementsGenerator<T, J> {
     try {
       for (;;) {
         const iteratorResult = await downstream.settlements.next();

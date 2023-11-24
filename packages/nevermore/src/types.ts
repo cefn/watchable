@@ -76,13 +76,25 @@ type AnyOptions = AllOrNothing<ConcurrencyOptions> &
 
 export type NevermoreOptions = AnyOptions & OnePropertyFrom<AnyOptions>;
 
+export type LaunchesGenerator<T, J extends Job<T>> = AsyncGenerator<
+  void,
+  void,
+  J
+>;
+
+export type SettlementsGenerator<T, J extends Job<T>> = AsyncGenerator<
+  JobSettlement<T, J>,
+  void,
+  void
+>;
+
 // TODO `launches` should track a uniquely-identified object per launch
 // since the job could be re-used, but the launch request is unique
 // maps could use the launch itself or an auto-incrementing id as a key
 // to manage launch records?
 export interface Strategy<T, J extends Job<T>> {
-  launches: AsyncGenerator<void, void, J>;
-  settlements: AsyncGenerator<JobSettlement<T, J>, void, void>;
+  launches: LaunchesGenerator<T, J>;
+  settlements: SettlementsGenerator<T, J>;
 }
 
 /** Function defining a Generic binding for a Strategy
@@ -120,4 +132,11 @@ export type Nexted<I extends Iterator<unknown>> = I extends Iterator<
   infer nexted
 >
   ? nexted
+  : never;
+
+/** From https://github.com/piotrwitek/utility-types/blob/411e83ecf70e428b529fc2a09a49519e8f36c8fa/src/mapped-types.ts#L630 */
+export type UnionToIntersection<U> = (
+  U extends any ? (k: U) => void : never
+) extends (k: infer I) => void
+  ? I
   : never;

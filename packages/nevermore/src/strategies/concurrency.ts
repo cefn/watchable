@@ -6,6 +6,8 @@ import type {
   NevermoreOptions,
   StrategyFactory,
   JobSettlement,
+  LaunchesGenerator,
+  SettlementsGenerator,
 } from "../types";
 import { promiseWithFulfil } from "../util";
 
@@ -34,7 +36,7 @@ export function createConcurrencyStrategy<T, J extends Job<T>>(
   let pendingJobs = 0;
   let slotAnnouncement: ReturnType<typeof promiseWithFulfil> | null = null;
 
-  async function* createLaunches(): AsyncGenerator<void, void, J> {
+  async function* createLaunches(): LaunchesGenerator<T, J> {
     try {
       await downstream.launches.next(); // prime downstream generator
       for (;;) {
@@ -63,11 +65,7 @@ export function createConcurrencyStrategy<T, J extends Job<T>>(
     }
   }
 
-  async function* createSettlements(): AsyncGenerator<
-    JobSettlement<T, J>,
-    void,
-    void
-  > {
+  async function* createSettlements(): SettlementsGenerator<T, J> {
     try {
       for (;;) {
         // wait for downstream to yield a settlement
