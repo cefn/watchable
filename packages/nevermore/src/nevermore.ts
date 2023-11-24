@@ -13,7 +13,7 @@ function* pipesFromOptions(
     pipes?: Pipe[];
   }
 ) {
-  if (validateConcurrency(options)) {
+  if (validateConcurrency(options, { throwError: true })) {
     // limit number of simultaneously pending promises
     yield createConcurrencyPipe(options);
   }
@@ -65,10 +65,12 @@ export async function* nevermore<T, J extends Job<T>>(
 
   // push jobs into strategy as fast as possible
   async function pushJobs() {
+    // prime the generator (progress to the first yield)
+    await strategy.launches.next();
     for await (const job of jobIterable) {
       await strategy.launches.next(job);
     }
-    await strategy.launches.return?.();
+    await strategy.launches.return();
   }
 
   // run in background

@@ -81,8 +81,8 @@ export type NevermoreOptions = AnyOptions & OnePropertyFrom<AnyOptions>;
 // maps could use the launch itself or an auto-incrementing id as a key
 // to manage launch records?
 export interface Strategy<T, J extends Job<T>> {
-  launches: AsyncIterator<void, void, J>;
-  settlements: AsyncIterator<JobSettlement<T, J>>;
+  launches: AsyncGenerator<void, void, J>;
+  settlements: AsyncGenerator<JobSettlement<T, J>, void, void>;
 }
 
 /** Function defining a Generic binding for a Strategy

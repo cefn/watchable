@@ -1,3 +1,8 @@
+/** The base strategy used to evaluate jobs and pass back their settlements after they have completed.
+ * Typically this strategy exists at the end of a pipeline of other strategies which impose constraints
+ * on the behaviour or flow of jobs.
+ */
+
 import { type MessageQueue, createQueue } from "@watchable/queue";
 import type { Job, JobSettlement, Strategy } from "../types";
 
@@ -6,7 +11,7 @@ import type { Job, JobSettlement, Strategy } from "../types";
  *  `settlements.next()`. */
 export function createSettlerStrategy<T, J extends Job<T>>(
   cancelPromise: Promise<unknown> | null = null
-) {
+): Strategy<T, J> {
   const queue: MessageQueue<JobSettlement<T, J>> = createQueue();
 
   async function triggerJob(job: J) {
@@ -27,31 +32,28 @@ export function createSettlerStrategy<T, J extends Job<T>>(
     }
   }
 
-  const settlerStrategy: Strategy<T, J> = {
-    launches: {
-      async next(job: J) {
-        // spawns job in background without waiting
-        void triggerJob(job);
-        // yields immediately to accept a new job
-        // limits are expected to be 'upstream'
-        return {
-          value: undefined,
-          done: false,
-        } satisfies IteratorResult<void>;
-      },
-    },
-    settlements: {
-      async next() {
-        // awaits job settlement
-        const value = await queue.receive();
-        // yields immediately
-        return {
-          value,
-          done: false,
-        } satisfies IteratorResult<JobSettlement<T, J>>;
-      },
-    },
-  };
+  async function* createLaunches(): AsyncGenerator<void, void, J> {
+    for (;;) {
+      // yields immediately to accept a new job
+      // spawns job in background without waiting
+      // limits are expected 'upstream'
+      void triggerJob(yield);
+    }
+  }
 
-  return settlerStrategy;
+  async function* createSettlements(): AsyncGenerator<
+    JobSettlement<T, J>,
+    void,
+    void
+  > {
+    for (;;) {
+      // immediately yield any job settlement
+      yield await queue.receive();
+    }
+  }
+
+  return {
+    launches: createLaunches(),
+    settlements: createSettlements(),
+  };
 }

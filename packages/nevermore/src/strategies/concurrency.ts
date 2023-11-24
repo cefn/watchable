@@ -5,6 +5,7 @@ import type {
   Pipe,
   NevermoreOptions,
   StrategyFactory,
+  JobSettlement,
 } from "../types";
 import { promiseWithFulfil } from "../util";
 
@@ -27,51 +28,72 @@ export function createConcurrencyStrategy<T, J extends Job<T>>(
   options: ConcurrencyOptions & {
     downstream: Strategy<T, J>;
   }
-) {
+): Strategy<T, J> {
   const { concurrency, downstream } = options;
 
   let pendingJobs = 0;
   let slotAnnouncement: ReturnType<typeof promiseWithFulfil> | null = null;
 
-  const concurrencyStrategy: Strategy<T, J> = {
-    launches: {
-      async next(job: J) {
+  async function* createLaunches(): AsyncGenerator<void, void, J> {
+    try {
+      await downstream.launches.next(); // prime downstream generator
+      for (;;) {
         if (slotAnnouncement !== null) {
           // concurrency exceeded - wait for slot
           await slotAnnouncement.promise;
         }
+        // accept next job
+        const job = yield;
         // account for launch request
         pendingJobs++;
         // check if concurrency exceeded
         if (pendingJobs === concurrency) {
-          // prepare announcement of slot availability
+          // slots now unavailable, prepare announcement of slot availability
           slotAnnouncement = promiseWithFulfil();
         }
         // request job launch
         // wait for downstream to yield next launch
-        return await downstream.launches.next(job);
-      },
-    },
-    settlements: {
-      async next() {
+        const launchResult = await downstream.launches.next(job);
+        if (launchResult.done === true) {
+          break;
+        }
+      }
+    } finally {
+      await downstream.launches.return();
+    }
+  }
+
+  async function* createSettlements(): AsyncGenerator<
+    JobSettlement<T, J>,
+    void,
+    void
+  > {
+    try {
+      for (;;) {
         // wait for downstream to yield a settlement
         const result = await downstream.settlements.next();
         // check it's a job settlement (not a sequence end)
-        if (result.done === false) {
-          // account for settlement
-          pendingJobs--;
-          // make slot announcement if it's awaited
-          if (slotAnnouncement !== null) {
-            slotAnnouncement.fulfil();
-            slotAnnouncement = null;
-          }
+        if (result.done === true) {
+          break;
         }
-        return result;
-      },
-    },
-  };
+        // account for settlement
+        pendingJobs--;
+        // make slot announcement if it's awaited
+        if (slotAnnouncement !== null) {
+          slotAnnouncement.fulfil();
+          slotAnnouncement = null;
+        }
+        yield result.value;
+      }
+    } finally {
+      await downstream.settlements.return();
+    }
+  }
 
-  return concurrencyStrategy;
+  return {
+    launches: createLaunches(),
+    settlements: createSettlements(),
+  };
 }
 
 export function createConcurrencyPipe(options: ConcurrencyOptions): Pipe {

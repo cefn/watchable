@@ -1,40 +1,6 @@
-import { vi, describe, test, expect } from "vitest";
+import { describe, test, expect } from "vitest";
 import { nevermore } from "../../src";
 import { gen2array } from "../testutil";
-
-/** Generator for a series of timeout promises. Pass a callback to be notified of
- * when the count of pending async operations changes (launched but not yet completed).
- */
-function* timeoutSequence(
-  amount: number,
-  delay = 1,
-  notifyPending: ((count: number) => void) | null = null
-) {
-  let pendingCount = 0;
-  notifyPending?.(pendingCount);
-
-  let count = 0;
-
-  while (count < amount) {
-    const pos = count;
-    const fn = async () =>
-      await new Promise<number>((resolve) => {
-        notifyPending?.(++pendingCount);
-        const cb = () => {
-          resolve(pos);
-          notifyPending?.(--pendingCount);
-        };
-        if (delay === 0) {
-          setImmediate(cb);
-        } else {
-          setTimeout(cb, delay);
-        }
-      });
-    fn.requestId = `foo${pos}`;
-    yield fn;
-    count++;
-  }
-}
 
 describe("Nevermore with concurrency", () => {
   test("concurrency<1 throws an error", async () => {
@@ -46,11 +12,33 @@ describe("Nevermore with concurrency", () => {
   });
 
   test("concurrency===1 forces resolution in series", async () => {
-    const notifyPending = vi.fn();
-    const promiseSequence = timeoutSequence(5, 10, notifyPending);
+    let pending = 0;
+
+    function createIntegerDelayJob(integer: number, delayMs = 10) {
+      return Object.assign(
+        async () => {
+          try {
+            pending++;
+            await new Promise((resolve) => setTimeout(resolve, delayMs));
+            return { integer, pending };
+          } finally {
+            pending--;
+          }
+        },
+        {
+          integer,
+          delayMs,
+        }
+      );
+    }
 
     // create schedule
-    const settlementSequence = nevermore({ concurrency: 1 }, promiseSequence);
+    const settlementSequence = nevermore({ concurrency: 1 }, function* () {
+      let integer = 0;
+      yield createIntegerDelayJob(integer++);
+      yield createIntegerDelayJob(integer++);
+      yield createIntegerDelayJob(integer++);
+    });
 
     // run schedule
     const startMs = Date.now();
@@ -58,26 +46,32 @@ describe("Nevermore with concurrency", () => {
     const durationMs = Date.now() - startMs;
 
     // check 10 ms jobs didn't run in parallel
-    expect(settlements).toMatchObject([
-      { kind: "resolved", job: expect.any(Function), value: 0 },
-      { kind: "resolved", job: expect.any(Function), value: 1 },
-      { kind: "resolved", job: expect.any(Function), value: 2 },
-      { kind: "resolved", job: expect.any(Function), value: 3 },
-      { kind: "resolved", job: expect.any(Function), value: 4 },
+    expect(settlements).toEqual([
+      {
+        job: expect.anything(),
+        status: "fulfilled",
+        value: {
+          integer: 0,
+          pending: 1,
+        },
+      },
+      {
+        job: expect.anything(),
+        status: "fulfilled",
+        value: {
+          integer: 1,
+          pending: 1,
+        },
+      },
+      {
+        job: expect.anything(),
+        status: "fulfilled",
+        value: {
+          integer: 2,
+          pending: 1,
+        },
+      },
     ]);
     expect(durationMs).toBeGreaterThan(20);
-    expect(notifyPending.mock.calls).toEqual([
-      [0],
-      [1],
-      [0],
-      [1],
-      [0],
-      [1],
-      [0],
-      [1],
-      [0],
-      [1],
-      [0],
-    ]);
   });
 });

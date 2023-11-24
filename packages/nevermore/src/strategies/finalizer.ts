@@ -22,6 +22,7 @@ export function createFinalizerStrategy<T, J extends Job<T>>(
   // track active count
   // move to finalizing settlements when upstream or downstream 'return'
   async function* createLaunches(): AsyncGenerator<void, void, J> {
+    await downstream.launches.next(); // prime downstream generator (to reach yield point)
     try {
       for (;;) {
         const job = yield;
@@ -33,6 +34,7 @@ export function createFinalizerStrategy<T, J extends Job<T>>(
       }
     } finally {
       launchesFinalized.notify();
+      await downstream.launches.return?.();
     }
   }
 
@@ -43,37 +45,41 @@ export function createFinalizerStrategy<T, J extends Job<T>>(
     let settlementResultPromise: Promise<
       IteratorResult<JobSettlement<T, J>>
     > | null = null;
-
-    for (;;) {
-      // check finalization
-      if (launchesFinalized.notified && activeJobs === 0) {
-        // settlements finalized (launches finalised and nothing more in flight)
-        break;
-      }
-      // initialise result promise (or refresh if 'used up' in last loop)
-      if (settlementResultPromise === null) {
-        settlementResultPromise = downstream.settlements.next();
-      }
-      // if launches not yet complete wait on both launch completion AND settlement
-      // (after launch completion, may learn that further result will never come)
-      if (!launchesFinalized.notified) {
-        const winner = await namedRace({
-          launchesFinalized: launchesFinalized.promise,
-          settlementResult: settlementResultPromise,
-        });
-        if (winner === "launchesFinalized") {
-          // loop again to reconsider if settlements now completed
-          continue;
+    try {
+      for (;;) {
+        // check finalization
+        if (launchesFinalized.notified && activeJobs === 0) {
+          // settlements finalized (launches finalised and nothing more in flight)
+          break;
         }
+        // initialise result promise (or refresh if 'used up' in last loop)
+        if (settlementResultPromise === null) {
+          settlementResultPromise = downstream.settlements.next();
+        }
+        // if launches not yet complete wait on both launch completion AND settlement
+        // (after launch completion, may learn that further result will never come)
+        if (!launchesFinalized.notified) {
+          const winner = await namedRace({
+            launchesFinalized: launchesFinalized.promise,
+            settlementResult: settlementResultPromise,
+          });
+          if (winner === "launchesFinalized") {
+            // loop again to reconsider if settlements now completed
+            continue;
+          }
+        }
+        // handle settlements result, reset promise
+        const result = await settlementResultPromise;
+        activeJobs--;
+        settlementResultPromise = null;
+        if (result.done === true) {
+          // complete: settlements ended
+          break;
+        }
+        yield result.value;
       }
-      // handle settlements result, reset promise
-      const result = await settlementResultPromise;
-      settlementResultPromise = null;
-      if (result.done === true) {
-        // complete: settlements ended
-        break;
-      }
-      yield result.value;
+    } finally {
+      await downstream.settlements.return();
     }
   }
 

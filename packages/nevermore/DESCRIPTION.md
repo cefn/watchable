@@ -1,6 +1,6 @@
 Nevermore provides a simple, generator-based interface turning a sequence of
 async functions (provided by the caller) into a sequence of settlements
-finalising the result of each job as `"resolved"` or `"rejected"`.
+finalising the result of each job as `"fulfilled"` or `"rejected"`.
 
 Sequences of async functions can be...
 
@@ -15,14 +15,14 @@ could get the first three Star Wars films, being kind to the SWAPI servers -
 with at most one outstanding request at a time...
 
 ```ts
-// with an array
+// with a complete array of jobs
 const settlementSequence = nevermore({ concurrency: 1 }, [
   () => fetchOk("https://swapi.dev/api/films/1/"),
   () => fetchOk("https://swapi.dev/api/films/2/"),
   () => fetchOk("https://swapi.dev/api/films/3/"),
 ]);
 
-// with a no-arg generator
+// with a lazy-evaluated no-arg generator of jobs
 const settlementSequence = nevermore({ concurrency: 1 }, function* () {
   let filmNumber = 1;
   do {
@@ -36,7 +36,7 @@ To consume the results as they are settled...
 
 ```ts
 for await (const settlement of settlementSequence) {
-  if (settlement.kind === "resolved") {
+  if (settlement.status === "fulfilled") {
     console.log(`Succeeded. Record : ${settlement.value}`);
   } else {
     console.err(`Failed. Error message: ${settlement.error?.message}`);
@@ -68,13 +68,13 @@ const settlementSequence = nevermore({ concurrency: 1 }, function* () {
 ```
 
 Using `Object.assign` to attach the property `filmNumber` extends the job type
-yielded by our generator. We can then read the type-safe `filmNumber` from the
-job when we consume the settlements, improving our reporting.
+we yield, adding a type-safe `filmNumber`. We can read this from the job when we
+consume the settlements, improving our reporting.
 
 ```ts
 for await (const settlement of settlementSequence) {
   const { filmNumber } = settlement.job;
-  if (settlement.kind === "resolved") {
+  if (settlement.status === "fulfilled") {
     console.log(`${filmNumber} record : ${settlement.value}`);
   } else {
     console.err(`${filmNumber} error message : ${settlement.error?.message}`);
@@ -82,12 +82,12 @@ for await (const settlement of settlementSequence) {
 }
 ```
 
-## Power Usage - Rate Limiting, Timeout, Retry,
+## Power Users - Rate Limiting, Timeout, Retry, Backoff
 
 Using `concurrency` limits to only N pending task at a time puts a ceiling on
 resources used by parallel requests. However, there are many more constraints
 that may be needed. The real power of `nevermore` comes when combining multiple
-constraints on the flow of async tasks...
+simultaneous constraints on the flow of async tasks...
 
 - Interval: An API often rate-limits clients, rejecting their requests if they
   make more than a certain number within an interval. Limiting tasks with an
@@ -100,12 +100,12 @@ constraints on the flow of async tasks...
 - Retry: If the SWAPI request occasionally fails or times out, you can re-run
   the job several times with a retry strategy.
 
-All of the above can be achieve through the same minimal signature as we saw
-with `concurrency` like this...
+All of the above can be achieve through a signature similar to the `concurrency`
+control case, but with a handful more parameters...
 
 ```ts
 const settlementSequence = nevermore(
-  { concurrency: 2, intervalLaunches: 2, retries: 3, timeoutMs: 3000 },
+  { concurrency: 2, intervalMs: 100, retries: 3, timeoutMs: 3000 },
   function* () {
     let filmNumber = 1;
     do {
@@ -118,100 +118,112 @@ const settlementSequence = nevermore(
 
 ## Implementation, Extension
 
-Internally, Nevermore is implemented using layered `Feeds`. Each `Feed` imposes
-constraints on earlier `Feeds` through the implementation of its `launches` and
-`settlements` generators.
+Internally, Nevermore is implemented using layered `Strategies`. Each `Strategy`
+imposes constraints on earlier `Strategies` through the implementation of its
+`launches` and `settlements` generators.
 
 Both `launches` and `settlements` are async coroutines, fed and consumed by the
-next `Feed` in the sequence. The last `Feed` in the sequence controls the
-eventual Promise `JobSettlement` events served to the caller.
+next `Strategy` in the sequence. The last `Strategy` in the sequence controls
+the eventual Promise `JobSettlement` events served to the caller.
 
-Strategies are all layered on top of 'SourceFeed'. This is a simple strategy
-which immediately runs every job passed via `launches.next(job)`, creating a
-Promise. It tracks the Promise's eventual outcome, yielding it as a
-`JobSettlement` via `settlements.next()`.
+Strategies are all layered on top of 'SettlerStrategy'. This is a simple
+strategy which immediately runs every job passed to its `launches.next(job)`,
+creating a Promise. It tracks the Promise's eventual outcome, yielding it as a
+`JobSettlement` via its `settlements.next()`.
 
-A strategy layered on top of the SourceFeed can intercept jobs and prevent them
-from being launched until the strategy allows. They can also couple their
-`launches` to the results of `settlements`, for example tracking the count of
-unsettled jobs and the timing of pending jobs. In turn further strategies can be
-layered on top. New `Feed` strategies following this pattern can be added by
-users.
+A strategy layered on top of the SettlerStrategy can intercept jobs, deciding
+when to allow them to be launched, or to substitute them with modified jobs
+(such as adding a timeout). They often couple their `launches` to the results of
+`settlements`, for example tracking the count of unsettled jobs and the timing
+of pending jobs. In turn further strategies can be layered on top. New kinds of
+`Strategy` following this pattern can be added by users.
 
 ### Mechanism: `launches` and `settlements`
 
-Each `Feed`'s async `launches` coroutine accepts a job via `.next(job)`. This
+Each `Strategy`'s async `launches` coroutine accepts a job via `.next(job)`
+which returns (yields) when the `Strategy` is ready for the next job. This
 approach effectively pulls through jobs created 'just in time' from a
 (potentially infinite) sequence provided by the caller.
 
-The `Feed` can choose when and how to pass a job on to the `launches` of a
-`Feed` in the layer below, potentially transforming the job on the way. It can
+The `Strategy` can choose when and how to pass a job on to the `launches` of a
+downstream `Strategy`, potentially transforming the job on the way. It can
 decide when to yield back to the caller and accept the next job. In this way
-launches can be constrained and transformed by lots of different strategies.
+async operations can be constrained and transformed by lots of different
+strategies.
 
-Crucially the `Feed` can also couple its manipulation of `launches` to its
+Crucially the `Strategy` can also couple its manipulation of `launches` to its
 implementation of `settlements` co-routine (which notifies the eventual outcome
-of jobs launched by lower Feeds).
+of jobs launched by lower Strategies).
 
 ### Worked Examples
 
-A _**concurrency-limiting**_ `Feed` accepts another job only when the number of
-pending jobs goes below a threshold (because pending jobs have settled as
+A _**concurrency-limiting**_ `Strategy` accepts another job only when the number
+of pending jobs goes below a threshold (because pending jobs have settled as
 resolved or rejected). Once there is a slot for a pending job, it will accept a
 new job and attempt to pass it on to the next layer.
 
-A _**rate-limiting**_ `Feed` accepts another job only when there is still a slot
-within this interval (until the number of launches within the interval matches
-`intervalLaunches`). When the limit is hit, it can work out when the next slot
-will become free, and sleeps for that duration.
+A _**rate-limiting**_ `Strategy` accepts another job only when there is still a
+slot within this interval (until the number of launches within the interval
+matches `intervalLaunches`). When the limit is hit, it can work out when the
+next slot will become free, and sleeps for that duration before yielding and
+accepting the next job.
 
-A _**timeout**_ `Feed` always accepts jobs, wraps them in a timeout job that
-throws an error if it hasn't settled in time. On receiving a settlement it
-unwraps it, so the `JobSettlement` points to the original job, rather than the
-modified one.
+A _**timeout**_ `Strategy` always accepts jobs, wraps them in a timeout job that
+throws an error if it hasn't settled in time before passing the task downstream.
+On receiving a settlement it unwraps the timeout job, so the `JobSettlement`
+points to the original job, rather than the modified one.
 
 A _**retry**_ `Feed` always accepts jobs, wraps them in a retry job, storing
 extra metadata describing the count of retries attempted. `JobResolved`
 settlements are unwrapped to create a `JobResolved` for the original job.
 However `JobRejected` events are re-attempted until reaching the maximum number
-of retries for that job.
+of retries for that job, and then the failure is passed back down the chain.
 
 ### Reference 'Identity' Feed Implementation
 
-The 'Identity' feed imagined below, could be layered on top of any feed and
-would transparently pass jobs and settlements. More specialised feeds are based
-on these coroutines, but with additional logic as jobs and settlements pass
-through them.
+The 'Identity' strategy imagined below, could be layered on top of any strategy
+and would transparently pass jobs and settlements. More specialised strategies
+are based on these coroutines, but with additional logic as jobs and settlements
+pass through them.
 
 ```ts
-export function createIdentityFeed<T, J extends Job<T>>(feed: Feed<T, J>) {
-    const launches = {
-        next(...args) {
-            return feed.launches.next(...args);
+export function createIdentityStrategy<T, J extends Job<T>>(
+  downstream: Strategy<T, J>
+) {
+  function* createLaunches(): AsyncGenerator<void, void, J> {
+    try {
+      await downstream.launches.next(); // prime generator to yield point
+      for (;;) {
+        const job = yield;
+        const launchResult = await downstream.launches.next(job);
+        if (launchResult.done === true) {
+          break;
         }
-        return(...args){
-            return feed.launches.return(...args);
-        }
-        throw(...args){
-            return feed.launches.throw(...args);
-        }
-    };
+      }
+    } finally {
+      downstream.launches.return();
+    }
+  }
 
-    const settlements = {
-        next(...args) {
-            return feed.settlements.next(...args);
-        }
-        return(...args){
-            return feed.settlements.return(...args);
-        }
-        throw(...args){
-            return feed.settlements.throw(...args);
-        }
-    };
+  function* createSettlements(): AsyncGenerator<
+    JobSettlement<T, J>,
+    void,
+    void
+  > {
+    try {
+      const settlementResult = await downstream.settlements.next();
+      if (settlementResult.done === true) {
+        break;
+      }
+      yield settlementResult.value;
+    } finally {
+      downstream.settlements.return();
+    }
+  }
 
-    return {
-        launches,
-        settlements,
-    };
+  return {
+    launches: createLaunches(),
+    settlements: createSettlements(),
+  };
 }
 ```

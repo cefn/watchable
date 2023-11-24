@@ -1,3 +1,5 @@
+/** This strategy retries all failing jobs for a specified number of retries before passing them back as rejected */
+
 /* eslint-disable @typescript-eslint/promise-function-async */
 import type { Job, JobSettlement, RetryOptions, Strategy } from "../types";
 
@@ -25,6 +27,7 @@ export function createRetryStrategy<T, J extends Job<T>>(
   const failedRetryJobs: Array<RetryJob<T, J>> = [];
 
   async function* createLaunches(): AsyncGenerator<void, void, J> {
+    await downstream.launches.next(); // prime downstream generator
     try {
       for (;;) {
         const retryJob =
@@ -64,7 +67,7 @@ export function createRetryStrategy<T, J extends Job<T>>(
         };
       }
     } finally {
-      await downstream.settlements.return?.();
+      await downstream.settlements.return();
     }
   }
 
