@@ -5,7 +5,7 @@
 
 import { describe, test, expect } from "vitest";
 
-import { nevermore, createPassthruPipe, serializeError } from "../../../src/";
+import { nevermore, createPassthruPipe, serializeError } from "../../src/";
 
 describe("Passthru strategy has no effect", () => {
   test("Simple job sequence", async () => {

@@ -127,8 +127,6 @@ export function createRetryStrategy<J extends Job<unknown>>(
 
 export function createRetryPipe(options: RetryOptions): Pipe {
   return (createStrategy: StrategyFactory) =>
-    <J extends Job<unknown>>() => {
-      const downstream: Strategy<RetryJob<J>> = createStrategy();
-      return createRetryStrategy<J>(options, downstream);
-    };
+    <J extends Job<unknown>>() =>
+      createRetryStrategy<J>(options, createStrategy());
 }

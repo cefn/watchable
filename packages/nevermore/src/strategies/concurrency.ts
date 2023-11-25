@@ -28,11 +28,10 @@ export function isConcurrencyOptions(
 }
 
 export function createConcurrencyStrategy<J extends Job<unknown>>(
-  options: ConcurrencyOptions & {
-    downstream: Strategy<J>;
-  }
+  options: ConcurrencyOptions,
+  downstream: Strategy<J>
 ): Strategy<J> {
-  const { concurrency, downstream } = options;
+  const { concurrency } = options;
 
   let pendingJobs = 0;
   let slotAnnouncement: ReturnType<typeof promiseWithFulfil> | null = null;
@@ -96,15 +95,7 @@ export function createConcurrencyStrategy<J extends Job<unknown>>(
 }
 
 export function createConcurrencyPipe(options: ConcurrencyOptions): Pipe {
-  const { concurrency } = options;
-
   return (createStrategy: StrategyFactory) =>
-    <J extends Job<unknown>>() => {
-      const downstream: Strategy<J> = createStrategy();
-
-      return createConcurrencyStrategy<J>({
-        concurrency,
-        downstream,
-      });
-    };
+    <J extends Job<unknown>>() =>
+      createConcurrencyStrategy<J>(options, createStrategy());
 }

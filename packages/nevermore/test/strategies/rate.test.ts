@@ -4,8 +4,8 @@ import {
   sleep,
   type RateOptions,
   type ConcurrencyOptions,
-} from "../../../src";
-import { iterable2array } from "../../testutil";
+} from "../../src";
+import { iterable2array } from "../testutil";
 
 describe("Rate limits: ", () => {
   const TASK_DELAY = 5;

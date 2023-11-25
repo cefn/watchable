@@ -102,8 +102,6 @@ export function createTimeoutStrategy<J extends Job<unknown>>(
 
 export function createTimeoutPipe(options: TimeoutOptions): Pipe {
   return (createStrategy: StrategyFactory) =>
-    <J extends Job<unknown>>() => {
-      const downstream: Strategy<TimeoutJob<J>> = createStrategy();
-      return createTimeoutStrategy<J>(options, downstream);
-    };
+    <J extends Job<unknown>>() =>
+      createTimeoutStrategy<J>(options, createStrategy());
 }

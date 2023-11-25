@@ -1,6 +1,6 @@
 import { describe, expect, test } from "vitest";
-import { nevermore, sleep, type NevermoreOptions } from "../../../src";
-import { iterable2array } from "../../testutil";
+import { nevermore, sleep, type NevermoreOptions } from "../../src";
+import { iterable2array } from "../testutil";
 
 describe("Retry behaviour", () => {
   function createFailingJob(options: { failures: number; delayMs?: number }) {

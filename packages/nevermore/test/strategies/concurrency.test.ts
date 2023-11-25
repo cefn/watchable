@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, test } from "vitest";
-import { iterable2array } from "../../testutil";
+import { iterable2array } from "../testutil";
 
-import { nevermore, sleep } from "../../../src";
+import { nevermore, sleep } from "../../src";
 
 describe("Concurrency limits:", () => {
   const TASK_DELAY = 5;

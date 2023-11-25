@@ -1,8 +1,8 @@
 /* eslint-disable @typescript-eslint/promise-function-async */
 import { describe, test, expect, vi } from "vitest";
-import { nevermore, type NevermoreOptions } from "../../../src/";
-import { delay, iterable2array } from "../../testutil";
-import { createNotifiable } from "../../../src/util";
+import { nevermore, type NevermoreOptions } from "../src";
+import { delay, iterable2array } from "./testutil";
+import { createNotifiable } from "../src/util";
 
 const NOOP_OPTIONS: NevermoreOptions = {};
 

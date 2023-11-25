@@ -88,8 +88,6 @@ export function createRateStrategy<J extends Job<unknown>>(
 
 export function createRatePipe(options: RateOptions): Pipe {
   return (createStrategy: StrategyFactory) =>
-    <T, J extends Job<T>>() => {
-      const downstream: Strategy<J> = createStrategy();
-      return createRateStrategy<J>(options, downstream);
-    };
+    <J extends Job<unknown>>() =>
+      createRateStrategy<J>(options, createStrategy());
 }

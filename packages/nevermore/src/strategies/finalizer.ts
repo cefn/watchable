@@ -93,8 +93,6 @@ export function createFinalizerStrategy<J extends Job<unknown>>(
 
 export function createFinalizerPipe(): Pipe {
   return (createStrategy: StrategyFactory) =>
-    <J extends Job<unknown>>() => {
-      const downstream: Strategy<J> = createStrategy();
-      return createFinalizerStrategy<J>(downstream);
-    };
+    <J extends Job<unknown>>() =>
+      createFinalizerStrategy<J>(createStrategy());
 }

@@ -47,8 +47,6 @@ export function createPassthruStrategy<J extends Job<unknown>>(
 
 export function createPassthruPipe(): Pipe {
   return (createStrategy: StrategyFactory) =>
-    <T, J extends Job<T>>() => {
-      const downstream: Strategy<J> = createStrategy();
-      return createPassthruStrategy<J>(downstream);
-    };
+    <J extends Job<unknown>>() =>
+      createPassthruStrategy<J>(createStrategy<J>());
 }
