@@ -20,6 +20,7 @@ describe("Passthru strategy has no effect", () => {
 
     // log eventual settlements to an array
     const logs: string[] = [];
+
     for await (const settlement of settlementSequence) {
       const { status, job } = settlement;
       if (status === "fulfilled") {

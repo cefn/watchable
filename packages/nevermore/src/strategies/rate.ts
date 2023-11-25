@@ -10,7 +10,22 @@ import type {
   Pipe,
   Strategy,
   StrategyFactory,
+  NevermoreOptions,
 } from "../types";
+
+export function isRateOptions(
+  options: NevermoreOptions
+): options is RateOptions {
+  const { intervalMs, intervalSlots } = options;
+  const hasIntervalMs = typeof intervalMs === "number";
+  const hasIntervalSlots = typeof intervalSlots === "number";
+  if (hasIntervalSlots) {
+    if (!hasIntervalMs) {
+      throw new Error("intervalMs is required to specify a rate limit");
+    }
+  }
+  return hasIntervalMs;
+}
 
 export function createRateStrategy<J extends Job<unknown>>(
   options: RateOptions,
@@ -22,35 +37,31 @@ export function createRateStrategy<J extends Job<unknown>>(
   let slotsUsed = 0;
 
   async function waitForSlot() {
-    const nowMs = Date.now();
-
-    // slots before slotExpiryMs have expired
-    const slotExpiryMs = nowMs - intervalMs;
-
-    // remove expired entries
-    let slotDelayMs = 0;
-    for (const [oldestMs, oldestCount] of countsByMs) {
-      if (oldestMs >= slotExpiryMs) {
-        // oldest not yet expired
-        if (slotsUsed >= intervalSlots) {
-          // calculate slot due
-          slotDelayMs = intervalMs - (nowMs - oldestMs);
-        }
-        break;
+    if (slotsUsed >= intervalSlots) {
+      // slots used - wait for oldest record to expire
+      const oldestResult = countsByMs.entries().next();
+      if (oldestResult.done === true) {
+        // there must be an oldest record
+        throw new Error(`Fatal: job record missing`);
       }
-      // dispose records of expired slots
-      slotsUsed -= oldestCount;
-      countsByMs.delete(oldestMs);
-    }
+      const [timestamp, count] = oldestResult.value;
 
-    // delay for slot if needed
-    if (slotDelayMs > 0) {
-      await sleep(slotDelayMs);
+      // check when oldest slot expires
+      const timestampNow = Date.now();
+      if (timestamp >= timestampNow - intervalMs) {
+        // not yet expired, wait for it
+        await sleep(intervalMs - (timestampNow - timestamp));
+      }
+      // forget expired jobs
+      slotsUsed -= count;
+      countsByMs.delete(timestamp);
     }
 
     // record job
-    const countNow = countsByMs.get(nowMs) ?? 0;
-    countsByMs.set(nowMs, countNow + 1);
+    slotsUsed++;
+    const timestampNow = Date.now();
+    const countNow = countsByMs.get(timestampNow) ?? 0;
+    countsByMs.set(timestampNow, countNow + 1);
   }
 
   async function* createLaunches(): LaunchesGenerator<J> {

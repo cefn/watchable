@@ -36,4 +36,7 @@ export default defineConfig({
     },
     // sourcemap: true,
   },
+  test: {
+    snapshotFormat: {},
+  },
 });

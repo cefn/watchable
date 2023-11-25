@@ -2,10 +2,16 @@ import type { Job, JobSettlement, NevermoreOptions, Pipe } from "./types";
 import { createSettlerStrategy } from "./strategies/settler";
 import {
   createConcurrencyPipe,
-  validateConcurrency,
+  isConcurrencyOptions,
 } from "./strategies/concurrency";
 import { createFinalizerPipe } from "./strategies/finalizer";
 import { asyncIterable } from "./util";
+import {
+  createRatePipe,
+  createRetryPipe,
+  isRateOptions,
+  isRetryOptions,
+} from ".";
 
 /** Sequence the pipes (strategy wrappers) specified by caller. */
 function* pipesFromOptions(
@@ -13,15 +19,27 @@ function* pipesFromOptions(
     pipes?: Pipe[];
   }
 ) {
-  if (validateConcurrency(options)) {
-    // limit number of simultaneously pending promises
+  if (isRateOptions(options)) {
+    // constrain jobs launched within an interval
+    yield createRatePipe(options);
+  }
+  if (isRetryOptions(options)) {
+    // repeat failing jobs a certain number of times
+    yield createRetryPipe(options);
+  }
+  if (isConcurrencyOptions(options)) {
+    // limit number of simultaneously running jobs
     yield createConcurrencyPipe(options);
   }
-  // wire pipes passed by caller before finalizing
+  // if (isTimeoutOptions(options)) {
+  //   // give up on slow jobs
+  //   yield createTimeoutPipe(options);
+  // }
+  // wire pipes passed by caller
   if (typeof options.pipes !== "undefined") {
     yield* options.pipes;
   }
-  // finalizer tracks events, notifies when sequence is done
+  // track launched jobs, end settlements when all jobs are settled
   yield createFinalizerPipe();
 }
 
@@ -66,7 +84,7 @@ export async function* nevermore<J extends Job<unknown>>(
   // push jobs into strategy as fast as possible
   async function pushJobs() {
     try {
-      // prime the generator (progress to the first yield)
+      // progress generator to initial yield
       await strategy.launches.next();
       for await (const job of jobIterable) {
         await strategy.launches.next(job);

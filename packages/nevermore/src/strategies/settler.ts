@@ -22,8 +22,9 @@ export function createSettlerStrategy<J extends Job<unknown>>(
 
   async function triggerJob(job: J) {
     try {
-      const value =
-        (cancelPromise !== null ? await job({ cancelPromise }) : await job()) as Awaited<ReturnType<typeof job>>;
+      const value = (
+        cancelPromise !== null ? await job({ cancelPromise }) : await job()
+      ) as Awaited<ReturnType<typeof job>>;
       queue.send({
         job,
         status: "fulfilled",
@@ -43,14 +44,16 @@ export function createSettlerStrategy<J extends Job<unknown>>(
       // yields immediately to accept a new job
       // spawns job in background without waiting
       // limits are expected 'upstream'
-      void triggerJob(yield);
+      const job = yield;
+      void triggerJob(job);
     }
   }
 
   async function* createSettlements(): SettlementsGenerator<J> {
     for (;;) {
       // immediately yield any job settlement
-      yield await queue.receive();
+      const settlement = await queue.receive();
+      yield settlement;
     }
   }
 

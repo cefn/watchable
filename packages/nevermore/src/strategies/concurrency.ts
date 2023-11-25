@@ -12,19 +12,19 @@ import type {
 } from "../types";
 import { promiseWithFulfil } from "../util";
 
-export function validateConcurrency(
-  options: NevermoreOptions,
-  validateOptions: { throwError: boolean } = { throwError: false }
+export function isConcurrencyOptions(
+  options: NevermoreOptions
 ): options is ConcurrencyOptions {
   const { concurrency } = options;
-  const { throwError } = validateOptions;
-  const result = typeof concurrency === "number" && concurrency > 0;
-  if (!result && throwError) {
-    throw new Error(
-      `Concurrency cannot be less than 1 : ${JSON.stringify({ concurrency })}`
-    );
+  if (typeof concurrency === "number") {
+    if (concurrency <= 0) {
+      throw new Error(
+        `Concurrency cannot be less than 1 : ${JSON.stringify({ concurrency })}`
+      );
+    }
+    return true;
   }
-  return result;
+  return false;
 }
 
 export function createConcurrencyStrategy<J extends Job<unknown>>(
@@ -95,9 +95,7 @@ export function createConcurrencyStrategy<J extends Job<unknown>>(
   };
 }
 
-export function createConcurrencyPipe(options: NevermoreOptions): Pipe {
-  validateConcurrency(options, { throwError: true });
-
+export function createConcurrencyPipe(options: ConcurrencyOptions): Pipe {
   const { concurrency } = options;
 
   return (createStrategy: StrategyFactory) =>

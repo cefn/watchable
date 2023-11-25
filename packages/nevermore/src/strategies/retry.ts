@@ -1,20 +1,41 @@
 /** This strategy retries all failing jobs for a specified number of retries before passing them back as rejected */
 
 /* eslint-disable @typescript-eslint/promise-function-async */
+import { promiseWithFulfil } from "..";
 import type {
   Job,
-  LaunchesGenerator,
-  RetryOptions,
-  SettlementsGenerator,
   Strategy,
+  LaunchesGenerator,
+  SettlementsGenerator,
+  NevermoreOptions,
+  RetryOptions,
+  StrategyFactory,
+  Pipe,
 } from "../types";
+
+export function isRetryOptions(
+  options: NevermoreOptions
+): options is RetryOptions {
+  const { retries } = options;
+  if (typeof retries === "number") {
+    if (retries < 1) {
+      throw new Error(
+        `Retries must be a positive integer. Received ${JSON.stringify({
+          retries,
+        })}`
+      );
+    }
+    return true;
+  }
+  return false;
+}
 
 type RetryJob<J extends Job<unknown>> = (() => ReturnType<J>) & {
   jobToRetry: J;
   jobFailures: number;
 };
 
-function createRetryJob<T, J extends Job<T>>(jobToRetry: J): RetryJob<J> {
+function createRetryJob<J extends Job<unknown>>(jobToRetry: J): RetryJob<J> {
   const retryJob: RetryJob<J> = Object.assign(
     () => jobToRetry() as ReturnType<J>,
     {
@@ -26,23 +47,21 @@ function createRetryJob<T, J extends Job<T>>(jobToRetry: J): RetryJob<J> {
   return retryJob;
 }
 
-export function createRetryStrategy<T, J extends Job<T>>(
+export function createRetryStrategy<J extends Job<unknown>>(
   options: RetryOptions,
   downstream: Strategy<RetryJob<J>>
 ): Strategy<J> {
   const { retries } = options;
 
-  // TODO CH what pipe order/checks should constrain this growing backlog?
-  const failedRetryJobs: Array<RetryJob<J>> = [];
+  const settlementsFinalized = promiseWithFulfil();
 
   async function* createLaunches(): LaunchesGenerator<J> {
     await downstream.launches.next(); // prime downstream generator
     try {
       for (;;) {
-        const retryJob =
-          failedRetryJobs.length > 0
-            ? (failedRetryJobs.shift() as RetryJob<J>) // prioritise clearing existing retries
-            : createRetryJob<T, J>(yield); // else wrap a new upstream job
+        // pull through a new job
+        const job = yield;
+        const retryJob = createRetryJob(job);
         const launchResult = await downstream.launches.next(retryJob);
         if (launchResult.done === true) {
           break; // sequence ended downstream
@@ -50,48 +69,66 @@ export function createRetryStrategy<T, J extends Job<T>>(
       }
     } finally {
       // handle upstream or downstream closure
+
+      /** Suspend downstream.launches.return()
+       * until we believe there will be no more retries
+       * (retries are replayed through downstream.launches). */
+      await settlementsFinalized.promise;
       await downstream.launches.return();
     }
   }
 
+  const launches = createLaunches();
+
   async function* createSettlements(): SettlementsGenerator<J> {
     try {
       for (;;) {
-        const iteratorResult = await downstream.settlements.next();
-        if (iteratorResult.done === true) {
+        const downstreamResult = await downstream.settlements.next();
+        if (downstreamResult.done === true) {
           break; // settlements sequence ended downstream
         }
-        const { value: retrySettlement } = iteratorResult;
-        const retryJob = retrySettlement.job;
+        const { value: retrySettlement } = downstreamResult;
+        const { status, job: retryJob } = retrySettlement;
+        const { jobToRetry } = retryJob;
         // intercept failures needing a retry
-        if (
-          retrySettlement.status === "rejected" &&
-          retryJob.jobFailures < retries
-        ) {
-          // record failure and schedule retry
-          retryJob.jobFailures++;
-          failedRetryJobs.push(retryJob);
-          continue;
-        }
-        // pass back other fulfilled or rejected events
-        // but reference the original job
-        const { status } = retrySettlement;
-        if (status === "fulfilled") {
-          const { value } = retrySettlement;
+        if (status === "rejected") {
+          if (retryJob.jobFailures < retries) {
+            // retries remain. record failure, schedule retry
+            retryJob.jobFailures++;
+            // TODO CH handle result from this call?
+            await downstream.launches.next(retryJob);
+            continue;
+          } else {
+            // no more retries. serve back rejection, referencing original job
+            yield {
+              ...retrySettlement,
+              job: jobToRetry,
+            };
+          }
+        } else {
+          // job was successful, serve back fulfilment, referenceing original job
           yield {
-            status,
-            value,
+            ...retrySettlement,
             job: retryJob.jobToRetry,
           };
         }
       }
     } finally {
+      settlementsFinalized.fulfil();
       await downstream.settlements.return();
     }
   }
 
   return {
-    launches: createLaunches(),
+    launches,
     settlements: createSettlements(),
   };
+}
+
+export function createRetryPipe(options: RetryOptions): Pipe {
+  return (createStrategy: StrategyFactory) =>
+    <J extends Job<unknown>>() => {
+      const downstream: Strategy<RetryJob<J>> = createStrategy();
+      return createRetryStrategy<J>(options, downstream);
+    };
 }
