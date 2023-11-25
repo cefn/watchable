@@ -1,11 +1,11 @@
 import { describe, test, expect } from "vitest";
 import { nevermore } from "../../../src";
-import { gen2array } from "../../testutil";
+import { iterable2array } from "../../testutil";
 
 describe("Nevermore with concurrency", () => {
   test("concurrency<1 throws an error", async () => {
     await expect(async () => {
-      await gen2array(nevermore({ concurrency: -1 }, []));
+      await iterable2array(nevermore({ concurrency: -1 }, []));
     }).rejects.toThrowErrorMatchingInlineSnapshot(
       '"Concurrency cannot be less than 1 : {\\"concurrency\\":-1}"'
     );
@@ -42,7 +42,7 @@ describe("Nevermore with concurrency", () => {
 
     // run schedule
     const startMs = Date.now();
-    const settlements = await gen2array(settlementSequence);
+    const settlements = await iterable2array(settlementSequence);
     const durationMs = Date.now() - startMs;
 
     // check 10 ms jobs didn't run in parallel

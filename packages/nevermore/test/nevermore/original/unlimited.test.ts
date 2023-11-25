@@ -1,9 +1,8 @@
 /* eslint-disable @typescript-eslint/promise-function-async */
 import { describe, test, expect, vi } from "vitest";
-import { nevermore } from "../../src/";
-import type { NevermoreOptions } from "../../src/types";
-import { delay, gen2array } from "../testutil";
-import { createNotifiable } from "../../src/util";
+import { nevermore, type NevermoreOptions } from "../../../src/";
+import { delay, iterable2array } from "../../testutil";
+import { createNotifiable } from "../../../src/util";
 
 const INFINITE_CONCURRENCY: NevermoreOptions = {
   concurrency: Number.MAX_SAFE_INTEGER,
@@ -36,7 +35,7 @@ describe("Nevermore pipelines without limits", () => {
     });
 
     // flatten async iterator to an eventual array of settlements
-    const settlements = await gen2array(settlementSequence);
+    const settlements = await iterable2array(settlementSequence);
 
     // settlements include jobs and outcomes
     expect(settlements).toMatchObject([
@@ -78,7 +77,7 @@ describe("Nevermore pipelines without limits", () => {
     );
 
     // results in settlements as normal
-    expect(await gen2array(settlementSequence)).toMatchObject([
+    expect(await iterable2array(settlementSequence)).toMatchObject([
       {
         job: expect.anything(),
         status: "fulfilled",
@@ -106,7 +105,7 @@ describe("Nevermore pipelines without limits", () => {
     ]);
 
     // results in settlements as normal
-    expect(await gen2array(settlementSequence)).toMatchObject([
+    expect(await iterable2array(settlementSequence)).toMatchObject([
       {
         job: expect.anything(),
         status: "fulfilled",
@@ -133,7 +132,7 @@ describe("Nevermore pipelines without limits", () => {
     });
 
     // flatten async iterator to an eventual array of settlements
-    const settlements = await gen2array(settlementSequence);
+    const settlements = await iterable2array(settlementSequence);
 
     // settlements' jobs reference their own config
     expect(settlements.map(({ job: { config } }) => config)).toMatchObject([
@@ -155,7 +154,7 @@ describe("Nevermore pipelines without limits", () => {
     });
 
     // flatten async iterator to an eventual array of settlements
-    const settlements = await gen2array(settlementSequence);
+    const settlements = await iterable2array(settlementSequence);
 
     // settlements include jobs and outcomes
     expect(settlements).toMatchObject([
