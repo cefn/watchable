@@ -2,6 +2,7 @@
  * The interval is a moving window, and slots become available when historical job invocations become old enough
  */
 
+import { sleep } from "../util";
 import type {
   RateOptions,
   Job,
@@ -10,11 +11,6 @@ import type {
   Strategy,
   StrategyFactory,
 } from "../types";
-
-// eslint-disable-next-line @typescript-eslint/promise-function-async
-function sleep(delayMs: number) {
-  return new Promise((resolve) => setTimeout(resolve, delayMs));
-}
 
 export function createRateStrategy<J extends Job<unknown>>(
   options: RateOptions,

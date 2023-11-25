@@ -1,3 +1,5 @@
+/**  */
+
 import type {
   Job,
   Strategy,
@@ -93,7 +95,9 @@ export function createConcurrencyStrategy<J extends Job<unknown>>(
   };
 }
 
-export function createConcurrencyPipe(options: ConcurrencyOptions): Pipe {
+export function createConcurrencyPipe(options: NevermoreOptions): Pipe {
+  validateConcurrency(options, { throwError: true });
+
   const { concurrency } = options;
 
   return (createStrategy: StrategyFactory) =>

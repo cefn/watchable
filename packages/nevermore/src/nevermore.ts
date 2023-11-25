@@ -13,7 +13,7 @@ function* pipesFromOptions(
     pipes?: Pipe[];
   }
 ) {
-  if (validateConcurrency(options, { throwError: true })) {
+  if (validateConcurrency(options)) {
     // limit number of simultaneously pending promises
     yield createConcurrencyPipe(options);
   }

@@ -74,7 +74,15 @@ type AnyOptions = AllOrNothing<ConcurrencyOptions> &
   AllOrNothing<RetryOptions> &
   AllOrNothing<CancelOptions>;
 
-export type NevermoreOptions = AnyOptions & OnePropertyFrom<AnyOptions>;
+// export type NevermoreOptions = AnyOptions & OnePropertyFrom<AnyOptions>;
+
+export type NevermoreOptions = Partial<
+  ConcurrencyOptions &
+    RateOptions &
+    TimeoutOptions &
+    RetryOptions &
+    CancelOptions
+>;
 
 export type LaunchesGenerator<J extends Job<unknown>> = AsyncGenerator<
   void,
