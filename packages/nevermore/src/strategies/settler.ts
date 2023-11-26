@@ -60,5 +60,5 @@ export function createSettlerStrategy<J extends Job<unknown>>(
   return {
     launches: createLaunches(),
     settlements: createSettlements(),
-  };
+  } satisfies Strategy<J>;
 }

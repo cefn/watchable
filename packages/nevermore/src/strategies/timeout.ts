@@ -97,7 +97,7 @@ export function createTimeoutStrategy<J extends Job<unknown>>(
   return {
     launches: createLaunches(),
     settlements: createSettlements(),
-  };
+  } satisfies Strategy<J>;
 }
 
 export function createTimeoutPipe(options: TimeoutOptions): Pipe {

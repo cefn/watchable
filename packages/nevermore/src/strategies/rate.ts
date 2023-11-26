@@ -83,7 +83,7 @@ export function createRateStrategy<J extends Job<unknown>>(
   return {
     launches: createLaunches(),
     settlements: downstream.settlements,
-  };
+  } satisfies Strategy<J>;
 }
 
 export function createRatePipe(options: RateOptions): Pipe {

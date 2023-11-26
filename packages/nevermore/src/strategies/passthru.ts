@@ -42,7 +42,7 @@ export function createPassthruStrategy<J extends Job<unknown>>(
   return {
     launches: createLaunches(),
     settlements: createSettlements(),
-  };
+  } satisfies Strategy<J>;
 }
 
 export function createPassthruPipe(): Pipe {

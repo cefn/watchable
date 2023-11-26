@@ -91,7 +91,7 @@ export function createConcurrencyStrategy<J extends Job<unknown>>(
   return {
     launches: createLaunches(),
     settlements: createSettlements(),
-  };
+  } satisfies Strategy<J>;
 }
 
 export function createConcurrencyPipe(options: ConcurrencyOptions): Pipe {

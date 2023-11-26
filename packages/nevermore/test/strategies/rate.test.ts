@@ -97,7 +97,7 @@ describe("Rate limits: ", () => {
 
     expect(Math.max(...events.map(([, { pending }]) => pending))).toBe(1);
     expect(duration).toBeGreaterThanOrEqual(
-      TASK_COUNT * (rateOptions.intervalMs - 1)
+      (TASK_COUNT - 1) * (rateOptions.intervalMs - 1) // task completes fractionally into Nth interval
     );
     expect(duration).toBeLessThanOrEqual(
       TASK_COUNT * (rateOptions.intervalMs + 1)

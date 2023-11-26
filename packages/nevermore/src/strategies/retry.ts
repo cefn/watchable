@@ -122,7 +122,7 @@ export function createRetryStrategy<J extends Job<unknown>>(
   return {
     launches,
     settlements: createSettlements(),
-  };
+  } satisfies Strategy<J>;
 }
 
 export function createRetryPipe(options: RetryOptions): Pipe {

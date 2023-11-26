@@ -51,37 +51,21 @@ export interface RetryOptions {
   retries: number;
 }
 
+export interface PipeOptions {
+  pipes: Pipe[];
+}
+
 export interface CancelOptions {
   cancelPromise: Promise<unknown>;
 }
-
-/** Require a type's properties to be either fully present, or fully absent */
-type AllOrNothing<T> =
-  | T
-  | {
-      [k in keyof Required<T>]?: never;
-    };
-
-/** Require at least one assigned property from T */
-type OnePropertyFrom<T> = {
-  [K in keyof T]: Pick<Required<T>, K>;
-}[keyof T];
-
-/** Presence and absence of all configs (implicitly includes case of no limits) */
-type AnyOptions = AllOrNothing<ConcurrencyOptions> &
-  AllOrNothing<TimeoutOptions> &
-  AllOrNothing<RateOptions> &
-  AllOrNothing<RetryOptions> &
-  AllOrNothing<CancelOptions>;
-
-// export type NevermoreOptions = AnyOptions & OnePropertyFrom<AnyOptions>;
 
 export type NevermoreOptions = Partial<
   ConcurrencyOptions &
     RateOptions &
     TimeoutOptions &
     RetryOptions &
-    CancelOptions
+    CancelOptions &
+    PipeOptions
 >;
 
 export type LaunchesGenerator<J extends Job<unknown>> = AsyncGenerator<
@@ -117,34 +101,3 @@ export type StrategyFactory = <J extends Job<unknown>>() => Strategy<J>;
 export type Pipe = (
   createDownstreamStrategy: StrategyFactory
 ) => StrategyFactory;
-
-/** Infers the yielded value from a generator type */
-export type Yielded<I extends Iterator<unknown>> = I extends Iterator<
-  infer yielded
->
-  ? yielded
-  : never;
-
-/** Infers the next() argument from a generator type */
-export type Returned<I extends Iterator<unknown>> = I extends Iterator<
-  any,
-  infer returned
->
-  ? returned
-  : never;
-
-/** Infers the returned value from a generator type */
-export type Nexted<I extends Iterator<unknown>> = I extends Iterator<
-  any,
-  any,
-  infer nexted
->
-  ? nexted
-  : never;
-
-/** From https://github.com/piotrwitek/utility-types/blob/411e83ecf70e428b529fc2a09a49519e8f36c8fa/src/mapped-types.ts#L630 */
-export type UnionToIntersection<U> = (
-  U extends any ? (k: U) => void : never
-) extends (k: infer I) => void
-  ? I
-  : never;
