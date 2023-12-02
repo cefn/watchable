@@ -1,5 +1,13 @@
 # counter-react-ts
 
+## 0.9.0-alpha.8
+
+### Patch Changes
+
+- Updated dependencies [0da58e5]
+  - @watchable/store-react@1.0.0-alpha.8
+  - @watchable/store@1.0.0-alpha.7
+
 ## 0.9.0-alpha.7
 
 ### Patch Changes

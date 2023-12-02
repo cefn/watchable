@@ -1,5 +1,13 @@
 # @watchable/store
 
+## 1.0.0-alpha.7
+
+### Patch Changes
+
+- 0da58e5: Remove Immutable from core interfaces in favour of author explicitly
+  adding it to their Store type if they wish. Adopt Immutable definition
+  directly from Immer Add documentation generation to tasks managed by wireit.
+
 ## 1.0.0-alpha.6
 
 ### Patch Changes

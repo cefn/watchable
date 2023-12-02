@@ -1,6 +1,6 @@
 {
   "name": "@watchable/store",
-  "version": "1.0.0-alpha.6",
+  "version": "1.0.0-alpha.7",
   "description": "Store with compile-time-immutable state.",
   "homepage": "https://github.com/cefn/watchable/tree/main/packages/store#readme",
   "bugs": {

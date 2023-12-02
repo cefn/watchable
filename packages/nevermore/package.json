@@ -104,6 +104,6 @@
   },
   "sideEffects": false,
   "dependencies": {
-    "@watchable/queue": "^0.9.0-alpha.3"
+    "@watchable/queue": "^1.0.0-alpha.5"
   }
 }
