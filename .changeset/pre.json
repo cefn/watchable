@@ -17,12 +17,14 @@
     "@watchable/store": "0.9.0-alpha.0",
     "@watchable/store-edit": "0.9.0-alpha.0",
     "@watchable/store-follow": "0.9.0-alpha.0",
-    "@watchable/store-react": "0.9.0-alpha.0"
+    "@watchable/store-react": "0.9.0-alpha.0",
+    "@watchable/nevermore": "0.9.0-alpha.3"
   },
   "changesets": [
     "eleven-donkeys-approve",
     "flat-ligers-heal",
     "funny-pans-matter",
+    "modern-crabs-tap",
     "red-crabs-buy",
     "sharp-coins-smile",
     "thin-rockets-sing",

@@ -111,7 +111,7 @@ export const PACKAGE_JSON_RULES = {
 
     const tsPackages = {
       ...common,
-      command: "vitest run",
+      command: "vitest run --reporter verbose",
       files: [
         "src/**/*",
         "test/**/*",

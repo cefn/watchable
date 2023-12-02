@@ -1,6 +1,6 @@
 {
   "name": "counter-dom-ts",
-  "version": "0.9.0-alpha.6",
+  "version": "0.9.0-alpha.7",
   "private": true,
   "description": "",
   "homepage": "https://github.com/cefn/watchable/tree/main/apps/counter-dom-ts#readme",
@@ -19,8 +19,8 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@watchable/store": "1.0.0-alpha.6",
-    "@watchable/store-follow": "1.0.0-alpha.6"
+    "@watchable/store": "1.0.0-alpha.7",
+    "@watchable/store-follow": "1.0.0-alpha.7"
   },
   "devDependencies": {
     "@vitejs/plugin-legacy": "^4.0.2",
