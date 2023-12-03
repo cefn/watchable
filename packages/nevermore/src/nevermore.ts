@@ -1,18 +1,26 @@
-import type { Job, JobSettlement, NevermoreOptions, Pipe } from "./types";
-import { createSettlerStrategy } from "./strategies/settler";
-import {
-  createConcurrencyPipe,
-  isConcurrencyOptions,
-} from "./strategies/concurrency";
+import type {
+  Job,
+  JobSettlement,
+  NevermoreOptions,
+  Pipe,
+  PipeOptions,
+} from "./types";
 import { asyncIterable } from "./util";
 import {
+  createLauncherStrategy,
   createRatePipe,
   createRetryPipe,
   createTimeoutPipe,
+  createConcurrencyPipe,
+  isConcurrencyOptions,
   isRateOptions,
   isRetryOptions,
   isTimeoutOptions,
-} from ".";
+} from "./strategies";
+
+function isPipeOptions(options: NevermoreOptions): options is PipeOptions {
+  return typeof options.pipes !== "undefined";
+}
 
 /** Sequence the pipes (strategy wrappers) specified by caller. */
 function* pipesFromOptions(
@@ -32,14 +40,38 @@ function* pipesFromOptions(
     // constrain jobs launched within an interval
     yield createRatePipe(options);
   }
+  // order ensures also re-inserted retry jobs
+  // are limited by concurrency, rate, timeout
   if (isRetryOptions(options)) {
     // repeat failing jobs a certain number of times
     yield createRetryPipe(options);
   }
   // wire pipes passed by caller
-  if (typeof options.pipes !== "undefined") {
+  if (isPipeOptions(options)) {
     yield* options.pipes;
   }
+}
+
+export function createStrategyFromOptions<J extends Job<unknown>>(
+  options: NevermoreOptions
+) {
+  const { cancelPromise } = options;
+  /** COMPOSE STRATEGY */
+
+  // define a factory that creates a settler strategy
+  // (a strategy that attempts to immediately settle every job)
+  // tracks launched jobs, ends settlements when all jobs are settled
+
+  let createStrategy = <J extends Job<unknown>>() =>
+    createLauncherStrategy<J>(cancelPromise);
+
+  // compose further factories specified by caller (wrapping settler factory)
+  for (const pipe of pipesFromOptions(options)) {
+    createStrategy = pipe(createStrategy);
+  }
+
+  // execute all wrapped factories, creating a composed strategy
+  return createStrategy<J>();
 }
 
 /**
@@ -48,33 +80,14 @@ function* pipesFromOptions(
  * @returns
  */
 export async function* nevermore<J extends Job<unknown>>(
-  options: NevermoreOptions & {
-    pipes?: Pipe[];
-  },
+  options: NevermoreOptions,
   jobs:
     | Iterable<J>
     | AsyncIterable<J>
     | (() => Generator<J>)
     | (() => AsyncGenerator<J>)
 ): AsyncIterable<JobSettlement<J>> {
-  const { cancelPromise } = options;
-
-  /** COMPOSE STRATEGY */
-
-  // define a factory that creates a settler strategy
-  // (a strategy that attempts to immediately settle every job)
-  // tracks launched jobs, ends settlements when all jobs are settled
-
-  let createStrategy = <J extends Job<unknown>>() =>
-    createSettlerStrategy<J>(cancelPromise);
-
-  // compose further factories specified by caller (wrapping settler factory)
-  for (const pipe of pipesFromOptions(options)) {
-    createStrategy = pipe(createStrategy);
-  }
-
-  // execute all wrapped factories, creating a composed strategy
-  const strategy = createStrategy<J>();
+  const strategy = createStrategyFromOptions<J>(options);
 
   /** PUSH JOBS */
 

@@ -218,7 +218,7 @@ describe("Rate limits: ", () => {
     // which always returns the same job
     const job = async () => "foo";
     let jobCount = 0;
-    let jobIterable = {
+    const jobIterable = {
       [Symbol.iterator]: () => jobIterable,
       next: () => {
         if (jobCount < LARGE_JOB_COUNT) {
@@ -233,7 +233,7 @@ describe("Rate limits: ", () => {
 
     const start = Date.now();
     let settlementCount = 0;
-    for await (const settlement of settlementSequence) {
+    for await (const _settlement of settlementSequence) {
       settlementCount++;
     }
     const duration = Date.now() - start;

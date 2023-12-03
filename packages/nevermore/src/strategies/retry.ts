@@ -1,10 +1,11 @@
+/* eslint-disable @typescript-eslint/no-misused-promises */
 import {
-  Job,
-  NevermoreOptions,
-  Pipe,
-  RetryOptions,
-  Strategy,
-  StrategyFactory,
+  type Job,
+  type NevermoreOptions,
+  type RetryOptions,
+  type Strategy,
+  type StrategyFactory,
+  type Pipe,
   promiseWithFulfil,
 } from "..";
 import { createLock } from "../lock";
@@ -99,7 +100,7 @@ export function createRetryStrategy<J extends Job<unknown>>(
         ) {
           // retry job
           retryJob.jobFailures++;
-          launchRetryJob(retryJob);
+          void launchRetryJob(retryJob);
           continue;
         }
 

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/promise-function-async */
 import type { Job, Pipe, Strategy, StrategyFactory } from "../types";
 
 export function createPassthruStrategy<J extends Job<unknown>>(
