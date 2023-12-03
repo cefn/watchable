@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-confusing-void-expression */
 /**  */
 import type {
   Job,
@@ -54,7 +55,7 @@ export function createConcurrencyStrategy<J extends Job<unknown>>(
     },
     async next() {
       const result = await downstream.next();
-      if (!result.done) {
+      if (result.done !== true) {
         // account for settlement
         pendingJobs--;
         // make slot announcement if it's awaited

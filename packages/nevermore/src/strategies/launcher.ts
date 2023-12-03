@@ -10,7 +10,7 @@ import { createNotifiable } from "..";
 /** Creates a Promise<T> from every job passed to `launches.next(job)`. Tracks
  *  Promise resolution or rejection. Passes back JobSettlements via
  *  `settlements.next()`. */
-export function createSettlerStrategy<J extends Job<unknown>>(
+export function createLauncherStrategy<J extends Job<unknown>>(
   cancelPromise: Promise<unknown> | null = null
 ): Strategy<J> {
   let activeJobs = 0;

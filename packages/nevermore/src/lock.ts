@@ -22,34 +22,34 @@ export interface Lock<Key> {
   acquire: (key?: Key) => Promise<Release>;
 }
 
-function arrayWithout<T>(arr: ReadonlyArray<T>, index: number) {
+function arrayWithout<T>(arr: readonly T[], index: number) {
   return [...arr.slice(0, index), ...arr.slice(index + 1)];
 }
 
 class DefaultLock<Key> implements Lock<Key> {
-  protected keys: ReadonlyArray<Key | void> = [];
+  protected keys: ReadonlyArray<Key | undefined> = [];
   protected releasePromises: ReadonlyArray<Promise<void>> = [];
   acquire = async (key?: Key) => {
     let release = null;
     do {
       const index = this.keys.indexOf(key);
       if (index === -1) {
-        //nobody has lock, issue to yourself and promise to release it
+        // nobody has lock, issue to yourself and promise to release it
         const unlockPromise = new Promise<void>((resolve) => {
           release = () => {
-            //remove record of lock
+            // remove record of lock
             const index = this.keys.indexOf(key);
             this.keys = arrayWithout(this.keys, index);
             this.releasePromises = arrayWithout(this.releasePromises, index);
             resolve();
           };
         });
-        //add record of lock and release promise
+        // add record of lock and release promise
         this.keys = [...this.keys, key];
         this.releasePromises = [...this.releasePromises, unlockPromise];
-        //return callback to release lock
+        // return callback to release lock
       } else {
-        //await whoever currently has the lock
+        // await whoever currently has the lock
         await this.releasePromises[index];
       }
     } while (release === null);

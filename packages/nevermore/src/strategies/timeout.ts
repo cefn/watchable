@@ -75,11 +75,11 @@ export function createTimeoutStrategy<J extends Job<unknown>>(
     launchesDone,
     async launchJob(job) {
       const timeoutJob = createTimeoutJob<J>(job, timeoutMs);
-      const launch = await downstream.launchJob(timeoutJob);
+      await downstream.launchJob(timeoutJob);
     },
     async next() {
       const settlementResult = await downstream.next();
-      if (settlementResult.done) {
+      if (settlementResult.done === true) {
         return settlementResult;
       }
       const { value: timeoutSettlement } = settlementResult;
@@ -97,7 +97,7 @@ export function createTimeoutStrategy<J extends Job<unknown>>(
         },
       };
     },
-  } as Strategy<J>;
+  } satisfies Strategy<J>;
 }
 
 export function createTimeoutPipe(options: TimeoutOptions): Pipe {

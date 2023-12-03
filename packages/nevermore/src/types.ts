@@ -75,8 +75,8 @@ export type NevermoreOptions = Partial<
 export type Strategy<J extends Job<unknown>> = AsyncIterator<
   JobSettlement<J>
 > & {
-  launchJob(job: J): Promise<void>;
-  launchesDone(): void;
+  launchJob: (job: J) => Promise<void>;
+  launchesDone: () => void;
 };
 
 export interface Launch<J extends Job<unknown>> {
