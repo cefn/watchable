@@ -37,12 +37,16 @@ export function createRateStrategy<J extends Job<unknown>>(
   const countsByMs = new Map<number, number>();
   let slotsUsed = 0;
 
+  // TODO CH assess the worst-case scenarios where multiple re-entrant calls are all sleeping
+  // but only one gets in at a time (hence everyone but one has to sleep again)
+  // compare with overhead of just adding a lock (where jobs are implicitly queued on
+  // the lock before entering the logic)
   async function waitForSlot() {
     while (slotsUsed >= intervalSlots) {
       // slots used - wait for oldest record to expire
       const oldestResult = countsByMs.entries().next();
       if (oldestResult.done === true) {
-        // slots are used up, there must be an oldest record
+        // slots are used up so there must be an oldest record
         throw new Error(`Fatal: job record missing`);
       }
       const [timestamp, count] = oldestResult.value;

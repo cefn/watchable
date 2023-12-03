@@ -15,37 +15,46 @@ export function namedRace<
   return Promise.race(racers);
 }
 
+export interface Biddable<Args extends unknown[]> {
+  promise: Promise<Args>;
+  fulfil: (...args: Args) => void;
+  fail: (error: unknown) => void;
+}
+
 /** Reference implementation to give access to a Promise callback outside the
- * scope of a Promise constructor function. By default, Args is a zero-length
+ * scope of a Promise constructor function. By default, FulfilmentArgs is a zero-length
  * array, meaning `callback` is `() => void` and `promise` is Promise<[]> - an
  * awaitable flag having no value.
  */
-export function promiseWithFulfil<Args extends unknown[] = []>() {
+export function createBiddablePromise<Args extends unknown[] = []>() {
   // non-null required as per https://github.com/microsoft/TypeScript/issues/42910
   let fulfil!: (...args: Args) => void;
-  const promise = new Promise<Args>((resolve) => {
+  let fail!: (reason?: unknown) => void;
+  const promise = new Promise<Args>((resolve, reject) => {
     fulfil = (...args) => {
       resolve(args);
     };
+    fail = reject;
   });
   return {
     promise,
     fulfil,
-  };
+    fail,
+  } satisfies Biddable<Args>;
 }
 
 /** Construct for an awaitable `notify()` callback, with `notified` indicating whether it has been called. */
-export function createNotifiable<Args extends unknown[] = []>() {
-  const { promise, fulfil } = promiseWithFulfil<Args>();
-  const notifiable = {
+export function createFlag() {
+  const { promise, fulfil } = createBiddablePromise();
+  const notifiableFlag = {
     promise,
-    notified: false,
-    notify: (...args: Args) => {
-      notifiable.notified = true;
-      fulfil(...args);
+    flagged: false,
+    flag: () => {
+      notifiableFlag.flagged = true;
+      fulfil();
     },
   };
-  return notifiable;
+  return notifiableFlag;
 }
 
 /** A loop that consumes an async iterator's values strictly in
