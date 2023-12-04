@@ -1,5 +1,11 @@
 # @watchable/nevermore
 
+## 0.9.0-alpha.6
+
+### Minor Changes
+
+- Ensure executor changes are included.
+
 ## 0.9.0-alpha.5
 
 ### Minor Changes
