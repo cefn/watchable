@@ -80,6 +80,7 @@
         "./packages/store-edit:build",
         "./packages/store-follow:build",
         "./packages/store-react:build",
+        "./packages/nevermore:build",
         "./apps/counter-dom-commonjs:build",
         "./apps/counter-dom-esm:build",
         "./apps/counter-dom-tiny:build",
@@ -101,7 +102,8 @@
         "./packages/store:test",
         "./packages/store-edit:test",
         "./packages/store-follow:test",
-        "./packages/store-react:test"
+        "./packages/store-react:test",
+        "./packages/nevermore:test"
       ]
     },
     "lint": {
@@ -119,7 +121,8 @@
         "./packages/store:lint",
         "./packages/store-edit:lint",
         "./packages/store-follow:lint",
-        "./packages/store-react:lint"
+        "./packages/store-react:lint",
+        "./packages/nevermore:lint"
       ]
     },
     "docs": {
@@ -129,7 +132,8 @@
         "./packages/store:build",
         "./packages/store-edit:build",
         "./packages/store-follow:build",
-        "./packages/store-react:build"
+        "./packages/store-react:build",
+        "./packages/nevermore:build"
       ]
     }
   }
