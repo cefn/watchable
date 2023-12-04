@@ -138,8 +138,16 @@ export const PACKAGE_JSON_RULES = {
       output: ["coverage", "playwright-report"],
     };
 
+    const nevermoreTests = {
+      ...tsPackages,
+      command: "vitest run --reporter verbose --no-threads --isolate",
+    };
+
     return byPackageType({
-      packages: tsPackages,
+      packages: byPackageName(
+        { "@watchable/nevermore": nevermoreTests },
+        tsPackages
+      ),
       apps: byPackageName(
         {
           "counter-preact-ts": tsAppsWithUnitTests,

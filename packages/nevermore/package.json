@@ -52,7 +52,7 @@
       "dependencies": [
         "build"
       ],
-      "command": "vitest run --reporter verbose",
+      "command": "vitest run --reporter verbose --no-threads --isolate",
       "files": [
         "src/**/*",
         "test/**/*",
