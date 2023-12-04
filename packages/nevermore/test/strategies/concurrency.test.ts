@@ -6,7 +6,7 @@ import { nevermore, sleep } from "../../src";
 type JobEvent = [string, { pending: number }];
 
 describe("Concurrency limits:", () => {
-  const JOB_DELAY = 10;
+  const JOB_DELAY = 20;
   const JOB_COUNT = 4;
 
   let events: JobEvent[] = [];
