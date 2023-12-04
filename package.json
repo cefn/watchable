@@ -66,12 +66,24 @@
   "wireit": {
     "qa": {
       "dependencies": [
+        "qa:time-insensitive",
+        "qa:time-sensitive"
+      ]
+    },
+    "qa:time-insensitive": {
+      "dependencies": [
         "packages:validate",
         "build",
         "test",
         "lint",
         "docs"
       ]
+    },
+    "qa:time-sensitive": {
+      "dependencies": [
+        "qa:time-insensitive"
+      ],
+      "command": "npm --workspace packages/nevermore run test"
     },
     "build": {
       "dependencies": [
@@ -102,8 +114,7 @@
         "./packages/store:test",
         "./packages/store-edit:test",
         "./packages/store-follow:test",
-        "./packages/store-react:test",
-        "./packages/nevermore:test"
+        "./packages/store-react:test"
       ]
     },
     "lint": {

@@ -59,7 +59,7 @@ describe("Fuzz testing", () => {
       const settlementSequence = nevermore(randomOptions, randomJobs);
       const settlementsPromise = iterable2array(settlementSequence);
 
-      const impatientPromise = sleep(3000);
+      const impatientPromise = sleep(4000);
       const winner = await namedRace({ settlementsPromise, impatientPromise });
       if (winner === "impatientPromise") {
         console.log(
@@ -91,7 +91,7 @@ describe("Fuzz testing", () => {
         randomExecutors.map((executor) => executor())
       );
 
-      const impatientPromise = sleep(3000);
+      const impatientPromise = sleep(4000);
       const winner = await namedRace({ settlementsPromise, impatientPromise });
       if (winner === "impatientPromise") {
         console.log(
