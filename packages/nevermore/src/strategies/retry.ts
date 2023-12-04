@@ -6,7 +6,7 @@ import {
   type Strategy,
   type StrategyFactory,
   type Pipe,
-  promiseWithFulfil,
+  createBiddablePromise,
 } from "..";
 import { createLock } from "../lock";
 
@@ -58,7 +58,7 @@ export function createRetryStrategy<J extends Job<unknown>>(
   const { retries } = options;
 
   const retryLock = createLock();
-  const settlementsFinalized = promiseWithFulfil();
+  const settlementsFinalized = createBiddablePromise();
   let activeJobs = 0;
   let upstreamLaunchesDone = false;
 

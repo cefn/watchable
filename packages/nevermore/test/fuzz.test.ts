@@ -1,5 +1,12 @@
+/* eslint-disable @typescript-eslint/promise-function-async */
 import { describe, expect, test } from "vitest";
-import { type NevermoreOptions, sleep, nevermore, namedRace } from "../src";
+import {
+  type NevermoreOptions,
+  sleep,
+  nevermore,
+  namedRace,
+  createExecutorStrategy,
+} from "../src";
 import { iterable2array } from "./testutil";
 
 function createRandomOptions(): NevermoreOptions {
@@ -41,7 +48,7 @@ function createRandomJob() {
 }
 
 describe("Fuzz testing", () => {
-  test("Create random combinations of options, tasks. Always expect eventual settlement", async () => {
+  test("Create random combinations of options, tasks to nevermore. Always expect eventual settlement", async () => {
     for (let testId = 0; testId < 64; testId++) {
       const length = 1 + Math.floor(Math.random() * 9);
       const randomJobs = Array.from({ length }, createRandomJob);
@@ -51,6 +58,7 @@ describe("Fuzz testing", () => {
 
       const settlementSequence = nevermore(randomOptions, randomJobs);
       const settlementsPromise = iterable2array(settlementSequence);
+
       const impatientPromise = sleep(3000);
       const winner = await namedRace({ settlementsPromise, impatientPromise });
       if (winner === "impatientPromise") {
@@ -62,6 +70,39 @@ describe("Fuzz testing", () => {
         );
         throw new Error("Fuzz test took too long");
       }
+
+      const settlements = await settlementsPromise;
+      expect(settlements.length).toBe(length);
+    }
+  });
+
+  test("Create random combinations of options, tasks to executor. Always expect eventual settlement", async () => {
+    for (let testId = 0; testId < 64; testId++) {
+      const length = 1 + Math.floor(Math.random() * 9);
+      const randomJobs = Array.from({ length }, createRandomJob);
+      const randomOptions = createRandomOptions();
+
+      const randomJobConfigs = randomJobs.map(({ config }) => config);
+
+      const { createExecutor } = createExecutorStrategy(randomOptions);
+      const randomExecutors = randomJobs.map((job) => createExecutor(job));
+
+      const settlementsPromise = Promise.allSettled(
+        randomExecutors.map((executor) => executor())
+      );
+
+      const impatientPromise = sleep(3000);
+      const winner = await namedRace({ settlementsPromise, impatientPromise });
+      if (winner === "impatientPromise") {
+        console.log(
+          `${JSON.stringify({
+            randomOptions,
+            randomJobConfigs,
+          })}`
+        );
+        throw new Error("Fuzz test took too long");
+      }
+
       const settlements = await settlementsPromise;
       expect(settlements.length).toBe(length);
     }

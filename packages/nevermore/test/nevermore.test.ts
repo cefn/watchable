@@ -7,7 +7,7 @@ import {
   type NevermoreOptions,
 } from "../src";
 import { createFailingJob, delay, iterable2array } from "./testutil";
-import { createNotifiable } from "../src/util";
+import { createFlag } from "../src/util";
 
 const NOOP_OPTIONS: NevermoreOptions = {};
 
@@ -238,7 +238,7 @@ describe("Nevermore pipelines without limits", () => {
 
   test.skip("Can cancel before first job launch", async () => {
     // create awaitable that will resolve after 5 ms before (parallel) jobs resolve
-    const notifiable = createNotifiable();
+    const notifiable = createFlag();
     setTimeout(() => {
       notifiable.notify();
     }, 5);
@@ -276,7 +276,7 @@ describe("Nevermore pipelines without limits", () => {
 
   test.skip("Settlement sequence terminates if cancelPromise resolves before job promises resolve", async () => {
     // create awaitable that will resolve after 5 ms before (parallel) jobs resolve
-    const notifiable = createNotifiable();
+    const notifiable = createFlag();
     setTimeout(() => {
       notifiable.notify();
     }, 5);
