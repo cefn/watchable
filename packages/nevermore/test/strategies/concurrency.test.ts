@@ -47,7 +47,7 @@ describe("Concurrency limits:", () => {
     expect(duration).toBeLessThan(JOB_DELAY * 2);
     expect(settlements.length).toBe(JOB_COUNT);
 
-    expect(events).toMatchInlineSnapshot([
+    expect(events).toEqual([
       ["Creating #0", { pending: 0 }],
       ["Starting #0", { pending: 1 }],
       ["Creating #1", { pending: 1 }],
@@ -80,7 +80,7 @@ describe("Concurrency limits:", () => {
     expect(duration).toBeLessThan(JOB_DELAY * 2);
     expect(settlements.length).toBe(JOB_COUNT);
 
-    expect(events).toMatchInlineSnapshot([
+    expect(events).toEqual([
       ["Creating #0", { pending: 0 }],
       ["Starting #0", { pending: 1 }],
       ["Creating #1", { pending: 1 }],
@@ -107,7 +107,7 @@ describe("Concurrency limits:", () => {
     expect(duration).toBeGreaterThanOrEqual(JOB_COUNT * JOB_DELAY);
     expect(settlements.length).toBe(JOB_COUNT);
 
-    expect(events).toMatchInlineSnapshot([
+    expect(events).toEqual([
       ["Creating #0", { pending: 0 }],
       ["Starting #0", { pending: 1 }],
       ["Creating #1", { pending: 1 }],
@@ -148,7 +148,7 @@ describe("Concurrency limits:", () => {
     }
 
     // check
-    expect(events).toMatchObject([
+    expect(events).toEqual([
       ["Creating #0", { pending: 0 }],
       ["Starting #0", { pending: 1 }],
       ["Creating #1", { pending: 1 }],

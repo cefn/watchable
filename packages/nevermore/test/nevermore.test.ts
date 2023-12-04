@@ -240,7 +240,7 @@ describe("Nevermore pipelines without limits", () => {
     // create awaitable that will resolve after 5 ms before (parallel) jobs resolve
     const notifiable = createFlag();
     setTimeout(() => {
-      notifiable.notify();
+      notifiable.flag();
     }, 5);
 
     const jobYielded = vi.fn();
@@ -278,7 +278,7 @@ describe("Nevermore pipelines without limits", () => {
     // create awaitable that will resolve after 5 ms before (parallel) jobs resolve
     const notifiable = createFlag();
     setTimeout(() => {
-      notifiable.notify();
+      notifiable.flag();
     }, 5);
 
     const settlementSequence = nevermore(
