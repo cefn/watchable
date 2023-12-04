@@ -1,6 +1,6 @@
 {
   "name": "@watchable/nevermore",
-  "version": "0.9.0-alpha.3",
+  "version": "0.9.0-alpha.7",
   "description": "Rate limits and concurrency using generators of promiseFactories",
   "homepage": "https://github.com/cefn/watchable/tree/main/packages/nevermore#readme",
   "bugs": {
