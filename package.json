@@ -30,7 +30,7 @@
     "prerelease:enter": "changeset pre enter alpha",
     "prerelease:exit": "changeset pre exit alpha",
     "npm:login": "npm whoami || npm login",
-    "publish": "run-s npm:login git:ensureclean qa:clean qa changeset:version changeset:publish git:commit:release"
+    "publish": "run-s npm:login git:ensureclean qa:clean qa changeset:create changeset:version changeset:publish git:commit:release"
   },
   "devDependencies": {
     "@changesets/cli": "^2.26.1",
@@ -66,12 +66,24 @@
   "wireit": {
     "qa": {
       "dependencies": [
+        "qa:time-insensitive",
+        "qa:time-sensitive"
+      ]
+    },
+    "qa:time-insensitive": {
+      "dependencies": [
         "packages:validate",
         "build",
         "test",
         "lint",
         "docs"
       ]
+    },
+    "qa:time-sensitive": {
+      "dependencies": [
+        "qa:time-insensitive"
+      ],
+      "command": "npm --workspace packages/nevermore run test"
     },
     "build": {
       "dependencies": [
@@ -80,6 +92,7 @@
         "./packages/store-edit:build",
         "./packages/store-follow:build",
         "./packages/store-react:build",
+        "./packages/nevermore:build",
         "./apps/counter-dom-commonjs:build",
         "./apps/counter-dom-esm:build",
         "./apps/counter-dom-tiny:build",
@@ -119,7 +132,8 @@
         "./packages/store:lint",
         "./packages/store-edit:lint",
         "./packages/store-follow:lint",
-        "./packages/store-react:lint"
+        "./packages/store-react:lint",
+        "./packages/nevermore:lint"
       ]
     },
     "docs": {
@@ -129,7 +143,8 @@
         "./packages/store:build",
         "./packages/store-edit:build",
         "./packages/store-follow:build",
-        "./packages/store-react:build"
+        "./packages/store-react:build",
+        "./packages/nevermore:build"
       ]
     }
   }
