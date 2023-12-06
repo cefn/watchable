@@ -21,6 +21,7 @@
     "@watchable/nevermore": "0.9.0-alpha.3"
   },
   "changesets": [
+    "chilly-gorillas-heal",
     "eleven-donkeys-approve",
     "flat-ligers-heal",
     "funny-pans-matter",

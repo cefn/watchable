@@ -1,5 +1,11 @@
 # @watchable/nevermore
 
+## 0.9.0-alpha.8
+
+### Minor Changes
+
+- Include better README
+
 ## 0.9.0-alpha.7
 
 ### Minor Changes
