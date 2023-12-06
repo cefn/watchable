@@ -1,4 +1,4 @@
-import { SkipRetryError, nevermore, serializeError } from "../../../src";
+import { SkipRetryError, nevermore, serializeError } from "../../src";
 
 /** We allow 2 outstanding requests to SWAPI at one time. This limits the local
  * resources that would be dedicated to multiple requests in parallel. A
