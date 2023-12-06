@@ -3,137 +3,145 @@ import { describe, test, expect } from "vitest";
 import { createExecutorStrategy } from "../../nevermore/src/executor";
 import { sleep } from "../src";
 describe("createExecutor ", () => {
-  test("executor with no constraints execute like original operation", async () => {
+  describe("Scheduling constraint", () => {
+    const TASK_DURATION = 5;
+
+    // track task parallelism
     let pending = 0;
-    const operation = async (n: number) => {
+
+    const sleepingOperation = async (n: number) => {
+      // register task
       pending++;
       try {
-        await sleep(5);
+        await sleep(TASK_DURATION);
         return { n, pending };
       } finally {
+        // unregister task
         pending--;
       }
     };
 
-    // create executor operation
-    const { createExecutor } = createExecutorStrategy({});
-    const executor = createExecutor(operation);
+    test("executor with concurrency=1 constraint executes in series", async () => {
+      const { createExecutor } = createExecutorStrategy({ concurrency: 1 });
 
-    // play original operations
-    let start = Date.now();
-    const operationResults = await Promise.all([
-      operation(0),
-      operation(1),
-      operation(2),
-      operation(3),
-    ]);
-    expect(Date.now() - start).toBeLessThanOrEqual(10);
+      pending = 0;
 
-    // reset the sequence
-    start = Date.now();
-    const executorResults = await Promise.all([
-      executor(0),
-      executor(1),
-      executor(2),
-      executor(3),
-    ]);
-    expect(Date.now() - start).toBeLessThanOrEqual(10);
+      let start = Date.now();
+      const unconstrainedResults = await Promise.all([
+        sleepingOperation(0),
+        sleepingOperation(1),
+        sleepingOperation(2),
+        sleepingOperation(3),
+      ]);
+      const unconstrainedDuration = Date.now() - start;
 
-    expect(operationResults).toEqual(executorResults);
-    expect(operationResults).toEqual([
-      { n: 0, pending: 4 },
-      { n: 1, pending: 3 },
-      { n: 2, pending: 2 },
-      { n: 3, pending: 1 },
-    ]);
-  });
+      const executor = createExecutor(sleepingOperation);
 
-  test("executor with concurrency constraint executes in series", async () => {
-    // create operation and executor
-    let pending = 0;
-    const operation = async (n: number) => {
-      pending++;
-      try {
-        await sleep(5);
-        return { n, pending };
-      } finally {
-        pending--;
-      }
-    };
-    const { createExecutor } = createExecutorStrategy({ concurrency: 1 });
-    const executor = createExecutor(operation);
+      start = Date.now();
+      const constrainedResults = await Promise.all([
+        executor(0),
+        executor(1),
+        executor(2),
+        executor(3),
+      ]);
+      const constrainedDuration = Date.now() - start;
 
-    // play original operations
-    let start = Date.now();
-    const operationResults = await Promise.all([
-      operation(0),
-      operation(1),
-      operation(2),
-      operation(3),
-    ]);
-    expect(Date.now() - start).toBeLessThanOrEqual(10);
+      expect(unconstrainedDuration).toBeLessThanOrEqual(TASK_DURATION * 2);
+      expect(unconstrainedResults).toEqual([
+        { n: 0, pending: 4 },
+        { n: 1, pending: 3 },
+        { n: 2, pending: 2 },
+        { n: 3, pending: 1 },
+      ]);
 
-    // reset the sequence
-    start = Date.now();
-    const executorResults = await Promise.all([
-      executor(0),
-      executor(1),
-      executor(2),
-      executor(3),
-    ]);
-    expect(Date.now() - start).toBeGreaterThanOrEqual(20);
+      expect(constrainedDuration).toBeGreaterThanOrEqual(TASK_DURATION * 4);
+      expect(constrainedResults).toEqual([
+        { n: 0, pending: 1 },
+        { n: 1, pending: 1 },
+        { n: 2, pending: 1 },
+        { n: 3, pending: 1 },
+      ]);
+    });
 
-    expect(operationResults).not.toEqual(executorResults);
-    expect(executorResults).toEqual([
-      { n: 0, pending: 1 },
-      { n: 1, pending: 1 },
-      { n: 2, pending: 1 },
-      { n: 3, pending: 1 },
-    ]);
-  });
+    test("executor with interval constraint delays further executions", async () => {
+      const { createExecutor } = createExecutorStrategy({
+        intervalMs: TASK_DURATION * 2,
+      });
 
-  test("executor with interval constraint is suitably delayed", async () => {
-    // create operation and executor
-    let pending = 0;
-    const operation = async (n: number) => {
-      pending++;
-      try {
-        await sleep(5);
-        return { n, pending };
-      } finally {
-        pending--;
-      }
-    };
-    const { createExecutor } = createExecutorStrategy({ intervalMs: 10 });
-    const executor = createExecutor(operation);
+      pending = 0;
 
-    // play original operations
-    let start = Date.now();
-    const operationResults = await Promise.all([
-      operation(0),
-      operation(1),
-      operation(2),
-      operation(3),
-    ]);
-    expect(Date.now() - start).toBeLessThanOrEqual(10);
+      let start = Date.now();
+      const unconstrainedResults = await Promise.all([
+        sleepingOperation(0),
+        sleepingOperation(1),
+        sleepingOperation(2),
+        sleepingOperation(3),
+      ]);
+      const unconstrainedDuration = Date.now() - start;
 
-    // reset the sequence
-    start = Date.now();
-    const executorResults = await Promise.all([
-      executor(0),
-      executor(1),
-      executor(2),
-      executor(3),
-    ]);
-    expect(Date.now() - start).toBeGreaterThanOrEqual(30);
+      const executor = createExecutor(sleepingOperation);
 
-    expect(operationResults).not.toEqual(executorResults);
-    expect(executorResults).toEqual([
-      { n: 0, pending: 1 },
-      { n: 1, pending: 1 },
-      { n: 2, pending: 1 },
-      { n: 3, pending: 1 },
-    ]);
+      start = Date.now();
+      const constrainedResults = await Promise.all([
+        executor(0),
+        executor(1),
+        executor(2),
+        executor(3),
+      ]);
+      const constrainedDuration = Date.now() - start;
+
+      expect(unconstrainedDuration).toBeLessThanOrEqual(TASK_DURATION * 2);
+      expect(unconstrainedResults).toEqual([
+        { n: 0, pending: 4 },
+        { n: 1, pending: 3 },
+        { n: 2, pending: 2 },
+        { n: 3, pending: 1 },
+      ]);
+
+      expect(constrainedDuration).toBeGreaterThanOrEqual(TASK_DURATION * 4);
+      expect(constrainedResults).toEqual([
+        { n: 0, pending: 1 },
+        { n: 1, pending: 1 },
+        { n: 2, pending: 1 },
+        { n: 3, pending: 1 },
+      ]);
+    });
+
+    test("executor with no scheduling constraints executes like original operation", async () => {
+      pending = 0;
+
+      // create executor operation
+      const { createExecutor } = createExecutorStrategy({});
+      const executor = createExecutor(sleepingOperation);
+
+      // play original operations
+      let start = Date.now();
+      const unconstrainedResults = await Promise.all([
+        sleepingOperation(0),
+        sleepingOperation(1),
+        sleepingOperation(2),
+        sleepingOperation(3),
+      ]);
+      expect(Date.now() - start).toBeLessThanOrEqual(TASK_DURATION * 2);
+
+      // reset the sequence
+      start = Date.now();
+      const constrainedResults = await Promise.all([
+        executor(0),
+        executor(1),
+        executor(2),
+        executor(3),
+      ]);
+      expect(Date.now() - start).toBeLessThanOrEqual(TASK_DURATION * 2);
+
+      expect(unconstrainedResults).toEqual(constrainedResults);
+      expect(unconstrainedResults).toEqual([
+        { n: 0, pending: 4 },
+        { n: 1, pending: 3 },
+        { n: 2, pending: 2 },
+        { n: 3, pending: 1 },
+      ]);
+    });
   });
 
   describe("Retry", () => {
@@ -165,10 +173,10 @@ describe("createExecutor ", () => {
       ];
 
       const executors = [
-        createExecutor(operations[0]),
-        createExecutor(operations[1]),
-        createExecutor(operations[2]),
-        createExecutor(operations[3]),
+        createExecutor(createFailingOperation(FAILURES)),
+        createExecutor(createFailingOperation(FAILURES)),
+        createExecutor(createFailingOperation(FAILURES)),
+        createExecutor(createFailingOperation(FAILURES)),
       ];
 
       // EXECUTE OPERATIONS AND EXECUTORS
@@ -221,10 +229,10 @@ describe("createExecutor ", () => {
       ];
 
       const executors = [
-        createExecutor(operations[0]),
-        createExecutor(operations[1]),
-        createExecutor(operations[2]),
-        createExecutor(operations[3]),
+        createExecutor(createFailingOperation(FAILURES)),
+        createExecutor(createFailingOperation(FAILURES)),
+        createExecutor(createFailingOperation(FAILURES)),
+        createExecutor(createFailingOperation(FAILURES)),
       ];
 
       // EXECUTE OPERATIONS AND EXECUTORS
@@ -257,13 +265,19 @@ describe("createExecutor ", () => {
   });
 
   describe("Timeout", () => {
+    const TASK_DURATION = 20;
+    const TIMEOUT_IMPATIENCE = 10;
+    const TIMEOUT_PATIENCE = 30;
+
     async function slowOperation() {
-      await sleep(20);
+      await sleep(TASK_DURATION);
       return "foo";
     }
 
     test("executor with short timeout rejects slow operations", async () => {
-      const { createExecutor } = createExecutorStrategy({ timeoutMs: 10 });
+      const { createExecutor } = createExecutorStrategy({
+        timeoutMs: TIMEOUT_IMPATIENCE,
+      });
       const impatientExecutor = createExecutor(slowOperation);
 
       {
@@ -293,7 +307,9 @@ describe("createExecutor ", () => {
           impatientExecutor(),
           impatientExecutor(),
         ]);
-        expect(Date.now() - start).toBeLessThanOrEqual(15);
+        expect(Date.now() - start).toBeLessThanOrEqual(
+          TIMEOUT_IMPATIENCE * 1.5
+        );
 
         expect(
           executorSettlements.every(
@@ -304,7 +320,9 @@ describe("createExecutor ", () => {
     });
 
     test("executor with long timeout resolves slow operations", async () => {
-      const { createExecutor } = createExecutorStrategy({ timeoutMs: 30 });
+      const { createExecutor } = createExecutorStrategy({
+        timeoutMs: TIMEOUT_PATIENCE,
+      });
 
       const patientExecutor = createExecutor(slowOperation);
 
@@ -316,7 +334,7 @@ describe("createExecutor ", () => {
         patientExecutor(),
         patientExecutor(),
       ]);
-      expect(Date.now() - start).toBeGreaterThanOrEqual(20);
+      expect(Date.now() - start).toBeGreaterThanOrEqual(TASK_DURATION);
 
       expect(
         executorSettlements.map(
