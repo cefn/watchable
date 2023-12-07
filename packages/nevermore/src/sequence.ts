@@ -86,21 +86,25 @@ export function createStrategyFromOptions<J extends Job<unknown>>(
 }
 
 /**
- * Create an AsyncIterable of JobSettlements for your job type J, from a
- * sequence of J that you provide. It will manage the launching and tracking of
- * your jobs within the (e.g. concurrency, interval, timeout, retry) constraints
- * defined by your options.
+ * Creates an `AsyncIterable` of `JobSettlement<J>` from a sequence of jobs `J`
+ * that you provide. It will manage the launching and tracking of your jobs
+ * within the (e.g. concurrency, interval, timeout, retry) constraints defined
+ * by your options.
  *
- * A JobSettlement is equivalent to the values returned by Promise.allSettled() except
- * they also have a typed member `job:J` allowing you to annotate your jobs in a
- * way that is useful when consuming settlements.
+ * Consume the resulting AsyncIterable with `for await...of sequence` or `await
+ * sequence.next()` to get the next settlement.
  *
- * You can consume the resulting AsyncIterable through `for await...of sequence`
- * or by calling `await sequence.next()` to get the next settlement.
+ * A `JobSettlement<J>` is equivalent to the values returned by
+ * `Promise.allSettled()`. It will have either `status:"fulfilled",
+ * value:Awaited<ReturnType<J>>` or `status:"rejected", reason:unknown`.
+ * However, it has an additional typed member `job:J` referencing the job which
+ * is being settled. You can add arbitrary annotations to your jobs that will
+ * help you when consuming settlements.
  *
  * @param jobSequence An array, generator or other Iterable. Nevermore will pull
  * jobs from it just-in-time.
- * @param options The combined options for all behaviours needed in the pipeline.
+ * @param options The combined options for all behaviours needed in the
+ * pipeline.
  * @returns AsyncIterable sequence of JobSettlement<J> values.
  */
 export async function* createSettlementSequence<J extends Job<unknown>>(

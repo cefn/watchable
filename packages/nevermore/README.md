@@ -16,11 +16,12 @@ npm install @watchable/nevermore
 An `ExecutorStrategy` can transform a normal async function into a function that
 is regulated by a `nevermore` pipeline.
 
-Create a strategy as below. This example exercises the optional
-concurrency-limits, rate-limits, timeouts and retries...
+Create a strategy and get back a `createExecutor()` function. The strategy shown
+below exercises most of the options - concurrency-limits, rate-limits, timeouts
+and retries...
 
 ```ts
-import { createExecutor } from "@watchable/nevermore";
+import { createExecutorStrategy } from "@watchable/nevermore";
 const { createExecutor } = createExecutorStrategy({
   concurrency: 1,
   intervalMs: 100,
@@ -29,8 +30,8 @@ const { createExecutor } = createExecutorStrategy({
 });
 ```
 
-Use `createExecutor` to turn an ordinary function into a regulated function that
-respects the constraints of the strategy you configured...
+You can then use `createExecutor` to turn an ordinary function into a regulated
+function that respects the constraints of the strategy you configured...
 
 ```ts
 async function getStarWars(filmId: number) {
