@@ -17,7 +17,8 @@ type ExecutorJob<T> = Job<T> & {
  *   throw a timeout error
  * * retry : the underlying operation is retried and the executor only throws
  *   when retries are exhausted
- *
+ * @param options
+ * @returns
  */
 export function createExecutorStrategy(options: NevermoreOptions) {
   /** Create a pipeline to limit arbitrary jobs according to the provided options. */

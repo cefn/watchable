@@ -61,7 +61,7 @@ function* pipesFromOptions(options: NevermoreOptions): Iterable<Pipe> {
  * (that triggers and tracks the jobs) but can have arbitrary
  * Strategies layed on top according to the options.
  *
- * @param options
+ * @param options The combined options for all behaviours needed in the pipeline.
  * @returns The combined strategy, ready to accept jobs
  */
 export function createStrategyFromOptions<J extends Job<unknown>>(
@@ -70,19 +70,18 @@ export function createStrategyFromOptions<J extends Job<unknown>>(
   const { cancelPromise } = options;
   /** COMPOSE STRATEGY */
 
-  // define a factory that creates a settler strategy
-  // (a strategy that attempts to immediately settle every job)
-  // tracks launched jobs, ends settlements when all jobs are settled
-
+  // Initial factory is a launcher that immediately launches every job passed to it.
+  // It tracks launched jobs, and passed back their settlements.
+  // It ends settlements sequence when job sequence is finished and all jobs are settled
   let createStrategy = <J extends Job<unknown>>() =>
     createLauncherStrategy<J>(cancelPromise);
 
-  // compose further factories specified by caller (wrapping settler factory)
+  // wrap each factory in further factories specified by caller
   for (const pipe of pipesFromOptions(options)) {
     createStrategy = pipe(createStrategy);
   }
 
-  // execute all wrapped factories, creating a composed strategy
+  // execute final factory, creating a composed strategy
   return createStrategy<J>();
 }
 
@@ -101,9 +100,8 @@ export function createStrategyFromOptions<J extends Job<unknown>>(
  *
  * @param jobSequence An array, generator or other Iterable. Nevermore will pull
  * jobs from it just-in-time.
- * @param options.cancelPromise If provided, Nevermore will cease launching jobs
- * whenever this promise settles.
- * @returns
+ * @param options The combined options for all behaviours needed in the pipeline.
+ * @returns AsyncIterable sequence of JobSettlement<J> values.
  */
 export async function* createSettlementSequence<J extends Job<unknown>>(
   options: NevermoreOptions,

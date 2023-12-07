@@ -41,10 +41,10 @@ export function createConcurrencyStrategy<J extends Job<unknown>>(
   return {
     launchesDone,
     async launchJob(job) {
+      // mutex prevent multiple requesters entering the flow, waiting on the same slot announcement promise
+      // they would get unblocked all at once rather than waiting their turn
       // TODO CH avoid wrapping this whole method in a mutex ( use while loop on pendingJobs
       // to ensure only a single job gets through each time, like rate logic? )
-      // mutex is here to prevent multiple requesters entering the flow and waiting on the same
-      // slot announcement promise (and then get unblocked all at once rather than waiting their turn)
       const release = await launchLock.acquire();
       try {
         if (slotAnnouncement !== null) {
@@ -59,13 +59,13 @@ export function createConcurrencyStrategy<J extends Job<unknown>>(
             throw new Error("Fatal: duplicate slot announcement requested");
           }
           // final slot now filled, prepare announcement
-          // for future settlement to 'free' slot availability
+          // for future settlement that will 'free' slot availability
           slotAnnouncement = createBiddablePromise();
         }
-        return await downstream.launchJob(job);
       } finally {
         release();
       }
+      return await downstream.launchJob(job);
     },
     async next() {
       const result = await downstream.next();
