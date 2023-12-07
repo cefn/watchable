@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, test } from "vitest";
 import { iterable2array } from "../testutil";
 
-import { nevermore, sleep } from "../../src";
+import { createSettlementSequence, sleep } from "../../src";
 
 type JobEvent = [string, { pending: number }];
 
@@ -34,7 +34,7 @@ describe("Concurrency limits:", () => {
   }
 
   test("with no concurrency limit, tasks run in parallel", async () => {
-    const settlementSequence = nevermore({}, taskGenerator);
+    const settlementSequence = createSettlementSequence({}, taskGenerator);
 
     const start = Date.now();
     const settlements = await iterable2array(settlementSequence);
@@ -64,7 +64,7 @@ describe("Concurrency limits:", () => {
   });
 
   test("with infinite concurrency limit, tasks run in parallel", async () => {
-    const settlementSequence = nevermore(
+    const settlementSequence = createSettlementSequence(
       { concurrency: Number.MAX_SAFE_INTEGER },
       taskGenerator
     );
@@ -97,7 +97,10 @@ describe("Concurrency limits:", () => {
   });
 
   test("with concurrency 1, tasks run in series", async () => {
-    const settlementSequence = nevermore({ concurrency: 1 }, taskGenerator);
+    const settlementSequence = createSettlementSequence(
+      { concurrency: 1 },
+      taskGenerator
+    );
 
     const start = Date.now();
     const settlements = await iterable2array(settlementSequence);
@@ -124,7 +127,10 @@ describe("Concurrency limits:", () => {
   });
 
   test("concurrency limits the number of parallel tasks", async () => {
-    const settlementSequence = nevermore({ concurrency: 2 }, taskGenerator);
+    const settlementSequence = createSettlementSequence(
+      { concurrency: 2 },
+      taskGenerator
+    );
 
     const start = Date.now();
     const settlements = await iterable2array(settlementSequence);
@@ -137,7 +143,10 @@ describe("Concurrency limits:", () => {
   });
 
   test("sequence of task settlements as expected", async () => {
-    const settlementSequence = nevermore({ concurrency: 2 }, taskGenerator);
+    const settlementSequence = createSettlementSequence(
+      { concurrency: 2 },
+      taskGenerator
+    );
 
     for await (const settlement of settlementSequence) {
       const { job, status } = settlement;

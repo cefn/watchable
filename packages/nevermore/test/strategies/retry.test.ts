@@ -1,14 +1,17 @@
 import { describe, expect, test } from "vitest";
-import { nevermore, type NevermoreOptions } from "../../src";
+import { createSettlementSequence, type NevermoreOptions } from "../../src";
 import { createFailingJob, iterable2array } from "../testutil";
 
 describe("Retry behaviour", () => {
   test("Can retry failed tasks", async () => {
-    const settlementSequence = nevermore({ retries: 1 }, function* () {
-      yield Object.assign(createFailingJob({ failures: 1 }), { taskId: 0 });
-      yield Object.assign(createFailingJob({ failures: 1 }), { taskId: 1 });
-      yield Object.assign(createFailingJob({ failures: 1 }), { taskId: 2 });
-    });
+    const settlementSequence = createSettlementSequence(
+      { retries: 1 },
+      function* () {
+        yield Object.assign(createFailingJob({ failures: 1 }), { taskId: 0 });
+        yield Object.assign(createFailingJob({ failures: 1 }), { taskId: 1 });
+        yield Object.assign(createFailingJob({ failures: 1 }), { taskId: 2 });
+      }
+    );
 
     const settlements = await iterable2array(settlementSequence);
 
@@ -17,11 +20,14 @@ describe("Retry behaviour", () => {
   });
 
   test("Tasks exhausting retries settle as failed", async () => {
-    const settlementSequence = nevermore({ retries: 1 }, function* () {
-      yield Object.assign(createFailingJob({ failures: 2 }), { taskId: 0 }); // fails all retries
-      yield Object.assign(createFailingJob({ failures: 1 }), { taskId: 1 });
-      yield Object.assign(createFailingJob({ failures: 1 }), { taskId: 2 });
-    });
+    const settlementSequence = createSettlementSequence(
+      { retries: 1 },
+      function* () {
+        yield Object.assign(createFailingJob({ failures: 2 }), { taskId: 0 }); // fails all retries
+        yield Object.assign(createFailingJob({ failures: 1 }), { taskId: 1 });
+        yield Object.assign(createFailingJob({ failures: 1 }), { taskId: 2 });
+      }
+    );
 
     const settlements = await iterable2array(settlementSequence);
 
@@ -43,17 +49,20 @@ describe("Retry behaviour", () => {
       delayMs: 10,
     };
 
-    const settlementSequence = nevermore(nevermoreOptions, function* () {
-      yield Object.assign(createFailingJob(failureOptions), {
-        taskId: 0,
-      });
-      yield Object.assign(createFailingJob(failureOptions), {
-        taskId: 1,
-      });
-      yield Object.assign(createFailingJob(failureOptions), {
-        taskId: 2,
-      });
-    });
+    const settlementSequence = createSettlementSequence(
+      nevermoreOptions,
+      function* () {
+        yield Object.assign(createFailingJob(failureOptions), {
+          taskId: 0,
+        });
+        yield Object.assign(createFailingJob(failureOptions), {
+          taskId: 1,
+        });
+        yield Object.assign(createFailingJob(failureOptions), {
+          taskId: 2,
+        });
+      }
+    );
 
     const start = Date.now();
     const settlements = await iterable2array(settlementSequence);
@@ -81,17 +90,20 @@ describe("Retry behaviour", () => {
       delayMs: 1,
     };
 
-    const settlementSequence = nevermore(nevermoreOptions, function* () {
-      yield Object.assign(createFailingJob(failureOptions), {
-        taskId: 0,
-      });
-      yield Object.assign(createFailingJob(failureOptions), {
-        taskId: 1,
-      });
-      yield Object.assign(createFailingJob(failureOptions), {
-        taskId: 2,
-      });
-    });
+    const settlementSequence = createSettlementSequence(
+      nevermoreOptions,
+      function* () {
+        yield Object.assign(createFailingJob(failureOptions), {
+          taskId: 0,
+        });
+        yield Object.assign(createFailingJob(failureOptions), {
+          taskId: 1,
+        });
+        yield Object.assign(createFailingJob(failureOptions), {
+          taskId: 2,
+        });
+      }
+    );
 
     const start = Date.now();
     const settlements = await iterable2array(settlementSequence);

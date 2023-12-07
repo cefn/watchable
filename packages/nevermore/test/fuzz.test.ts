@@ -3,7 +3,7 @@ import { describe, expect, test } from "vitest";
 import {
   type NevermoreOptions,
   sleep,
-  nevermore,
+  createSettlementSequence,
   namedRace,
   createExecutorStrategy,
 } from "../src";
@@ -56,7 +56,10 @@ describe("Fuzz testing", () => {
 
       const randomJobConfigs = randomJobs.map(({ config }) => config);
 
-      const settlementSequence = nevermore(randomOptions, randomJobs);
+      const settlementSequence = createSettlementSequence(
+        randomOptions,
+        randomJobs
+      );
       const settlementsPromise = iterable2array(settlementSequence);
 
       const impatientPromise = sleep(4000);

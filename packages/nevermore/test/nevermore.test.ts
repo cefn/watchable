@@ -1,13 +1,11 @@
 /* eslint-disable @typescript-eslint/promise-function-async */
 import { describe, test, expect, vi } from "vitest";
-import {
-  createConcurrencyPipe,
-  createRetryPipe,
-  nevermore,
-  type NevermoreOptions,
-} from "../src";
 import { createFailingJob, delay, iterable2array } from "./testutil";
 import { createFlag } from "../src/util";
+import type { NevermoreOptions } from "../src/types";
+import { createSettlementSequence } from "../src/sequence";
+import { createConcurrencyPipe } from "../src/strategies/concurrency";
+import { createRetryPipe } from "../src/strategies/retry";
 
 const NOOP_OPTIONS: NevermoreOptions = {};
 
@@ -31,11 +29,14 @@ describe("Nevermore pipelines without limits", () => {
   }
 
   test("Job sequence can be generator", async () => {
-    const settlementSequence = nevermore(NOOP_OPTIONS, function* () {
-      for (const msg of ["one", "two", "three"]) {
-        yield createMessageJob(msg);
+    const settlementSequence = createSettlementSequence(
+      NOOP_OPTIONS,
+      function* () {
+        for (const msg of ["one", "two", "three"]) {
+          yield createMessageJob(msg);
+        }
       }
-    });
+    );
 
     // flatten async iterator to an eventual array of settlements
     const settlements = await iterable2array(settlementSequence);
@@ -69,12 +70,15 @@ describe("Nevermore pipelines without limits", () => {
 
   test("Job sequence can be async generator", async () => {
     // when job input is a normal iterable
-    const settlementSequence = nevermore(NOOP_OPTIONS, async function* () {
-      for (const msg of ["one", "two", "three"]) {
-        await delay(10, undefined);
-        yield createMessageJob(msg);
+    const settlementSequence = createSettlementSequence(
+      NOOP_OPTIONS,
+      async function* () {
+        for (const msg of ["one", "two", "three"]) {
+          await delay(10, undefined);
+          yield createMessageJob(msg);
+        }
       }
-    });
+    );
 
     // results in settlements as normal
     expect(await iterable2array(settlementSequence)).toMatchObject([
@@ -98,7 +102,7 @@ describe("Nevermore pipelines without limits", () => {
 
   test("Job sequence can be an ordinary iterable", async () => {
     // when job input is a normal iterable
-    const settlementSequence = nevermore(NOOP_OPTIONS, [
+    const settlementSequence = createSettlementSequence(NOOP_OPTIONS, [
       createMessageJob("one"),
       createMessageJob("two"),
       createMessageJob("three"),
@@ -125,17 +129,20 @@ describe("Nevermore pipelines without limits", () => {
   });
 
   test("Job sequence can be empty array", async () => {
-    const settlementSequence = nevermore(NOOP_OPTIONS, []);
+    const settlementSequence = createSettlementSequence(NOOP_OPTIONS, []);
     const settlements = await iterable2array(settlementSequence);
     expect(settlements.length).toBe(0);
   });
 
   test("Settlements allow Generic job with caller-provided metadata", async () => {
-    const settlementSequence = nevermore(NOOP_OPTIONS, function* () {
-      for (const msg of ["one", "two", "three"]) {
-        yield createMessageJob(msg);
+    const settlementSequence = createSettlementSequence(
+      NOOP_OPTIONS,
+      function* () {
+        for (const msg of ["one", "two", "three"]) {
+          yield createMessageJob(msg);
+        }
       }
-    });
+    );
 
     // flatten async iterator to an eventual array of settlements
     const settlements = await iterable2array(settlementSequence);
@@ -149,15 +156,18 @@ describe("Nevermore pipelines without limits", () => {
   });
 
   test("Settlements can include a record of failure", async () => {
-    const settlementSequence = nevermore(NOOP_OPTIONS, function* () {
-      for (const msg of ["one", "two", "three"]) {
-        if (msg === "two") {
-          yield createFailingMessageJob(msg);
-        } else {
-          yield createMessageJob(msg);
+    const settlementSequence = createSettlementSequence(
+      NOOP_OPTIONS,
+      function* () {
+        for (const msg of ["one", "two", "three"]) {
+          if (msg === "two") {
+            yield createFailingMessageJob(msg);
+          } else {
+            yield createMessageJob(msg);
+          }
         }
       }
-    });
+    );
 
     // flatten async iterator to an eventual array of settlements
     const settlements = await iterable2array(settlementSequence);
@@ -190,7 +200,7 @@ describe("Nevermore pipelines without limits", () => {
       ],
     };
 
-    const settlementSequence = nevermore(options, function* () {
+    const settlementSequence = createSettlementSequence(options, function* () {
       yield createFailingJob({ failures: 1, delayMs: 10 });
       yield createFailingJob({ failures: 1, delayMs: 10 });
       yield createFailingJob({ failures: 1, delayMs: 10 });
@@ -208,7 +218,7 @@ describe("Nevermore pipelines without limits", () => {
       ],
     };
 
-    const settlementSequence = nevermore(options, function* () {
+    const settlementSequence = createSettlementSequence(options, function* () {
       yield createFailingJob({ failures: 1, delayMs: 10 });
       yield createFailingJob({ failures: 1, delayMs: 10 });
       yield createFailingJob({ failures: 1, delayMs: 10 });
@@ -226,7 +236,7 @@ describe("Nevermore pipelines without limits", () => {
       ],
     };
 
-    const settlementSequence = nevermore(options, function* () {
+    const settlementSequence = createSettlementSequence(options, function* () {
       yield createFailingJob({ failures: 1, delayMs: 10 });
       yield createFailingJob({ failures: 1, delayMs: 10 });
       yield createFailingJob({ failures: 1, delayMs: 10 });
@@ -246,7 +256,7 @@ describe("Nevermore pipelines without limits", () => {
     const jobYielded = vi.fn();
     const imaginaryJob = vi.fn();
 
-    const settlementSequence = nevermore(
+    const settlementSequence = createSettlementSequence(
       {
         cancelPromise: notifiable.promise,
       },
@@ -281,7 +291,7 @@ describe("Nevermore pipelines without limits", () => {
       notifiable.flag();
     }, 5);
 
-    const settlementSequence = nevermore(
+    const settlementSequence = createSettlementSequence(
       {
         cancelPromise: notifiable.promise,
       },

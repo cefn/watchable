@@ -5,11 +5,13 @@
 
 import { describe, test, expect } from "vitest";
 
-import { nevermore, createPassthruPipe, serializeError } from "../../src/";
+import { createSettlementSequence } from "../../src/sequence";
+import { serializeError } from "../../src/util";
+import { createPassthruPipe } from "../../src/strategies/passthru";
 
 describe("Passthru strategy has no effect", () => {
   test("Simple job sequence", async () => {
-    const settlementSequence = nevermore(
+    const settlementSequence = createSettlementSequence(
       { concurrency: Number.MAX_SAFE_INTEGER, pipes: [createPassthruPipe()] },
       function* () {
         yield Object.assign(async () => "foo", { task: 0 });

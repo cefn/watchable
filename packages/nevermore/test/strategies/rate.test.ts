@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, test } from "vitest";
 import {
-  nevermore,
+  createSettlementSequence,
   sleep,
   type RateOptions,
   type ConcurrencyOptions,
@@ -44,7 +44,10 @@ describe("Rate limits: ", () => {
       intervalSlots: Number.MAX_SAFE_INTEGER,
     };
 
-    const settlementSequence = nevermore(rateOptions, taskGenerator);
+    const settlementSequence = createSettlementSequence(
+      rateOptions,
+      taskGenerator
+    );
 
     const start = Date.now();
     const settlements = await iterable2array(settlementSequence);
@@ -76,7 +79,10 @@ describe("Rate limits: ", () => {
 
   test("{ intervalMs: 10, intervalSlots: 1 } - 4 tasks run in series", async () => {
     const rateOptions: RateOptions = { intervalMs: 10, intervalSlots: 1 };
-    const settlementSequence = nevermore(rateOptions, taskGenerator);
+    const settlementSequence = createSettlementSequence(
+      rateOptions,
+      taskGenerator
+    );
 
     const start = Date.now();
     const settlements = await iterable2array(settlementSequence);
@@ -109,7 +115,10 @@ describe("Rate limits: ", () => {
 
   test("{ intervalMs: 40, intervalSlots: 4 } - 4 tasks execute in parallel", async () => {
     const rateOptions: RateOptions = { intervalMs: 40, intervalSlots: 4 };
-    const settlementSequence = nevermore(rateOptions, taskGenerator);
+    const settlementSequence = createSettlementSequence(
+      rateOptions,
+      taskGenerator
+    );
 
     const start = Date.now();
     const settlements = await iterable2array(settlementSequence);
@@ -138,7 +147,10 @@ describe("Rate limits: ", () => {
 
   test("{ intervalMs: 30, intervalSlots: 3 } - 3 tasks run, 4th waits for slot expiry", async () => {
     const rateOptions: RateOptions = { intervalMs: 30, intervalSlots: 3 };
-    const settlementSequence = nevermore(rateOptions, taskGenerator);
+    const settlementSequence = createSettlementSequence(
+      rateOptions,
+      taskGenerator
+    );
 
     const start = Date.now();
     const settlements = await iterable2array(settlementSequence);
@@ -171,7 +183,7 @@ describe("Rate limits: ", () => {
     // this concurrency should prevent more than one executing at once
     // tasks should be in series and take JOB_DURATION
     const concurrencyOptions: ConcurrencyOptions = { concurrency: 1 };
-    const settlementSequence = nevermore(
+    const settlementSequence = createSettlementSequence(
       {
         ...rateOptions,
         ...concurrencyOptions,
@@ -192,7 +204,7 @@ describe("Rate limits: ", () => {
   test("Rate can override concurrency", async () => {
     const rateOptions: RateOptions = { intervalMs: 10, intervalSlots: 1 };
     const concurrencyOptions: ConcurrencyOptions = { concurrency: 10 };
-    const settlementSequence = nevermore(
+    const settlementSequence = createSettlementSequence(
       {
         ...rateOptions,
         ...concurrencyOptions,
@@ -229,7 +241,10 @@ describe("Rate limits: ", () => {
       },
     } satisfies Iterable<typeof job> & Iterator<typeof job>;
 
-    const settlementSequence = nevermore(rateOptions, jobIterable);
+    const settlementSequence = createSettlementSequence(
+      rateOptions,
+      jobIterable
+    );
 
     const start = Date.now();
     let settlementCount = 0;

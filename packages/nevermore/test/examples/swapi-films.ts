@@ -1,4 +1,8 @@
-import { SkipRetryError, nevermore, serializeError } from "../../src";
+import {
+  SkipRetryError,
+  createSettlementSequence,
+  serializeError,
+} from "../../src";
 
 /** We allow 2 outstanding requests to SWAPI at one time. This limits the local
  * resources that would be dedicated to multiple requests in parallel. A
@@ -17,7 +21,7 @@ import { SkipRetryError, nevermore, serializeError } from "../../src";
  * triggered by some unexpected request load.
  * */
 
-for await (const settlement of nevermore(
+for await (const settlement of createSettlementSequence(
   {
     concurrency: 2,
     timeoutMs: 3000,

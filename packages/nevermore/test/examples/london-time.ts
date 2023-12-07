@@ -1,4 +1,4 @@
-import { nevermore } from "../../src";
+import { createSettlementSequence } from "../../src";
 
 async function run() {
   // define a sequence of zero-arg functions
@@ -20,7 +20,7 @@ async function run() {
   }
 
   // create a sequence of settlements (limited by specified options)
-  const settlementSequence = nevermore(
+  const settlementSequence = createSettlementSequence(
     {
       concurrency: 1,
       intervalMs: 1000,

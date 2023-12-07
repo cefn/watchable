@@ -11,7 +11,7 @@
 
 import { type MessageQueue, createQueue } from "@watchable/queue";
 import type { Job, JobSettlement, Strategy } from "../types";
-import { createFlag } from "..";
+import { createFlag } from "../util";
 
 /** Creates a Promise<T> from every job passed to `launches.next(job)`. Tracks
  *  Promise resolution or rejection. Doesn't await completion of job.  Wires

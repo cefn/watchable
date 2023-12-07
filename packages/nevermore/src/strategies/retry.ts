@@ -1,14 +1,14 @@
 /* eslint-disable @typescript-eslint/no-misused-promises */
-import {
-  type Job,
-  type NevermoreOptions,
-  type RetryOptions,
-  type Strategy,
-  type StrategyFactory,
-  type Pipe,
-  createBiddablePromise,
-} from "..";
+import type {
+  RetryOptions,
+  NevermoreOptions,
+  Job,
+  Strategy,
+  StrategyFactory,
+  Pipe,
+} from "../types";
 import { createLock } from "../lock";
+import { createBiddablePromise } from "../util";
 
 export class SkipRetryError extends Error {
   constructor(message: string, readonly originalError?: Error) {

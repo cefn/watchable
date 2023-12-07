@@ -29,7 +29,8 @@ const { createExecutor } = createExecutorStrategy({
 });
 ```
 
-Use `createExecutor` to turn an ordinary function into a regulated function...
+Use `createExecutor` to turn an ordinary function into a regulated function that
+respects the constraints of the strategy you configured...
 
 ```ts
 async function getStarWars(filmId: number) {
@@ -56,10 +57,11 @@ const [episode4, episode5, episode6] = await Promise.allSettled([
 ### Batch (generator) API
 
 For batch routines, (or potentially infinite sets), nevermore provides an
-alternative API based on generators, with the same options available...
+alternative API based on iterable sequences of no-arg functions, with the same
+options available...
 
 ```ts
-import { nevermore } from "@watchable/nevermore";
+import { createSettlementSequence } from "@watchable/nevermore";
 
 // define a sequence of zero-arg functions
 async function* createJobSequence() {
@@ -77,7 +79,7 @@ async function* createJobSequence() {
 }
 
 // create a sequence of settlements (limited by specified options)
-const settlementSequence = nevermore(
+const settlementSequence = createSettlementSequence(
   {
     concurrency: 1,
     intervalMs: 1000,
@@ -167,7 +169,7 @@ throws an error if it hasn't settled in time before passing the task downstream.
 On receiving a settlement it unwraps the timeout job, so the `JobSettlement`
 points to the original job, rather than the modified one.
 
-A _**retry**_ `Feed` always accepts jobs, wraps them in a retry job, storing
+A _**retry**_ `Strategy` always accepts jobs, wraps them in a retry job, storing
 extra metadata describing the count of retries attempted. `JobResolved`
 settlements are unwrapped to create a `JobResolved` for the original job.
 However `JobRejected` events are re-attempted until reaching the maximum number
