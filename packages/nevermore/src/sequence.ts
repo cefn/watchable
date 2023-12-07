@@ -91,7 +91,7 @@ export function createStrategyFromOptions<J extends Job<unknown>>(
  * your jobs within the (e.g. concurrency, interval, timeout, retry) constraints
  * defined by your options.
  *
- * A JobSettlement is equivalent to the values returned by Promise.all() except
+ * A JobSettlement is equivalent to the values returned by Promise.allSettled() except
  * they also have a typed member `job:J` allowing you to annotate your jobs in a
  * way that is useful when consuming settlements.
  *

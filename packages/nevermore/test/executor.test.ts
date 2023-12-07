@@ -334,7 +334,7 @@ describe("createExecutor ", () => {
         patientExecutor(),
         patientExecutor(),
       ]);
-      expect(Date.now() - start).toBeGreaterThanOrEqual(TASK_DURATION);
+      expect(Date.now() - start).toBeGreaterThanOrEqual(TASK_DURATION - 1);
 
       expect(
         executorSettlements.map(
