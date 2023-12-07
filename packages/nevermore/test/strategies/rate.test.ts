@@ -1,11 +1,7 @@
 import { beforeEach, describe, expect, test } from "vitest";
-import {
-  createSettlementSequence,
-  sleep,
-  type RateOptions,
-  type ConcurrencyOptions,
-} from "../../src";
+import { createSettlementSequence, sleep } from "../../src";
 import { iterable2array } from "../testutil";
+import type { ConcurrencyOptions, RateOptions } from "../../src/types";
 
 describe("Rate limits: ", () => {
   const JOB_DURATION = 5;
@@ -230,8 +226,7 @@ describe("Rate limits: ", () => {
     // which always returns the same job
     const job = async () => "foo";
     let jobCount = 0;
-    const jobIterable = {
-      [Symbol.iterator]: () => jobIterable,
+    const jobIterator = {
       next: () => {
         if (jobCount < LARGE_JOB_COUNT) {
           jobCount++;
@@ -239,7 +234,8 @@ describe("Rate limits: ", () => {
         }
         return { done: true, value: undefined };
       },
-    } satisfies Iterable<typeof job> & Iterator<typeof job>;
+    } satisfies Iterator<typeof job>;
+    const jobIterable = { [Symbol.iterator]: () => jobIterator };
 
     const settlementSequence = createSettlementSequence(
       rateOptions,

@@ -1,8 +1,6 @@
-import {
-  SkipRetryError,
-  createSettlementSequence,
-  serializeError,
-} from "../../src";
+import { createSettlementSequence } from "../../src";
+import { SkipRetryError } from "../../src/strategies/retry";
+import { serializeError } from "../../src/util";
 
 /** We allow 2 outstanding requests to SWAPI at one time. This limits the local
  * resources that would be dedicated to multiple requests in parallel. A
