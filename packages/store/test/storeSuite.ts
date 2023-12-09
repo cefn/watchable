@@ -122,12 +122,9 @@ export function createStoreSuite(
             unwatch();
             return;
           }
-          if (methodName === "write") {
-            const { write } = store;
-            write({ pi: 22 / 7 });
-            return;
-          }
-          methodName satisfies never;
+          methodName satisfies "write";
+          const { write } = store;
+          write({ pi: 22 / 7 });
         } catch (err) {
           throw new Error(`${methodName} may not be bound properly`);
         }

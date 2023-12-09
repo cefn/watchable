@@ -1,13 +1,23 @@
 /** A strategy that ensures jobs taking more than a specified timeout settle as "rejected". */
 
+import { namedRace } from "..";
 import type {
   Job,
+  JobArgs,
   NevermoreOptions,
   Pipe,
   Strategy,
   StrategyFactory,
   TimeoutOptions,
 } from "../types";
+import { createBiddablePromise, serializeError } from "../util";
+
+export class TimeoutError extends Error {
+  constructor(timeoutMs: number) {
+    super(`Job timed out after ${timeoutMs} ms.`);
+    Object.setPrototypeOf(this, new.target.prototype);
+  }
+}
 
 export function isTimeoutOptions(
   options: NevermoreOptions
@@ -24,43 +34,77 @@ export function isTimeoutOptions(
   return false;
 }
 
-type TimeoutJob<J extends Job<unknown>> = (() => Promise<ReturnType<J>>) & {
-  jobToTimeout: J;
-  timeoutMs: number;
-};
+type TimeoutJob<J extends Job<unknown>> = J extends Job<infer T>
+  ? Job<T> & {
+      jobToTimeout: J;
+      timeoutMs: number;
+    }
+  : never;
 
 function createTimeoutJob<J extends Job<unknown>>(
   jobToTimeout: J,
   timeoutMs: number
 ): TimeoutJob<J> {
-  return Object.assign(
-    async () => {
-      let timeoutId: ReturnType<typeof setTimeout> | null = null;
+  const jobWithTimeout = async (...args: JobArgs) => {
+    // access global cancel (if provided)
+    const upstreamCancelPromise = args[0]?.cancelPromise;
+    // create local cancel
+    const downstreamCancelBiddable = createBiddablePromise();
+    let timeoutId: ReturnType<typeof setTimeout> | null = null;
 
-      try {
-        const jobPromise = jobToTimeout() as Promise<
-          Awaited<ReturnType<typeof jobToTimeout>>
-        >;
+    try {
+      // promise job execution, providing a private cancellation promise
+      // so job can clean up from timeout
+      const jobPromise = jobToTimeout({
+        cancelPromise: downstreamCancelBiddable.promise,
+      });
 
-        const timeoutPromise = new Promise<never>((_resolve, reject) => {
-          timeoutId = setTimeout(() => {
-            timeoutId = null;
-            reject(new Error(`Job timed out after ${timeoutMs} ms.`));
-          }, timeoutMs);
+      // create timeout promise
+      const timeoutPromise = new Promise<void>((resolve) => {
+        timeoutId = setTimeout(() => {
+          timeoutId = null;
+          resolve();
+        }, timeoutMs);
+      });
+
+      const winner = await namedRace({
+        settle: jobPromise,
+        timeout: timeoutPromise,
+        ...(typeof upstreamCancelPromise !== "undefined"
+          ? { upstreamCancel: upstreamCancelPromise }
+          : null),
+      });
+      if (winner !== "settle") {
+        // Not a settlement. Must be early termination (timeout or upstreamCancel)
+        // trigger a downstream cancel
+        downstreamCancelBiddable.fulfil();
+        // handle eventual errors from (now-ignored) job
+        jobPromise.catch((error) => {
+          console.log(
+            `Ignoring eventual error ${serializeError(
+              error
+            )}. Job already timed out`
+          );
         });
-
-        return await Promise.race([jobPromise, timeoutPromise]);
-      } finally {
-        if (timeoutId !== null) {
-          clearTimeout(timeoutId);
-        }
       }
-    },
-    {
-      jobToTimeout,
-      timeoutMs,
+      if (winner === "timeout") {
+        throw new TimeoutError(timeoutMs);
+      }
+      // resolve to job settlement or job cancel behaviour
+      // (triggered by the downstream cancel happening in the background)
+      return await jobPromise;
+    } finally {
+      // typescript is wrong about code-paths here. `timeoutId` can be non-null
+      // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+      if (timeoutId !== null) {
+        clearTimeout(timeoutId);
+      }
     }
-  );
+  };
+  return Object.assign(jobWithTimeout, {
+    jobToTimeout,
+    timeoutMs,
+  }) as TimeoutJob<J>;
 }
 
 export function createTimeoutStrategy<J extends Job<unknown>>(
@@ -79,23 +123,39 @@ export function createTimeoutStrategy<J extends Job<unknown>>(
     },
     async next() {
       const settlementResult = await downstream.next();
+      // settlements have terminated
       if (settlementResult.done === true) {
         return settlementResult;
       }
-      const { value: timeoutSettlement } = settlementResult;
-      const {
-        job: { jobToTimeout },
-      } = timeoutSettlement;
-      // pass back settlement event
-      // but reference the original job
-      return {
-        // TODO CH simplify restructure
-        done: false,
-        value: {
-          ...timeoutSettlement,
-          job: jobToTimeout,
-        },
-      };
+
+      // prepare to reconcile settlement result (needs job, not timeoutJob)
+      const { value: timeoutJobSettlement } = settlementResult;
+      const { status } = timeoutJobSettlement;
+
+      // typescript apparently can't infer jobToTimeout is J
+      const job = timeoutJobSettlement.job.jobToTimeout as J;
+      if (status === "fulfilled") {
+        // typescript apparently can't infer value is completion of J
+        const jobValue = timeoutJobSettlement.value as unknown as Awaited<
+          ReturnType<J>
+        >;
+        return {
+          done: false,
+          value: {
+            ...timeoutJobSettlement,
+            value: jobValue,
+            job,
+          },
+        };
+      } else {
+        return {
+          done: false,
+          value: {
+            ...timeoutJobSettlement,
+            job,
+          },
+        };
+      }
     },
   } satisfies Strategy<J>;
 }

@@ -82,7 +82,7 @@ export async function followSelector<State extends RootState, Selected, Ending>(
           return lastSelected;
         },
       };
-      while (true) {
+      for (;;) {
         const ending = await follower(selected, controls);
         if (ending === exitStatus) {
           // eslint-disable-next-line @typescript-eslint/no-non-null-assertion

@@ -30,7 +30,7 @@ class DefaultLock<Key> implements Lock<Key> {
   protected keys: ReadonlyArray<Key | undefined> = [];
   protected releasePromises: ReadonlyArray<Promise<void>> = [];
   acquire = async (key?: Key) => {
-    let release = null;
+    let release: Release | null = null;
     do {
       const index = this.keys.indexOf(key);
       if (index === -1) {
@@ -52,6 +52,8 @@ class DefaultLock<Key> implements Lock<Key> {
         // await whoever currently has the lock
         await this.releasePromises[index];
       }
+      // typescript is wrong about code-paths here. `release` can be non-null
+      // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
     } while (release === null);
     return release;
   };
