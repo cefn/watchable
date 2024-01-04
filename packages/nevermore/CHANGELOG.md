@@ -1,5 +1,11 @@
 # @watchable/nevermore
 
+## 0.9.0-alpha.9
+
+### Patch Changes
+
+- Eliminate memory leaks from Promise.race
+
 ## 0.9.0-alpha.8
 
 ### Minor Changes

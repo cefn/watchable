@@ -1,3 +1,5 @@
+import safeRace from "race-as-promised";
+
 /* eslint-disable @typescript-eslint/no-base-to-string */
 /* eslint-disable @typescript-eslint/promise-function-async */
 
@@ -12,7 +14,7 @@ export function namedRace<
     promise.then(() => name)
   );
 
-  return Promise.race(racers);
+  return safeRace(racers);
 }
 
 export interface Biddable<Args extends unknown[]> {
@@ -78,10 +80,7 @@ export async function pull<T>(
     if (cancelRacer === null) {
       iteratorResult = await iteratorPromise;
     } else {
-      iteratorResult = await Promise.race([
-        iteratorPromise,
-        cancelRacer,
-      ] as const);
+      iteratorResult = await safeRace([iteratorPromise, cancelRacer] as const);
       if (iteratorResult === "cancel") {
         // cancelled
         return;

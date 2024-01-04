@@ -40,7 +40,7 @@ describe("withSelectorQueue behaviour", () => {
       (state) => state.near,
       async (queue, initialValue) => {
         let near = initialValue;
-        while (true) {
+        for (;;) {
           notified.push(near);
           near = await queue.receive();
         }
@@ -72,7 +72,7 @@ describe("withSelectorQueue behaviour", () => {
       (state) => state.near,
       async (queue, initialValue) => {
         let near = initialValue;
-        while (true) {
+        for (;;) {
           notified.push(near);
           near = await queue.receive();
         }
@@ -100,7 +100,7 @@ describe("withSelectorQueue behaviour", () => {
       (state) => state.near,
       async (queue, initialValue) => {
         let near = initialValue;
-        while (true) {
+        for (;;) {
           notified.push(near);
           near = await queue.receive();
           if (near === manchester) {
