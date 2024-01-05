@@ -34,9 +34,9 @@ export function createConcurrencyStrategy<J extends Job<unknown>>(
 
   let slotsUsed = 0;
   let deferredSlot: Biddable | null = null;
+  const launchMutex = createMutex();
 
   const { launchesDone } = downstream;
-  const launchMutex = createMutex();
 
   return {
     launchesDone,

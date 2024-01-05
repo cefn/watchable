@@ -23,20 +23,28 @@ export interface Mutex {
 }
 
 class DefaultMutex implements Mutex {
-  private unlockPromise: Promise<void> | null = null;
-  lock = async () => {
-    let release!: Release;
-    while (this.unlockPromise !== null) {
-      await this.unlockPromise;
+  private isLocked: boolean = false;
+  private readonly queue: Array<() => void> = [];
+
+  private readonly unlock = (): void => {
+    if (this.queue.length > 0) {
+      const nextResolve = this.queue.shift();
+      if (typeof nextResolve !== "undefined") {
+        nextResolve();
+      }
+    } else {
+      this.isLocked = false;
     }
-    // nobody has lock, issue to yourself and promise to release it
-    this.unlockPromise = new Promise<void>((resolve) => {
-      release = () => {
-        this.unlockPromise = null;
-        resolve();
-      };
-    });
-    return release;
+  };
+
+  lock = async (): Promise<Release> => {
+    if (this.isLocked) {
+      await new Promise<void>((resolve) => {
+        this.queue.push(resolve);
+      });
+    }
+    this.isLocked = true;
+    return this.unlock;
   };
 }
 
