@@ -17,7 +17,7 @@ export function namedRace<
   return safeRace(racers);
 }
 
-export interface Biddable<Args extends unknown[]> {
+export interface Biddable<Args extends unknown[] = []> {
   promise: Promise<Args>;
   fulfil: (...args: Args) => void;
   fail: (error: unknown) => void;

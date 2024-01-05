@@ -218,12 +218,19 @@ describe("Rate limits: ", () => {
     expect(settlements.length).toBe(JOB_COUNT);
   });
 
-  test("Large task count - task throughput is adequate", async () => {
-    const LARGE_JOB_COUNT = 1001; // off-by-one task forces a 'final' period at around 1000ms
-    const rateOptions: RateOptions = { intervalMs: 100, intervalSlots: 100 };
-    // preallocate jobs
-    // for speed create an jobIterator
-    // which always returns the same job
+  test("Large task count - can process 100,000 tasks per second", async () => {
+    // off-by-one task forces a 'final' period at around 1000ms
+    // allowing for predictable timing (> 1000ms)
+    const LARGE_JOB_COUNT = 100001;
+
+    const rateOptions = {
+      intervalMs: 100, // slot period in ms
+      intervalSlots: 10000, // number of slots in the period
+    } as const satisfies RateOptions;
+
+    // optimised synchronous job iterator
+    // always returns the same job
+    // (but job is invoked 100,000 times)
     const job = async () => "foo";
     let jobCount = 0;
     const jobIterator = {
@@ -237,21 +244,27 @@ describe("Rate limits: ", () => {
     } satisfies Iterator<typeof job>;
     const jobIterable = { [Symbol.iterator]: () => jobIterator };
 
+    // create settlement sequence
     const settlementSequence = createSettlementSequence(
       rateOptions,
       jobIterable
     );
 
+    // pull through settlements from sequence as fast as possible
     const start = Date.now();
     let settlementCount = 0;
-    for await (const _settlement of settlementSequence) {
+    for await (const settlement of settlementSequence) {
       settlementCount++;
+      expect(settlement.status === "fulfilled" && settlement.value).toBe("foo");
     }
     const duration = Date.now() - start;
 
-    expect(duration).toBeGreaterThanOrEqual(LARGE_JOB_COUNT);
-    expect(duration).toBeLessThanOrEqual(LARGE_JOB_COUNT * 1.1);
-
     expect(settlementCount).toBe(LARGE_JOB_COUNT);
+
+    const idealDuration =
+      (LARGE_JOB_COUNT / rateOptions.intervalSlots) * rateOptions.intervalMs;
+
+    expect(duration).toBeGreaterThanOrEqual(idealDuration);
+    expect(duration).toBeLessThanOrEqual(idealDuration * 1.1);
   });
 });

@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/no-misused-promises */
+import { createMutex } from "../mutex";
 import type {
   RetryOptions,
   NevermoreOptions,
@@ -7,7 +8,6 @@ import type {
   StrategyFactory,
   Pipe,
 } from "../types";
-import { createLock } from "../lock";
 import { createBiddablePromise } from "../util";
 
 export class SkipRetryError extends Error {
@@ -57,17 +57,17 @@ export function createRetryStrategy<J extends Job<unknown>>(
 ) {
   const { retries } = options;
 
-  const retryLock = createLock();
+  const retryMutex = createMutex();
   const settlementsFinalized = createBiddablePromise();
   let activeJobs = 0;
   let upstreamLaunchesDone = false;
 
   async function launchRetryJob(retryJob: RetryJob<J>) {
-    const release = await retryLock.acquire();
+    const unlock = await retryMutex.lock();
     try {
       await downstream.launchJob(retryJob);
     } finally {
-      release();
+      unlock();
     }
   }
 

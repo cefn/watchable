@@ -13,9 +13,9 @@ import { type MessageQueue, createQueue } from "@watchable/queue";
 import type { Job, JobSettlement, Strategy } from "../types";
 import { createFlag } from "../util";
 
-/** Creates a Promise<T> from every job passed to `launches.next(job)`. Tracks
- *  Promise resolution or rejection. Doesn't await completion of job.  Wires
- *  JobSettlements to `settlements.next()`. */
+/** Creates a Promise<T> from every job passed to `launchJob()`. launchJob
+ * resolves immediately without awaiting job completion. Eventual JobSettlement
+ * is wired to `settlements.next()`. */
 export function createLauncherStrategy<J extends Job<unknown>>(
   cancelPromise: Promise<unknown> | null = null
 ): Strategy<J> {

@@ -38,5 +38,10 @@ export default defineConfig({
   },
   test: {
     snapshotFormat: {},
+    typecheck: {
+      checker: "tsc",
+      tsconfig: "tsconfig.test.json",
+      include: ["test/**/*"],
+    },
   },
 });

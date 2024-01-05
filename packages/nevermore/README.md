@@ -104,12 +104,13 @@ for await (const settlement of settlementSequence) {
 
 #### Extending Settlement
 
-The type of settlements yielded by `nevermore` aligns with
+The type of settlements yielded by `createSettlementSequence` aligns with
 [Promise.allSettled()](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise/allSettled),
 but with an extra `job` member.
 
-The type of your job `J` is preserved in `JobSettlement<J>`, meaning you can get
-the annotations back at settlement time.
+The type of your job `J` is preserved in `JobSettlement<J>`. If you extend the
+type of your job with annotations, you can get them back at settlement time for
+logging, error handling.
 
 Annotating a job is trivial. Instead of ...
 
@@ -148,11 +149,11 @@ The `nevermore` implementation accepts arbitrary pipeline stages known as
 strategies. The concurrency, interval, timeout, retry strategies are already
 implemented as individual composable blocks which are piped together. You can
 see the available options through intellisense when invoking `createExecutor` or
-`nevermore`.
+`createSettlementSequence`.
 
-The `createExecutor` primitive is built on top of `nevermore` pipelines, but
-provides a simple API in which you can transparently wrap your own typed
-functions to have them constrained by the pipeline.
+The `createExecutor` primitive is built on top of a `createSettlementSequence`
+pipeline, but provides a simple API in which you can transparently wrap your own
+typed functions to have them constrained.
 
 A _**concurrency-limiting**_ `Strategy` accepts another job only when the number
 of pending jobs goes below a threshold (because pending jobs have settled as
@@ -160,21 +161,21 @@ resolved or rejected). Once there is a slot for a pending job, it will accept a
 new job and attempt to pass it on to the next layer.
 
 A _**rate-limiting**_ `Strategy` accepts another job only when there is still a
-slot within this interval (until the number of launches within the interval
-matches `intervalLaunches`). When the limit is hit, it can work out when the
-next slot will become free, and sleeps for that duration before yielding and
-accepting the next job.
+slot within this `intervalMs`. That is, until the number of launches within the
+interval matches `intervalLaunches` (intervalLaunches defaults to 1). When slots
+are exhausted, it works out when the next slot will become free, and sleeps for
+that duration before yielding and accepting the next job.
 
 A _**timeout**_ `Strategy` always accepts jobs, wraps them in a timeout job that
-throws an error if it hasn't settled in time before passing the task downstream.
-On receiving a settlement it unwraps the timeout job, so the `JobSettlement`
-points to the original job, rather than the modified one.
+throws an error if it hasn't settled in time then passes the timeout job
+downstream. On receiving a settlement it unwraps the timeout job, so the
+`JobSettlement` points to the original job, rather than the modified one.
 
 A _**retry**_ `Strategy` always accepts jobs, wraps them in a retry job, storing
 extra metadata describing the count of retries attempted. `JobResolved`
 settlements are unwrapped to create a `JobResolved` for the original job.
 However `JobRejected` events are re-attempted until reaching the maximum number
-of retries for that job, and then the failure is passed back down the chain.
+of retries for that job, at which point the final `JobRejected` is passed back.
 
 If you wish to add e.g. a BackoffRetry or a CircuitBreaker strategy, this can
 extend the richness of your pipeline. Pass your piped strategies in the `pipes`

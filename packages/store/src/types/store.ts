@@ -2,7 +2,7 @@ import type { Watchable } from "./watchable";
 
 /** A `Store` keeps an immutable {@link RootState}, (any array, tuple or
  * object), which can be replaced by a new state. Monitoring for state replacement
- * can indentify changes in state to drive an app. Make
+ * can identify changes in state to drive an app. Make
  * a new `Store` by calling {@link createStore} with an `initialState`.
  *
  * Flagging all state references as {@link Immutable} guides IDEs to treat these
