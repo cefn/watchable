@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-confusing-void-expression */
 /**  */
-import { createLock } from "../lock";
+import { createMutex } from "../mutex";
 import type {
   Job,
   Strategy,
@@ -9,7 +9,7 @@ import type {
   NevermoreOptions,
   StrategyFactory,
 } from "../types";
-import { createBiddablePromise } from "../util";
+import { type Biddable, createBiddablePromise } from "../util";
 
 export function isConcurrencyOptions(
   options: NevermoreOptions
@@ -32,11 +32,11 @@ export function createConcurrencyStrategy<J extends Job<unknown>>(
 ): Strategy<J> {
   const { concurrency } = options;
 
-  let pendingJobs = 0;
-  let slotAnnouncement: ReturnType<typeof createBiddablePromise> | null = null;
+  let slotsUsed = 0;
+  let deferredSlot: Biddable | null = null;
 
   const { launchesDone } = downstream;
-  const launchLock = createLock();
+  const launchMutex = createMutex();
 
   return {
     launchesDone,
@@ -45,25 +45,24 @@ export function createConcurrencyStrategy<J extends Job<unknown>>(
       // they would get unblocked all at once rather than waiting their turn
       // TODO CH avoid wrapping this whole method in a mutex ( use while loop on pendingJobs
       // to ensure only a single job gets through each time, like rate logic? )
-      const release = await launchLock.acquire();
+      const unlock = await launchMutex.lock();
       try {
-        if (slotAnnouncement !== null) {
+        if (deferredSlot !== null) {
           // concurrency exceeded - wait for slot
-          await slotAnnouncement.promise;
+          await deferredSlot.promise;
         }
         // record launch request
-        pendingJobs++;
+        slotsUsed++;
         // check if concurrency exceeded
-        if (pendingJobs === concurrency) {
-          if (slotAnnouncement !== null) {
-            throw new Error("Fatal: duplicate slot announcement requested");
+        if (slotsUsed === concurrency) {
+          if (deferredSlot !== null) {
+            throw new Error("Fatal: multiple requests for deferredSlot");
           }
-          // final slot now filled, prepare announcement
-          // for future settlement that will 'free' slot availability
-          slotAnnouncement = createBiddablePromise();
+          // final slot just filled, create deferredSlot for next job to wait on
+          deferredSlot = createBiddablePromise();
         }
       } finally {
-        release();
+        unlock();
       }
       return await downstream.launchJob(job);
     },
@@ -71,11 +70,11 @@ export function createConcurrencyStrategy<J extends Job<unknown>>(
       const result = await downstream.next();
       if (result.done !== true) {
         // account for settlement
-        pendingJobs--;
-        // make slot announcement if it's awaited
-        if (slotAnnouncement !== null) {
-          slotAnnouncement.fulfil();
-          slotAnnouncement = null;
+        slotsUsed--;
+        // wake any process waiting on the deferred slot
+        if (deferredSlot !== null) {
+          deferredSlot.fulfil();
+          deferredSlot = null;
         }
       }
       return result;
