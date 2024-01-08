@@ -88,18 +88,18 @@ function withResolvers<T>(): PromiseWithResolvers<T> {
 export class Unpromise<T> implements Promise<T> {
   /** Promises expecting eventual settlement (unless unsubscribed first). This list is deleted
    * after the original promise settles - no more notifications will ever be issued. */
-  private subscribers: ReadonlyArray<PromiseWithResolvers<T>> | null = [];
+  protected subscribers: ReadonlyArray<PromiseWithResolvers<T>> | null = [];
 
   /** The Promise's settlement (recorded when it fulfils or rejects). This is consulted when
    * calling .subscribe() .then() .catch() .finally() to see if an immediately-resolving Promise
    * can be returned, and therefore subscription can be bypassed. */
-  private settlement: PromiseSettledResult<T> | null = null;
+  protected settlement: PromiseSettledResult<T> | null = null;
 
   /** Initialises an Unpromise. Adds `.then()` and `.catch()` handlers to the
    * original Promise. These handlers pass fulfilment and rejection
    * notifications on to downstream subscribers and control the settlement
    * record for this Unpromise. */
-  private constructor(readonly promise: Promise<T>) {
+  protected constructor(readonly promise: Promise<T>) {
     // subscribe for eventual fulfilment and rejection
     void promise
       .then((value) => {
@@ -230,7 +230,7 @@ export class Unpromise<T> implements Promise<T> {
   /** Unpromise STATIC METHODS */
 
   /** Create and store an Unpromise keyed by an original Promise. */
-  private static createCachedUnpromise<T>(promise: Promise<T>) {
+  protected static createCachedUnpromise<T>(promise: Promise<T>) {
     const created = new Unpromise<T>(promise);
     unpromiseCache.set(promise, created as Unpromise<unknown>); // resolve promise to unpromise
     unpromiseCache.set(created, created as Unpromise<unknown>); // resolve the unpromise to itself
@@ -238,7 +238,7 @@ export class Unpromise<T> implements Promise<T> {
   }
 
   /** Retrieve a previously-created Unpromise keyed by an original Promise. */
-  private static getCachedUnpromise<T>(promise: Promise<T>) {
+  protected static getCachedUnpromise<T>(promise: Promise<T>) {
     return unpromiseCache.get(promise) as Unpromise<T> | undefined;
   }
 
