@@ -56,7 +56,7 @@ export function createConcurrencyStrategy<J extends Job<unknown>>(
         // check if concurrency exceeded
         if (slotsUsed === concurrency) {
           if (deferredSlot !== null) {
-            throw new Error("Fatal: multiple requests for deferredSlot");
+            throw new Error("Fatal: deferredSlot already created");
           }
           // final slot just filled, create deferredSlot for next job to wait on
           deferredSlot = createBiddablePromise();

@@ -19,62 +19,69 @@ import { serializeError } from "../../src/util";
  * triggered by some unexpected request load.
  * */
 
-for await (const settlement of createSettlementSequence(
-  {
-    concurrency: 2,
-    timeoutMs: 3000,
-    retries: 3,
-    intervalMs: 864000,
-    intervalSlots: 50,
-  },
-  function* () {
-    // user's generator yields metadata-annotated jobs one by one
-    // nevermore lazy-creates, runs them according to regime specified above
-    for (const filmId of [0, 1, 2, 3] as const) {
-      yield Object.assign(
-        async () => {
-          const result = await fetch(`https://swapi.dev/api/films/${filmId}/`, {
-            method: "get",
-            headers: {
-              "Content-Type": "application/json",
-            },
-          });
+async function run() {
+  for await (const settlement of createSettlementSequence(
+    {
+      concurrency: 2,
+      timeoutMs: 3000,
+      retries: 3,
+      intervalMs: 864000,
+      intervalSlots: 50,
+    },
+    function* () {
+      // user's generator yields metadata-annotated jobs one by one
+      // nevermore lazy-creates, runs them according to regime specified above
+      for (const filmId of [0, 1, 2, 3] as const) {
+        yield Object.assign(
+          async () => {
+            const result = await fetch(
+              `https://swapi.dev/api/films/${filmId}/`,
+              {
+                method: "get",
+                headers: {
+                  "Content-Type": "application/json",
+                },
+              }
+            );
 
-          const { status } = result;
-          if (status === 200) {
-            return (await result.json()) as {
-              episode_id: number;
-              title: string;
-              opening_crawl: string;
-            };
+            const { status } = result;
+            if (status === 200) {
+              return (await result.json()) as {
+                episode_id: number;
+                title: string;
+                opening_crawl: string;
+              };
+            }
+            const error = new Error(`Status ${status} not OK`);
+            if ([429, 500, 502, 503, 507].includes(status)) {
+              // throw normal error, (implicitly allows retry)
+              throw error;
+            }
+            // throw special error (wrapping the original error) to prevent retry
+            throw new SkipRetryError(`Not retrying status ${status}`, error);
+          },
+          {
+            filmId,
           }
-          const error = new Error(`Status ${status} not OK`);
-          if ([429, 500, 502, 503, 507].includes(status)) {
-            // throw normal error, (implicitly allows retry)
-            throw error;
-          }
-          // throw special error (wrapping the original error) to prevent retry
-          throw new SkipRetryError(`Not retrying status ${status}`, error);
-        },
-        {
-          filmId,
-        }
-      );
+        );
+      }
+    }
+  )) {
+    // job comes back with type-safe metadata
+    const { status, job } = settlement;
+    if (status === "fulfilled") {
+      // job was a success, consume the result (in the context of the job's metadata)
+      const film = settlement.value;
+      console.log(`Film ${job.filmId} retrieved`);
+      console.log(`Episode ${film.episode_id}`);
+      console.log(`Title: '${film.title}'`);
+      console.log(film.opening_crawl, "\n\n");
+    } else {
+      // job failed after three retries
+      console.log(`Film ${job.filmId} unsuccessful`);
+      console.log(serializeError(settlement.reason), "\n\n");
     }
   }
-)) {
-  // job comes back with type-safe metadata
-  const { status, job } = settlement;
-  if (status === "fulfilled") {
-    // job was a success, consume the result (in the context of the job's metadata)
-    const film = settlement.value;
-    console.log(`Film ${job.filmId} retrieved`);
-    console.log(`Episode ${film.episode_id}`);
-    console.log(`Title: '${film.title}'`);
-    console.log(film.opening_crawl, "\n\n");
-  } else {
-    // job failed after three retries
-    console.log(`Film ${job.filmId} unsuccessful`);
-    console.log(serializeError(settlement.reason), "\n\n");
-  }
 }
+
+void run();

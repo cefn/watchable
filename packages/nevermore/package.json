@@ -26,6 +26,7 @@
   },
   "devDependencies": {
     "@vitest/coverage-v8": "^0.34.6",
+    "expose-gc": "^1.0.0",
     "typescript": "^5.0.4",
     "vite": "^4.2.1",
     "vitest": "^0.34.6",
@@ -36,7 +37,7 @@
   },
   "wireit": {
     "test:watch": {
-      "command": "vitest",
+      "command": "vitest --reporter verbose",
       "dependencies": [
         "build"
       ],

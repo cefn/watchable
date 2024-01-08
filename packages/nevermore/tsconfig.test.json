@@ -2,6 +2,7 @@
   "extends": "../../tsconfig.build.json",
   "include": ["src/**/*", "test/**/*", "vite.config.ts"],
   "compilerOptions": {
-    "resolveJsonModule": true
+    "resolveJsonModule": true,
+    "lib": ["ES2021.WeakRef"]
   }
 }
