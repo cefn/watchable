@@ -88,12 +88,13 @@ export class Unpromise<T> implements Promise<T> {
 
   /** The Promise's settlement (recorded when it fulfils or rejects). This is consulted when
    * calling .subscribe() .then() .catch() .finally() to see if an immediately-resolving Promise
-   * can be returned, and subscription can be bypassed. */
+   * can be returned, and therefore subscription can be bypassed. */
   private settlement: PromiseSettledResult<T> | null = null;
 
   /** Initialises an Unpromise. Adds `.then()` and `.catch()` handlers to the
    * original Promise. These handlers pass fulfilment and rejection
-   * notifications on to downstream subscribers. */
+   * notifications on to downstream subscribers and control the settlement
+   * record for this Unpromise. */
   private constructor(readonly promise: Promise<T>) {
     // subscribe for eventual fulfilment
     void promise.then((value) => {
@@ -223,7 +224,7 @@ export class Unpromise<T> implements Promise<T> {
 
   readonly [Symbol.toStringTag] = "Unpromise";
 
-  /** CLASS STATIC METHODS */
+  /** Unpromise STATIC METHODS */
 
   /** Create and store an Unpromise keyed by an original Promise. */
   private static createCachedUnpromise<T>(promise: Promise<T>) {
@@ -247,15 +248,17 @@ export class Unpromise<T> implements Promise<T> {
       : Unpromise.createCachedUnpromise(promise);
   }
 
-  /** Lookup the Unpromise for this promise, and derive a SubscribedPromise from it (that can be later unsubscribed to eliminate Memory leaks) */
+  /** Promise STATIC METHODS */
+
+  /** Lookup the Unpromise for this promise, and derive a SubscribedPromise from
+   * it (that can be later unsubscribed to eliminate Memory leaks) */
   static resolve<T>(promise: Promise<T>): SubscribedPromise<T> {
     return Unpromise.get(promise).subscribe();
   }
 
-  /** Perform Promise.any() via SubscribedPromises, then unsubscribe them
-   *
-   * This is equivalent to Promise.any but eliminates memory leaks
-   * from long-lived promises accumulating .then() and .catch() subscribers. */
+  /** Perform Promise.any() via SubscribedPromises, then unsubscribe them.
+   * Equivalent to Promise.any but eliminates memory leaks from long-lived
+   * promises accumulating .then() and .catch() subscribers. */
   static async any<const Promises extends ReadonlyArray<Promise<unknown>>>(
     promises: Promises
   ) {
@@ -269,9 +272,7 @@ export class Unpromise<T> implements Promise<T> {
     }
   }
 
-  /** Race promises as SubscribedPromises, then unsubscribe them
-   *
-   * Creates an equivalent to Promise.race but eliminates memory leaks
+  /** Race promises as SubscribedPromises, then unsubscribe them. Equivalent to Promise.race but eliminates memory leaks
    * from long-lived promises accumulating .then() and .catch() subscribers. */
   static async race<const Promises extends ReadonlyArray<Promise<unknown>>>(
     promises: Promises
