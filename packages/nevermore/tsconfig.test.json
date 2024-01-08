@@ -3,6 +3,6 @@
   "include": ["src/**/*", "test/**/*", "vite.config.ts"],
   "compilerOptions": {
     "resolveJsonModule": true,
-    "lib": ["ES2021.WeakRef"]
+    "lib": ["ES2021.WeakRef", "ES2021.Promise"]
   }
 }

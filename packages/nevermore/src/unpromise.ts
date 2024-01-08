@@ -45,32 +45,55 @@ function withResolvers<T>(): PromiseWithResolvers<T> {
   };
 }
 
-/** Get a Promise's Unpromise using Unpromise.get(promise).
+/**
+ * Every `Promise<T>` has a single `Unpromise<T>` that is created once, then
+ * cached and reused throughout the lifetime of the Promise. Get a Promise's
+ * Unpromise using `Unpromise.get(promise)`.
  *
- * Every Promise has a single Unpromise that is created, cached and reused
- * throughout the lifetime of the Promise.
+ * The `Unpromise<T>` looks after attaching to the original `Promise<T>`
+ * `.then()` and `.catch()` just once. It then implements the normal
+ * `Promise<T>` interface via a subscription- (and unsubscription-) based
+ * mechanism
  *
- * An Unpromise behaves exactly like the original Promise, except every time you
- * call `.subscribe`, `.then()` `.catch()` or `.finally` the returned Promise
- * has an additional `unsubscribe()` method.
+ * Every time you call `.subscribe()`, `.then()` `.catch()` or `.finally()` the
+ * returned Promise has an additional `unsubscribe()` method allowing it to be
+ * cleanly detached from the upstream Promise.
  *
- * This feature facilitates calls to `Promise.race(subscribedPromises)` and
- * `Promise.any(subscribedPromises)` which can be followed up by calling
- * `subscribedPromise.unsubscribe()` on temporary promises you created in order
- * to control potential memory leaks (which would come about from calling
- * .then() multiple times on the original Promise ). */
+ * Calls to `Promise.race(subscribedPromises)` and
+ * `Promise.any(subscribedPromises)` involving long-lived promises can be
+ * followed up by calling `subscribedPromise.unsubscribe()` to detach each
+ * Promise.
+ *
+ * This approach can eliminate the memory leaks that otherwise come about from
+ * repeated `race()` or `any()` calls invoking `.then()` and `.catch()` multiple
+ * times on the same long-lived native Promise (subscriptions which can never be
+ * cleaned up).
+ *
+ * `Unpromise.resolve(promise)` returns a `SubscribedPromise<T>` equivalent to
+ * any given `Promise<T>`, (this is implemented simply as
+ * `Unpromise.get(promise).subscribe()`).
+ *
+ * `Unpromise.race(promises)` provides a reference implementation of
+ * `Promise.race` which avoids memory leaks when using long-lived unsettled
+ * Promises.
+ *
+ * `Unpromise.any(promises)` provides a reference implementation of
+ * `Promise.any` which avoids memory leaks when using long-lived unsettled
+ * Promises.
+ */
 export class Unpromise<T> implements Promise<T> {
   /** Promises expecting eventual settlement (unless unsubscribed first). This list is deleted
-   * after the original promise settles, as no more notifications will ever be issued. */
+   * after the original promise settles - no more notifications will ever be issued. */
   private subscribers: ReadonlyArray<PromiseWithResolvers<T>> | null = [];
 
   /** The Promise's settlement (recorded when it fulfils or rejects). This is consulted when
    * calling .subscribe() .then() .catch() .finally() to see if an immediately-resolving Promise
-   * can be returned. */
+   * can be returned, and subscription can be bypassed. */
   private settlement: PromiseSettledResult<T> | null = null;
 
-  /** Initialises an Unpromise. Adds .then() and .catch handlers to the original
-   * Promise, which will pass fulfilment and rejection on to subscribers. */
+  /** Initialises an Unpromise. Adds `.then()` and `.catch()` handlers to the
+   * original Promise. These handlers pass fulfilment and rejection
+   * notifications on to downstream subscribers. */
   private constructor(readonly promise: Promise<T>) {
     // subscribe for eventual fulfilment
     void promise.then((value) => {
@@ -122,7 +145,7 @@ export class Unpromise<T> implements Promise<T> {
    * will never settle.
    */
   subscribe(): SubscribedPromise<T> {
-    // in all cases we return a promise and an unsubscribe function
+    // in all cases we will combine some promise with its unsubscribe function
     let promise: Promise<T>;
     let unsubscribe: () => void;
 
@@ -215,7 +238,8 @@ export class Unpromise<T> implements Promise<T> {
     return unpromiseCache.get(promise) as Unpromise<T> | undefined;
   }
 
-  /** Create or Retrieve the Unpromise for the lifetime of the provided Promise */
+  /** Create or Retrieve the Unpromise (a re-used Unpromise for the VM lifetime
+   * of the provided Promise reference) */
   static get<T>(promise: Promise<T>): Unpromise<T> {
     const cached = Unpromise.getCachedUnpromise(promise);
     return typeof cached !== "undefined"
@@ -223,14 +247,32 @@ export class Unpromise<T> implements Promise<T> {
       : Unpromise.createCachedUnpromise(promise);
   }
 
-  /** Lookup the Unpromise for this promise, and derive a SubscribedPromise from it (that can be unsubscribed to eliminate Memory leaks) */
+  /** Lookup the Unpromise for this promise, and derive a SubscribedPromise from it (that can be later unsubscribed to eliminate Memory leaks) */
   static resolve<T>(promise: Promise<T>): SubscribedPromise<T> {
     return Unpromise.get(promise).subscribe();
   }
 
-  /** Race promises as SubscribedPromises, then unsubscribe them, to create
-   *  an equivalent to Promise.race but which eliminates memory leaks from
-   * long-lived promises accumulating .then() and .catch() subscribers. */
+  /** Perform Promise.any() via SubscribedPromises, then unsubscribe them
+   *
+   * This is equivalent to Promise.any but eliminates memory leaks
+   * from long-lived promises accumulating .then() and .catch() subscribers. */
+  static async any<const Promises extends ReadonlyArray<Promise<unknown>>>(
+    promises: Promises
+  ) {
+    const subscribedPromises = promises.map(Unpromise.resolve);
+    try {
+      return await Promise.any(subscribedPromises);
+    } finally {
+      subscribedPromises.forEach(({ unsubscribe }) => {
+        unsubscribe();
+      });
+    }
+  }
+
+  /** Race promises as SubscribedPromises, then unsubscribe them
+   *
+   * Creates an equivalent to Promise.race but eliminates memory leaks
+   * from long-lived promises accumulating .then() and .catch() subscribers. */
   static async race<const Promises extends ReadonlyArray<Promise<unknown>>>(
     promises: Promises
   ) {
@@ -244,23 +286,25 @@ export class Unpromise<T> implements Promise<T> {
     }
   }
 
+  /** Race promises as SubscribedPromises that fulfil to 1-tuples referencing the promise
+   * Unsubscribe temporary promises to eliminate memory leaks. */
   static async raceSingletons<
     const Promises extends ReadonlyArray<Promise<unknown>>
   >(promises: Promises) {
-    // a 1-Tuple containing just one of the Promises
+    // a Singleton is a 1-Tuple containing just one of the Promises
     type Singleton = readonly [MemberOf<Promises>];
 
-    // for each promise, create a SubscribedPromise of a Singleton with that
-    // promise as its only member. The SubscribedPromise resolves when the
-    // promise resolves, and can be unsubscribed after the race
+    // for each promise, create a SubscribedPromise for the 1-tuple of that
+    // promise. The SubscribedPromise resolves when the promise resolves, and
+    // can be unsubscribed after the race
     const singletons: Array<SubscribedPromise<Singleton>> = promises.map(
       (promise) => Unpromise.get(promise).then(() => [promise] as const)
     );
 
-    // now race the resulting promises, (which will return some Singleton)
+    // now race the resulting promises, (will fulfil to some Singleton or reject)
     // and unsubscribe them when the race is over, to mitigate memory leaks
     try {
-      return Promise.race(singletons);
+      return await Promise.race(singletons);
     } finally {
       for (const singleton of singletons) {
         singleton.unsubscribe();
