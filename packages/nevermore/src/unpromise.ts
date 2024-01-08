@@ -1,26 +1,6 @@
 /* eslint-disable @typescript-eslint/return-await */
 /* eslint-disable @typescript-eslint/promise-function-async */
 
-/** A promise that exploits a single, memory-safe upstream subscription
- * to a single re-used Unpromise that persists for the VM lifetime of a
- * Promise.
- *
- * Calling unsubscribe() removes the subscription, eliminating
- * all references to the SubscribedPromise. */
-export type SubscribedPromise<T> = Promise<T> & { unsubscribe: () => void };
-
-/** A standard pattern for a resolvable, rejectable Promise, based
- * on the emerging ES2023 standard. Type ported from
- * https://github.com/microsoft/TypeScript/pull/56593 */
-export interface PromiseWithResolvers<T> {
-  promise: Promise<T>;
-  resolve: (value: T | PromiseLike<T>) => void;
-  reject: (reason?: any) => void;
-}
-
-/** Given an array, this is the union of its members' types. */
-export type MemberOf<Arr extends readonly unknown[]> = Arr[number];
-
 /** Memory safe (weakmapped) records of each Promise's Unpromise which
  * will only last for the lifetime of the Promise themselves.
  */
@@ -29,25 +9,6 @@ const unpromiseCache = new WeakMap<Promise<unknown>, Unpromise<unknown>>();
 /** A NOOP function allowing a consistent interface for settled
  * SubscribedPromises (settled promises are not subscribed - they resolve immediately). */
 const NOOP = () => {};
-
-/** Reference implementation of https://github.com/tc39/proposal-promise-with-resolvers */
-function withResolvers<T>(): PromiseWithResolvers<T> {
-  let resolve!: PromiseWithResolvers<T>["resolve"];
-  let reject!: PromiseWithResolvers<T>["reject"];
-  const promise = new Promise<T>((_resolve, _reject) => {
-    resolve = (value) => {
-      _resolve(value);
-    };
-    reject = (error) => {
-      _reject(error);
-    };
-  });
-  return {
-    promise,
-    resolve,
-    reject,
-  };
-}
 
 /**
  * Every `Promise<T>` has a single `Unpromise<T>` that is created once, then
@@ -86,6 +47,36 @@ function withResolvers<T>(): PromiseWithResolvers<T> {
  * Promises.
  */
 export class Unpromise<T> implements Promise<T> {
+  /** Unpromise STATIC METHODS */
+
+  /** Create or Retrieve the Unpromise (a re-used Unpromise for the VM lifetime
+   * of the provided Promise reference) */
+  static get<T>(promise: Promise<T>): Unpromise<T> {
+    const cached = Unpromise.getCachedUnpromise(promise);
+    return typeof cached !== "undefined"
+      ? cached
+      : Unpromise.createCachedUnpromise(promise);
+  }
+
+  /** Create and store an Unpromise keyed by an original Promise. */
+  protected static createCachedUnpromise<T>(promise: Promise<T>) {
+    const created = new Unpromise<T>(promise);
+    unpromiseCache.set(promise, created as Unpromise<unknown>); // resolve promise to unpromise
+    unpromiseCache.set(created, created as Unpromise<unknown>); // resolve the unpromise to itself
+    return created;
+  }
+
+  /** Retrieve a previously-created Unpromise keyed by an original Promise. */
+  protected static getCachedUnpromise<T>(promise: Promise<T>) {
+    return unpromiseCache.get(promise) as Unpromise<T> | undefined;
+  }
+
+  /** TOSTRING SUPPORT */
+
+  readonly [Symbol.toStringTag] = "Unpromise";
+
+  /** INSTANCE IMPLEMENTATION */
+
   /** Promises expecting eventual settlement (unless unsubscribed first). This list is deleted
    * after the original promise settles - no more notifications will ever be issued. */
   protected subscribers: ReadonlyArray<PromiseWithResolvers<T>> | null = [];
@@ -223,34 +214,6 @@ export class Unpromise<T> implements Promise<T> {
     });
   }
 
-  /** TOSTRING SUPPORT */
-
-  readonly [Symbol.toStringTag] = "Unpromise";
-
-  /** Unpromise STATIC METHODS */
-
-  /** Create and store an Unpromise keyed by an original Promise. */
-  protected static createCachedUnpromise<T>(promise: Promise<T>) {
-    const created = new Unpromise<T>(promise);
-    unpromiseCache.set(promise, created as Unpromise<unknown>); // resolve promise to unpromise
-    unpromiseCache.set(created, created as Unpromise<unknown>); // resolve the unpromise to itself
-    return created;
-  }
-
-  /** Retrieve a previously-created Unpromise keyed by an original Promise. */
-  protected static getCachedUnpromise<T>(promise: Promise<T>) {
-    return unpromiseCache.get(promise) as Unpromise<T> | undefined;
-  }
-
-  /** Create or Retrieve the Unpromise (a re-used Unpromise for the VM lifetime
-   * of the provided Promise reference) */
-  static get<T>(promise: Promise<T>): Unpromise<T> {
-    const cached = Unpromise.getCachedUnpromise(promise);
-    return typeof cached !== "undefined"
-      ? cached
-      : Unpromise.createCachedUnpromise(promise);
-  }
-
   /** Promise STATIC METHODS */
 
   /** Lookup the Unpromise for this promise, and derive a SubscribedPromise from
@@ -318,6 +281,23 @@ export class Unpromise<T> implements Promise<T> {
   }
 }
 
+/** VENDORED (Future) PROMISE UTILITIES */
+
+/** Reference implementation of https://github.com/tc39/proposal-promise-with-resolvers */
+function withResolvers<T>(): PromiseWithResolvers<T> {
+  let resolve!: PromiseWithResolvers<T>["resolve"];
+  let reject!: PromiseWithResolvers<T>["reject"];
+  const promise = new Promise<T>((_resolve, _reject) => {
+    resolve = _resolve;
+    reject = _reject;
+  });
+  return {
+    promise,
+    resolve,
+    reject,
+  };
+}
+
 /** IMMUTABLE LIST OPERATIONS */
 
 function listWithMember<T>(arr: readonly T[], member: T): readonly T[] {
@@ -335,3 +315,25 @@ function listWithoutMember<T>(arr: readonly T[], member: unknown) {
   }
   return arr;
 }
+
+/** TYPES */
+
+/** A promise that exploits a single, memory-safe upstream subscription
+ * to a single re-used Unpromise that persists for the VM lifetime of a
+ * Promise.
+ *
+ * Calling unsubscribe() removes the subscription, eliminating
+ * all references to the SubscribedPromise. */
+export type SubscribedPromise<T> = Promise<T> & { unsubscribe: () => void };
+
+/** A standard pattern for a resolvable, rejectable Promise, based
+ * on the emerging ES2023 standard. Type ported from
+ * https://github.com/microsoft/TypeScript/pull/56593 */
+export interface PromiseWithResolvers<T> {
+  promise: Promise<T>;
+  resolve: (value: T | PromiseLike<T>) => void;
+  reject: (reason?: any) => void;
+}
+
+/** Given an array, this is the union of its members' types. */
+export type MemberOf<Arr extends readonly unknown[]> = Arr[number];
