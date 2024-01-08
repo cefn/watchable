@@ -1,12 +1,13 @@
 /* eslint-disable @typescript-eslint/promise-function-async */
 
 /** Provides a formalism for 'switching' between winners of multiple races, but
- * guaranteeing to call `p.then()` at most twice for each promise.
+ * guaranteeing to call `p.then()` at most twice for each promise even as part of
+ * infinite loops.
  *
  * The approach ensures that a promise that's reused multiple times in races
  * (such as a promise of system shutdown or possibly-infinite stream completion)
  * doesn't become a source of memory leaks when every race creates additional
- * calls to `then()`, which can't be undone.
+ * calls to `then()` which can't be undone.
  *
  * A common pattern in `@watchable` code before `singletonRace()` was something
  * like...

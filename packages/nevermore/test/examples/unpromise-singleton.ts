@@ -1,30 +1,14 @@
 /* eslint-disable @typescript-eslint/return-await */
 /* eslint-disable @typescript-eslint/promise-function-async */
-import { getUnpromise } from "../../src/unpromise";
+import { Unpromise } from "../../src/unpromise";
 
 // also problem for promise.any
 
-export async function singletonRace<
-  const Promises extends ReadonlyArray<Promise<unknown>>
->(promises: Promises) {
-  const mappedPromises = promises.map((promise) => {
-    const unpromise = getUnpromise(promise);
-    return unpromise.then(() => [promise] as const);
-  });
-  try {
-    return Promise.race(mappedPromises) as Promise<readonly [Promises[number]]>;
-  } finally {
-    mappedPromises.forEach(({ unsubscribe }) => {
-      unsubscribe();
-    });
-  }
-}
-
-export async function exampleRace(
+export async function raceStringAndNumber(
   promiseA: Promise<string>,
   promiseB: Promise<number>
 ) {
-  const [winner] = await singletonRace([promiseA, promiseB]);
+  const [winner] = await Unpromise.raceSingletons([promiseA, promiseB]);
   if (winner === promiseA) {
     return (await promiseA).includes("foo");
   }

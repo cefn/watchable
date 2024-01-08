@@ -35,8 +35,12 @@ function withResolvers<T>(): PromiseWithResolvers<T> {
   let resolve!: PromiseWithResolvers<T>["resolve"];
   let reject!: PromiseWithResolvers<T>["reject"];
   const promise = new Promise<T>((_resolve, _reject) => {
-    resolve = _resolve;
-    reject = _reject;
+    resolve = (value) => {
+      _resolve(value);
+    };
+    reject = (error) => {
+      _reject(error);
+    };
   });
   return {
     promise,
@@ -96,35 +100,34 @@ export class Unpromise<T> implements Promise<T> {
    * notifications on to downstream subscribers and control the settlement
    * record for this Unpromise. */
   private constructor(readonly promise: Promise<T>) {
-    // subscribe for eventual fulfilment
-    void promise.then((value) => {
-      // atomically record fulfilment and detach subscriber list
-      const { subscribers } = this;
-      this.subscribers = null;
-      this.settlement = {
-        status: "fulfilled",
-        value,
-      };
-      // notify fulfilment to subscriber list
-      subscribers?.forEach(({ resolve }) => {
-        resolve(value);
+    // subscribe for eventual fulfilment and rejection
+    void promise
+      .then((value) => {
+        // atomically record fulfilment and detach subscriber list
+        const { subscribers } = this;
+        this.subscribers = null;
+        this.settlement = {
+          status: "fulfilled",
+          value,
+        };
+        // notify fulfilment to subscriber list
+        subscribers?.forEach(({ resolve }) => {
+          resolve(value);
+        });
+      })
+      .catch((reason) => {
+        // atomically record rejection and detach subscriber list
+        const { subscribers } = this;
+        this.subscribers = null;
+        this.settlement = {
+          status: "rejected",
+          reason,
+        };
+        // notify rejection to subscriber list
+        subscribers?.forEach(({ reject }) => {
+          reject(reason);
+        });
       });
-    });
-
-    // subscribe for eventual rejection
-    void promise.catch((reason) => {
-      // atomically record rejection and detach subscriber list
-      const { subscribers } = this;
-      this.subscribers = null;
-      this.settlement = {
-        status: "rejected",
-        reason,
-      };
-      // notify rejection to subscriber list
-      subscribers?.forEach(({ reject }) => {
-        reject(reason);
-      });
-    });
   }
 
   /** Create a promise that mitigates uncontrolled subscription to a long-lived
@@ -272,8 +275,9 @@ export class Unpromise<T> implements Promise<T> {
     }
   }
 
-  /** Race promises as SubscribedPromises, then unsubscribe them. Equivalent to Promise.race but eliminates memory leaks
-   * from long-lived promises accumulating .then() and .catch() subscribers. */
+  /** Perform Promise.race via SubscribedPromises, then unsubscribe them.
+   * Equivalent to Promise.race but eliminates memory leaks from long-lived
+   * promises accumulating .then() and .catch() subscribers. */
   static async race<const Promises extends ReadonlyArray<Promise<unknown>>>(
     promises: Promises
   ) {
