@@ -6,19 +6,21 @@ function sleep(delayMs: number) {
   return new Promise((resolve) => setTimeout(resolve, delayMs));
 }
 
-function createComplianceSuite(
-  wrapper: <T>(promise: Promise<T>) => Promise<T>,
-  wrapperDescription: string
-) {
-  describe(`${wrapperDescription} Promise<T> compliance`, () => {
-    test(`${wrapperDescription} resolves (subscribed)`, async () => {
+function createComplianceSuite(options: {
+  wrapper: <T>(promise: Promise<T>) => Promise<T>;
+  wrapperName: string;
+  wrapperDescription: string;
+}) {
+  const { wrapper, wrapperName, wrapperDescription } = options;
+  describe(`${wrapperDescription} : Promise<T> compliance`, () => {
+    test(`${wrapperName} resolves (subscribed)`, async () => {
       // create Unpromise immediately (don't give promise a chance to settle)
       const wrapped = wrapper(sleep(1).then(() => "foo"));
       // should resolve like CONTROL
       expect(await wrapped).toBe("foo");
     });
 
-    test(`${wrapperDescription} resolves (settled)`, async () => {
+    test(`${wrapperName} resolves (settled)`, async () => {
       // create promise
       const promise = sleep(1).then(() => "foo");
       // allow it to settle
@@ -29,7 +31,7 @@ function createComplianceSuite(
       expect(await wrapped).toBe("foo");
     });
 
-    test(`${wrapperDescription} rejects (subscribed)`, async () => {
+    test(`${wrapperName} rejects (subscribed)`, async () => {
       // create Unpromise immediately (without underlying promise having time to settle)
       const unpromise = wrapper(
         sleep(1).then(() => {
@@ -45,7 +47,7 @@ function createComplianceSuite(
       }
     });
 
-    test(`${wrapperDescription} rejects (settled)`, async () => {
+    test(`${wrapperName} rejects (settled)`, async () => {
       // create promise
       const promise = sleep(1).then(() => {
         throw new Error("bar");
@@ -69,7 +71,7 @@ function createComplianceSuite(
       }
     });
 
-    test(`${wrapperDescription} finally - then condition (subscribed)`, async () => {
+    test(`${wrapperName} finally - then condition (subscribed)`, async () => {
       let finallyCalled = false;
       try {
         await wrapper(sleep(1));
@@ -81,7 +83,7 @@ function createComplianceSuite(
       expect(finallyCalled).toBe(true);
     });
 
-    test(`${wrapperDescription} finally - catch condition (subscribed)`, async () => {
+    test(`${wrapperName} finally - catch condition (subscribed)`, async () => {
       let finallyCalled = false;
       try {
         await wrapper(
@@ -97,7 +99,7 @@ function createComplianceSuite(
       expect(finallyCalled).toBe(true);
     });
 
-    test(`${wrapperDescription} finally - then condition (settled)`, async () => {
+    test(`${wrapperName} finally - then condition (settled)`, async () => {
       // create promise
       const promise = sleep(1);
 
@@ -115,7 +117,7 @@ function createComplianceSuite(
       expect(finallyCalled).toBe(true);
     });
 
-    test(`${wrapperDescription} finally - catch condition (settled)`, async () => {
+    test(`${wrapperName} finally - catch condition (settled)`, async () => {
       const promise = sleep(1).then(() => {
         throw new Error("bar");
       });
@@ -140,18 +142,21 @@ function createComplianceSuite(
 }
 
 describe("Unpromise compliance", () => {
-  createComplianceSuite(
-    <T>(promise: Promise<T>) => promise,
-    "Promise (CONTROL)"
-  );
+  createComplianceSuite({
+    wrapper: <T>(promise: Promise<T>) => promise,
+    wrapperDescription: "Platform Native Promise (CONTROL)",
+    wrapperName: "Promise<T>",
+  });
 
-  createComplianceSuite(
-    <T>(promise: Promise<T>) => Unpromise.get(promise),
-    "Unpromise.get(promise)"
-  );
+  createComplianceSuite({
+    wrapper: <T>(promise: Promise<T>) => Unpromise.get(promise),
+    wrapperDescription: "Weakmap-cached Unpromise",
+    wrapperName: "Unpromise<T>",
+  });
 
-  createComplianceSuite(
-    <T>(promise: Promise<T>) => Unpromise.resolve(promise),
-    "Unpromise.resolve(promise)"
-  );
+  createComplianceSuite({
+    wrapper: <T>(promise: Promise<T>) => Unpromise.resolve(promise),
+    wrapperDescription: "Promise<T> subscribed to Unpromise",
+    wrapperName: "SubscribedPromise<T>",
+  });
 });

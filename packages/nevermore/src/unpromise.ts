@@ -7,7 +7,8 @@
 const unpromiseCache = new WeakMap<Promise<unknown>, Unpromise<unknown>>();
 
 /** A NOOP function allowing a consistent interface for settled
- * SubscribedPromises (settled promises are not subscribed - they resolve immediately). */
+ * SubscribedPromises (settled promises are not subscribed - they resolve
+ * immediately). */
 const NOOP = () => {};
 
 /**
@@ -148,7 +149,7 @@ export class Unpromise<T> implements Promise<T> {
     if (settlement === null) {
       // not yet settled - subscribe new promise. Expect eventual settlement
       if (this.subscribers === null) {
-        // invariant - not settled, must have subscribers
+        // invariant - it is not settled, so it must have subscribers
         throw new Error("Unpromise settled but still has subscribers");
       }
       const subscriber = withResolvers<T>();
@@ -254,8 +255,9 @@ export class Unpromise<T> implements Promise<T> {
     }
   }
 
-  /** Race promises as SubscribedPromises that fulfil to 1-tuples referencing the promise
-   * Unsubscribe temporary promises to eliminate memory leaks. */
+  /** Race promises as SubscribedPromises that fulfil to 1-tuples referencing
+   * the promise. Eliminates memory leaks from long-lived promises accumulating
+   * .then() and .catch() subscribers. */
   static async raceSingletons<
     const Promises extends ReadonlyArray<Promise<unknown>>
   >(promises: Promises) {
