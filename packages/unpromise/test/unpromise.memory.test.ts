@@ -2,7 +2,7 @@ import { describe, test, expect, vi } from "vitest";
 
 import "expose-gc";
 
-import { sleep } from "../src";
+import { sleep } from "./util";
 
 import { Unpromise } from "../src/unpromise";
 
@@ -15,7 +15,7 @@ describe("Unpromise garbage collection", () => {
   test("Unpromise collected when corresponding promise out of scope", async () => {
     function createScopedPromises() {
       const promise = sleep(1);
-      const unpromise = Unpromise.get(promise);
+      const unpromise = Unpromise.proxy(promise);
       return {
         unpromiseRef: new WeakRef(unpromise),
       };
@@ -33,7 +33,7 @@ describe("Unpromise garbage collection", () => {
   test("SubscribedPromise collected when corresponding promise out of scope", async () => {
     function createScopedPromises() {
       const promise = sleep(1);
-      const unpromise = Unpromise.get(promise);
+      const unpromise = Unpromise.proxy(promise);
       const subscribedPromise = unpromise.subscribe();
       return {
         subscribedPromiseRef: new WeakRef(subscribedPromise),

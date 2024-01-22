@@ -3,6 +3,8 @@
   "include": ["src/**/*", "test/**/*", "vite.config.ts"],
   "compilerOptions": {
     "resolveJsonModule": true,
-    "types": ["node"]
+    "rootDir": ".",
+    "types": ["node"],
+    "lib": ["ES2021.Promise", "ES2021.WeakRef"]
   }
 }

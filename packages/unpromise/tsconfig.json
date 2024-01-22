@@ -9,7 +9,7 @@
     "declarationMap": true,
     "emitDeclarationOnly": true,
     "types": ["node"],
-    "lib": ["ES2021.Promise"]
+    "lib": ["ES2021.Promise", "ES2021.WeakRef"]
   },
   "typedocOptions": {
     "entryPoints": ["src/index.ts"]
