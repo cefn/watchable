@@ -105,7 +105,7 @@ function* listRuleIssues(
 
   // treat all other cases as expecting equality
   if (!isDeepStrictEqual(actualValue, expectedValue)) {
-    const diffString = jsonDiff.diffString(expectedValue, actualValue);
+    const diffString = jsonDiff.diffString(actualValue, expectedValue);
     yield {
       message: `DIFFERS FROM RULE:\n${diffString}`,
       path: valuePath,

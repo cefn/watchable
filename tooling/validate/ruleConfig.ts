@@ -140,7 +140,7 @@ export const PACKAGE_JSON_RULES = {
 
     const nevermoreTests = {
       ...tsPackages,
-      command: "vitest run --reporter verbose --no-threads --isolate",
+      command: "vitest run --reporter verbose --isolate",
     };
 
     return byPackageType({

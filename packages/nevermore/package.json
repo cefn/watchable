@@ -25,10 +25,10 @@
     "test:watch": "wireit"
   },
   "devDependencies": {
-    "@vitest/coverage-v8": "^0.34.6",
+    "@vitest/coverage-v8": "^1.2.1",
     "typescript": "^5.0.4",
-    "vite": "^4.2.1",
-    "vitest": "^0.34.6",
+    "vite": "^5.0.12",
+    "vitest": "^1.2.1",
     "wireit": "^0.9.5"
   },
   "publishConfig": {
@@ -52,7 +52,7 @@
       "dependencies": [
         "build"
       ],
-      "command": "vitest run --reporter verbose --no-threads --isolate",
+      "command": "vitest run --reporter verbose --isolate",
       "files": [
         "src/**/*",
         "test/**/*",
