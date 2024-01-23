@@ -23,8 +23,8 @@
     "@watchable/store-follow": "1.0.0-alpha.7"
   },
   "devDependencies": {
-    "@vitejs/plugin-legacy": "^4.0.2",
-    "vite": "^4.2.1",
+    "@vitejs/plugin-legacy": "^5.2.0",
+    "vite": "^5.0.12",
     "wireit": "^0.9.5"
   },
   "wireit": {

@@ -22,7 +22,7 @@
     "@watchable/store": "1.0.0-alpha.7"
   },
   "devDependencies": {
-    "vite": "^4.2.1",
+    "vite": "^5.0.12",
     "wireit": "^0.9.5"
   },
   "wireit": {
