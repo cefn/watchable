@@ -18,10 +18,12 @@
     "@watchable/store-edit": "0.9.0-alpha.0",
     "@watchable/store-follow": "0.9.0-alpha.0",
     "@watchable/store-react": "0.9.0-alpha.0",
-    "@watchable/nevermore": "0.9.0-alpha.3"
+    "@watchable/nevermore": "0.9.0-alpha.3",
+    "@watchable/unpromise": "0.1.0-alpha.1"
   },
   "changesets": [
     "chilly-gorillas-heal",
+    "curvy-shoes-melt",
     "eleven-donkeys-approve",
     "flat-ligers-heal",
     "funny-pans-matter",
@@ -33,6 +35,7 @@
     "modern-crabs-tap",
     "real-days-drive",
     "red-crabs-buy",
+    "rich-cameras-explain",
     "sharp-coins-smile",
     "thin-rockets-sing",
     "wicked-cherries-juggle"
