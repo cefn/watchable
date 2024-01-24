@@ -40,7 +40,7 @@ import { Unpromise } from "@watchable/unpromise"; // esm build
 const { Unpromise } = require("@watchable/unpromise"); // commonjs build
 ```
 
-## Under the hood: Step 1 - Create an Unpromise
+## Under the hood: Step 1 - proxy
 
 The library manages a single lazy-created `ProxyPromise` that shadows any
 `Promise`. For every native Promise there is only one `ProxyPromise` that
@@ -53,25 +53,30 @@ handlers.
 const proxyPromise = Unpromise.proxy(promise);
 ```
 
-## Under the hood: Step 2 - Create a SubscribedPromise
+## Under the hood: Step 2 - subscribe
 
 Once you have a `ProxyPromise` you can call `proxyPromise.then()`
 `proxyPromise.catch()` or `proxyPromise.finally()` in the normal way. A promise
 returned by these methods is a `SubscribedPromise`. It behaves like any normal
 `Promise` except it has an `unsubscribe()` method that will remove its handlers
-from the `ProxyPromise`. This eliminates memory leaks from subscription and from
-reference retention.
+from the `ProxyPromise`.
+
+## Under the hood: Step 3 - unsubscribe
+
+Finally you must call `subscribedPromise.unsubscribe()` before you release the
+promise reference. This eliminates memory leaks from subscription and
+(therefore) from reference retention.
 
 ## Under the hood: Simple Shortcuts
 
-Using `Unpromise.race` or `Unpromise.any` is recommended as the proxying and
-subscribing steps are handled behind the scenes for you automatically.
+Using `Unpromise.race` or `Unpromise.any` is recommended. Using these static
+methods, the proxying, subscribing and unsubscribing steps are handled behind
+the scenes for you automatically.
 
 Alternatively `const subscribedPromise = Unpromise.resolve(promise)` completes
 both Step 1 and Step 2 for you (it's equivalent to
-`const subscribedPromise = Unpromise.proxy(promise).subscribe()` ). Be sure to
-call `subscribedPromise.unsubscribe()` before you release its reference if you
-want to prevent memory leaks.
+`const subscribedPromise = Unpromise.proxy(promise).subscribe()` ). Then later
+you can call `subscribedPromise.unsubscribe()` to tidy up.
 
 ## Typical Problem Case
 
