@@ -1,12 +1,14 @@
-# Unpromise: A Proxy Promise supporting unsubscription
+# Unpromise: Proxy promises for unsubscription
 
 Javascript's built-in implementation of
 [Promise.race](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise/race)
 and
 [Promise.any](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise/any)
 have a bug/feature that leads to
-[uncontrollable memory leaks](https://github.com/nodejs/node/issues/17469#issuecomment-349794909),
-which are fixed using @watchable/unpromise.
+[uncontrollable memory leaks](https://github.com/nodejs/node/issues/17469#issuecomment-349794909).
+See the `Typical Problem Case` below for reference.
+
+The Memory leaks are fixed by using @watchable/unpromise.
 
 # Usage
 
@@ -21,9 +23,8 @@ const raceResult = await Unpromise.race([taskPromise, interruptPromise]);
 const anyResult = await Unpromise.any([taskPromise, interruptPromise]);
 ```
 
-Advanced users who want to exploit `SubscribablePromise` for their own
-async/await patterns should consider `Unpromise.proxy()` or
-`Unpromise.resolve()`. Read more at the
+Advanced users exploring other async/await patterns should consider
+`Unpromise.proxy()` or `Unpromise.resolve()`. Read more at the
 [API docs](https://watchable.dev/api/modules/_watchable_unpromise.html).
 
 ## Install
@@ -43,9 +44,10 @@ const { Unpromise } = require("@watchable/unpromise"); // commonjs build
 
 The library manages a single lazy-created `ProxyPromise` that shadows any
 `Promise`. For every native Promise there is only one `ProxyPromise` that
-remains cached for the lifetime of the Promise itself. On creation, it adds
-handlers to the native Promise's `.then()` and `.catch()` just once to prevent
-memory leaks from repeated subscription.
+remains cached in a WeakMap for the lifetime of the Promise itself. On creation,
+the `ProxyPromise` adds handlers to the native Promise's `.then()` and
+`.catch()` just once. This eliminates memory leaks from adding multiple
+handlers.
 
 ```ts
 const proxyPromise = Unpromise.proxy(promise);
@@ -57,11 +59,19 @@ Once you have a `ProxyPromise` you can call `proxyPromise.then()`
 `proxyPromise.catch()` or `proxyPromise.finally()` in the normal way. A promise
 returned by these methods is a `SubscribedPromise`. It behaves like any normal
 `Promise` except it has an `unsubscribe()` method that will remove its handlers
-from the `ProxyPromise`, eliminating memory leaks from subscription and from
+from the `ProxyPromise`. This eliminates memory leaks from subscription and from
 reference retention.
 
-When you use `Unpromise.race` or `Unpromise.any`, the proxying and subscribing
-steps are handled behind the scenes for you automatically. This is recommended.
+## Under the hood: Simple Shortcuts
+
+Using `Unpromise.race` or `Unpromise.any` is recommended as the proxying and
+subscribing steps are handled behind the scenes for you automatically.
+
+Alternatively `const subscribedPromise = Unpromise.resolve(promise)` completes
+both Step 1 and Step 2 for you (it's equivalent to
+`const subscribedPromise = Unpromise.proxy(promise).subscribe()` ). Be sure to
+call `subscribedPromise.unsubscribe()` before you release its reference if you
+want to prevent memory leaks.
 
 ## Typical Problem Case
 
