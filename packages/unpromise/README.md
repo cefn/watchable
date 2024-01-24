@@ -42,15 +42,22 @@ const { Unpromise } = require("@watchable/unpromise"); // commonjs build
 
 ## Under the hood: Step 1 - proxy
 
-The library manages a single lazy-created `ProxyPromise` that shadows any
-`Promise`. For every native Promise there is only one `ProxyPromise` that
+The library manages a single lazy-created `ProxyPromise` for you that shadows
+any `Promise`. For every native Promise there is only one `ProxyPromise`. It
 remains cached in a WeakMap for the lifetime of the Promise itself. On creation,
-the `ProxyPromise` adds handlers to the native Promise's `.then()` and
+the shadow `ProxyPromise` adds handlers to the native Promise's `.then()` and
 `.catch()` just once. This eliminates memory leaks from adding multiple
 handlers.
 
 ```ts
 const proxyPromise = Unpromise.proxy(promise);
+```
+
+As an alternative if you are constructing your own `Promise`, you can use
+`Unpromise` to create a `ProxyPromise` right from the beginning...
+
+```ts
+const proxyPromise = new Unpromise((resolve) => setTimeout(resolve, 1000));
 ```
 
 ## Under the hood: Step 2 - subscribe
@@ -69,7 +76,7 @@ promise reference. This eliminates memory leaks from subscription and
 
 ## Under the hood: Simple Shortcuts
 
-Using `Unpromise.race` or `Unpromise.any` is recommended. Using these static
+Using `Unpromise.race()` or `Unpromise.any()` is recommended. Using these static
 methods, the proxying, subscribing and unsubscribing steps are handled behind
 the scenes for you automatically.
 
