@@ -34,8 +34,8 @@ const NOOP = () => {};
  *
  * Every time you call `.subscribe()`, `.then()` `.catch()` or `.finally()` on a
  * `ProxyPromise<T>` it returns a `SubscribedPromise<T>` having an additional
- * `unsubscribe()` method. Calling `unsubscribe()` detaches reference chains from
- * the original, potentially long-lived Promise, eliminating memory leaks.
+ * `unsubscribe()` method. Calling `unsubscribe()` detaches reference chains
+ * from the original, potentially long-lived Promise, eliminating memory leaks.
  *
  * This approach can eliminate the memory leaks that otherwise come about from
  * repeated `race()` or `any()` calls invoking `.then()` and `.catch()` multiple
@@ -51,7 +51,8 @@ const NOOP = () => {};
  * `Unpromise.resolve(promise)` returns an ephemeral `SubscribedPromise<T>` for
  * any given `Promise<T>` facilitating arbitrary async/await patterns. Behind
  * the scenes, `resolve` is implemented simply as
- * `Unpromise.proxy(promise).subscribe()`).
+ * `Unpromise.proxy(promise).subscribe()`. Don't forget to call `.unsubscribe()`
+ * to tidy up!
  *
  */
 export class Unpromise<T> implements ProxyPromise<T> {
