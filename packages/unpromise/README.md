@@ -1,18 +1,78 @@
 # Unpromise: A Proxy Promise supporting unsubscription
 
-The built-in implementation of
+Javascript's built-in implementation of
 [Promise.race](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise/race)
 and
 [Promise.any](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise/any)
-have a bug/feature that leads to uncontrollable memory leaks.
+have a bug/feature that leads to
+[uncontrollable memory leaks](https://github.com/nodejs/node/issues/17469#issuecomment-349794909),
+which are fixed using @watchable/unpromise.
 
-For example in the example app below, we have a long-lived Promise that we await
-every time around the loop with `Promise.race(...)`. We use `race` so that we
-can respond to _**either**_ the task result _**or**_ the keyboard interrupt.
+# Usage
 
-Unfortunately this leads to a memory leak because every `Promise.race` creates
-an unbreakable reference chain from the interruptPromise to the taskPromise and
-its task result, and these references can never be garbage-collected.
+Substitute `Unpromise.race` or `Unpromise.any` in place of `Promise.race` and
+`Promise.any`...
+
+```ts
+import { Unpromise } from "@watchable/unpromise";
+
+const raceResult = await Unpromise.race([taskPromise, interruptPromise]);
+
+const anyResult = await Unpromise.any([taskPromise, interruptPromise]);
+```
+
+Advanced users who want to exploit `SubscribablePromise` for their own
+async/await patterns should consider `Unpromise.proxy()` or
+`Unpromise.resolve()`. Read more at the
+[API docs](https://watchable.dev/api/modules/_watchable_unpromise.html).
+
+## Install
+
+```zsh
+npm install @watchable/unpromise
+```
+
+## Import OR Require
+
+```javascript
+import { Unpromise } from "@watchable/unpromise"; // esm build
+const { Unpromise } = require("@watchable/unpromise"); // commonjs build
+```
+
+## Under the hood: Step 1 - Create an Unpromise
+
+The library manages a single lazy-created `ProxyPromise` that shadows any
+`Promise`. For every native Promise there is only one `ProxyPromise` that
+remains cached for the lifetime of the Promise itself. On creation, it adds
+handlers to the native Promise's `.then()` and `.catch()` just once to prevent
+memory leaks from repeated subscription.
+
+```ts
+const proxyPromise = Unpromise.proxy(promise);
+```
+
+## Under the hood: Step 2 - Create a SubscribedPromise
+
+Once you have a `ProxyPromise` you can call `proxyPromise.then()`
+`proxyPromise.catch()` or `proxyPromise.finally()` in the normal way. A promise
+returned by these methods is a `SubscribedPromise`. It behaves like any normal
+`Promise` except it has an `unsubscribe()` method that will remove its handlers
+from the `ProxyPromise`, eliminating memory leaks from subscription and from
+reference retention.
+
+When you use `Unpromise.race` or `Unpromise.any`, the proxying and subscribing
+steps are handled behind the scenes for you automatically. This is recommended.
+
+## Typical Problem Case
+
+In the example app below, we have a long-lived Promise that we await every time
+around the loop with `Promise.race(...)`. We use `race` so that we can respond
+to _**either**_ the task result _**or**_ the keyboard interrupt.
+
+Unfortunately this leads to a memory leak. Every call to `Promise.race` creates
+an unbreakable reference chain from the `interruptPromise` to the `taskPromise`
+(and its task result), and these references can never be garbage-collected,
+leading to an out of memory error.
 
 ```js
 const interruptPromise = new Promise((resolve) => {
@@ -37,55 +97,3 @@ async function run() {
 
 run();
 ```
-
-## Install
-
-```zsh
-npm install @watchable/unpromise
-```
-
-## Import OR Require
-
-```javascript
-import { Unpromise } from "@watchable/unpromise"; // esm build
-const { Unpromise } = require("@watchable/unpromise"); // commonjs build
-```
-
-# Usage
-
-The simplest usage is probably to use `Unpromise.race` or `Unpromise.any` in the
-place of `Promise.race` and `Promise.any`.
-
-```ts
-const raceResult = await Unpromise.race([taskPromise, interruptPromise]);
-const anyResult = await Unpromise.any([taskPromise, interruptPromise]);
-```
-
-Advanced users who want to exploit `SubscribablePromise` for their own
-async/await patterns should consider `Unpromise.proxy()` or
-`Unpromise.resolve()`. Read more at the [API docs].
-
-## Create an Unpromise
-
-The library manages a single lazy-created, cached `ProxyPromise` that shadows
-any `Promise`. For every native Promise there is only one `ProxyPromise`. It
-remains cached for the lifetime of the Promise itself.
-
-```ts
-const unpromise = Unpromise.proxy(promise);
-```
-
-## Create a SubscribedPromise
-
-Once you have a `ProxyPromise` you can call `.then()` `.catch()` `.finally()` in
-the normal way. The resulting promise is a `SubscribedPromise` that behaves like
-any normal `Promise` except it has an `unsubscribe()` method that will remove
-its handlers from the `ProxyPromise` hence eliminating memory leaks. If you use
-`Unpromise.race` or `Unpromise.any`, proxying and subscribing each `Promise` is
-all handled for you automatically.
-
-## Unsubscribe to mitigate for Memory Leaks
-
-# Getting Started
-
-## Example Apps
