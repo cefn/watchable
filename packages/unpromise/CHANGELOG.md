@@ -1,5 +1,11 @@
 # @watchable/unpromise
 
+## 0.1.0-alpha.6
+
+### Patch Changes
+
+- Point to package path in monorepo
+
 ## 0.1.0-alpha.5
 
 ### Patch Changes
