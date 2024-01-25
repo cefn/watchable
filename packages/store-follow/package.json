@@ -4,7 +4,7 @@
   "description": "Await @watchable/store state changes and trigger business logic",
   "homepage": "https://github.com/cefn/watchable/tree/main/packages/store-follow#readme",
   "bugs": {
-    "url": "https://github.com/cefn/watchable/issues",
+    "url": "https://github.com/cefn/watchable/issues?q=is%3Aissue+is%3Aopen+label%3Astore-follow",
     "email": "watchable@cefn.com"
   },
   "repository": "github:cefn/watchable",

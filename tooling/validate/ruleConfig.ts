@@ -20,9 +20,13 @@ export const PACKAGE_JSON_RULES = {
       .replace("/package.json", "");
     return `https://github.com/cefn/watchable/tree/main${relativePath}#readme`;
   },
-  bugs: {
-    url: "https://github.com/cefn/watchable/issues",
-    email: "watchable@cefn.com",
+  bugs: ({ packageJson }) => {
+    const { name } = packageJson;
+    const shortName = name.replace(/@watchable\//, "");
+    return {
+      url: `https://github.com/cefn/watchable/issues?q=is%3Aissue+is%3Aopen+label%3A${shortName}`,
+      email: "watchable@cefn.com",
+    };
   },
   "devDependencies.typescript": byPackageLanguage({
     ts: "^5.0.4",

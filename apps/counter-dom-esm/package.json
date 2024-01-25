@@ -5,7 +5,7 @@
   "description": "",
   "homepage": "https://github.com/cefn/watchable/tree/main/apps/counter-dom-esm#readme",
   "bugs": {
-    "url": "https://github.com/cefn/watchable/issues",
+    "url": "https://github.com/cefn/watchable/issues?q=is%3Aissue+is%3Aopen+label%3Acounter-dom-esm",
     "email": "watchable@cefn.com"
   },
   "repository": "github:cefn/watchable",

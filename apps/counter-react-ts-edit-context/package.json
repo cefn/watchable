@@ -4,7 +4,7 @@
   "private": true,
   "homepage": "https://github.com/cefn/watchable/tree/main/apps/counter-react-ts-edit-context#readme",
   "bugs": {
-    "url": "https://github.com/cefn/watchable/issues",
+    "url": "https://github.com/cefn/watchable/issues?q=is%3Aissue+is%3Aopen+label%3Acounter-react-ts-edit-context",
     "email": "watchable@cefn.com"
   },
   "repository": "github:cefn/watchable",
