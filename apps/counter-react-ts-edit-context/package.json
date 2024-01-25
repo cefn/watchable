@@ -7,7 +7,10 @@
     "url": "https://github.com/cefn/watchable/issues?q=is%3Aissue+is%3Aopen+label%3Acounter-react-ts-edit-context",
     "email": "watchable@cefn.com"
   },
-  "repository": "github:cefn/watchable",
+  "repository": {
+    "url": "https://github.com/cefn/watchable.git",
+    "directory": "apps/counter-react-ts-edit-context"
+  },
   "license": "MIT",
   "author": "Cefn Hoile <github.com@cefn.com> (https://cefn.com)",
   "type": "module",

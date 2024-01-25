@@ -4,6 +4,7 @@
  */
 import { getPackageType, PackageType } from "./packages";
 import { ValueFactory, ValueRule } from "../../types";
+import { getRepoPath } from "../util";
 
 /** ValueFactory with distinct values for PackageType 'apps' or 'packages' */
 export function byPackageType(
@@ -39,5 +40,17 @@ export function byPackageLanguage(
         ? "ts"
         : "js";
     return lookup[language];
+  };
+}
+
+export function byPackageRelativePath<T>(
+  createValueRule: (relativePath: string) => ValueRule
+): ValueFactory {
+  return ({ packagePath }) => {
+    const repoPath = getRepoPath();
+    const relativePath = packagePath
+      .replace(repoPath + "/", "")
+      .replace("/package.json", "");
+    return createValueRule(relativePath);
   };
 }

@@ -1,6 +1,7 @@
 import {
   byPackageLanguage,
   byPackageName,
+  byPackageRelativePath,
   byPackageType,
 } from "./lib/rules/factories";
 import { getUpstreamBuildDependencies } from "./lib/rules/packages";
@@ -12,14 +13,14 @@ export const PACKAGE_JSON_RULES = {
   sideEffects: byPackageType({ packages: false, apps: undefined }),
   license: "MIT",
   author: "Cefn Hoile <github.com@cefn.com> (https://cefn.com)",
-  repository: "github:cefn/watchable",
-  homepage: ({ packagePath }) => {
-    const repoPath = getRepoPath();
-    const relativePath = packagePath
-      .replace(repoPath, "")
-      .replace("/package.json", "");
-    return `https://github.com/cefn/watchable/tree/main${relativePath}#readme`;
-  },
+  repository: byPackageRelativePath((relativePath) => ({
+    url: "https://github.com/cefn/watchable.git",
+    directory: relativePath,
+  })),
+  homepage: byPackageRelativePath(
+    (relativePath) =>
+      `https://github.com/cefn/watchable/tree/main/${relativePath}#readme`
+  ),
   bugs: ({ packageJson }) => {
     const { name } = packageJson;
     const shortName = name.replace(/@watchable\//, "");
