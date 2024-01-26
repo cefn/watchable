@@ -2,6 +2,7 @@
   "name": "@watchable/unpromise",
   "version": "0.1.0-alpha.6",
   "description": "Promise with unsubscribe feature that minimises memory leaks",
+  "keywords": ["Promise.race", "Promise.any", "oom", "memory leak", "subscription", "unsubscription", "subscribe", "unsubscribe"],
   "homepage": "https://github.com/cefn/watchable/tree/main/packages/unpromise#readme",
   "bugs": {
     "url": "https://github.com/cefn/watchable/issues?q=is%3Aissue+is%3Aopen+label%3Aunpromise",
