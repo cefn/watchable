@@ -1,6 +1,8 @@
 /* eslint-disable @typescript-eslint/no-confusing-void-expression */
 /**  */
-import { createMutex } from "../mutex";
+// import { createMutex } from "../mutex";
+import { createLock } from "../lock";
+
 import type {
   Job,
   Strategy,
@@ -34,7 +36,8 @@ export function createConcurrencyStrategy<J extends Job<unknown>>(
 
   let slotsUsed = 0;
   let deferredSlot: Biddable | null = null;
-  const launchMutex = createMutex();
+  // const launchMutex = createMutex();
+  const launchLock = createLock();
 
   const { launchesDone } = downstream;
 
@@ -45,7 +48,8 @@ export function createConcurrencyStrategy<J extends Job<unknown>>(
       // they would get unblocked all at once rather than waiting their turn
       // TODO CH avoid wrapping this whole method in a mutex ( use while loop on pendingJobs
       // to ensure only a single job gets through each time, like rate logic? )
-      const unlock = await launchMutex.lock();
+      // const unlock = await launchMutex.lock();
+      const release = await launchLock.acquire();
       try {
         if (deferredSlot !== null) {
           // concurrency exceeded - wait for slot
@@ -62,7 +66,8 @@ export function createConcurrencyStrategy<J extends Job<unknown>>(
           deferredSlot = createBiddablePromise();
         }
       } finally {
-        unlock();
+        release();
+        //unlock();
       }
       return await downstream.launchJob(job);
     },
