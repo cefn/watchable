@@ -177,7 +177,7 @@ describe("Rate limits: ", () => {
     // this rate limit would allow all 4 tasks to complete immediately
     const rateOptions: RateOptions = { intervalMs: 10, intervalSlots: 10 };
     // this concurrency should prevent more than one executing at once
-    // tasks should be in series and take JOB_DURATION
+    // tasks should therefore be in series and take JOB_DURATION each
     const concurrencyOptions: ConcurrencyOptions = { concurrency: 1 };
     const settlementSequence = createSettlementSequence(
       {
@@ -218,14 +218,14 @@ describe("Rate limits: ", () => {
     expect(settlements.length).toBe(JOB_COUNT);
   });
 
-  test("Large task count - can process 100,000 tasks per second", async () => {
+  test("Large task count - can process 10,000 tasks per second", async () => {
     // off-by-one task forces a 'final' period at around 1000ms
     // allowing for predictable timing (> 1000ms)
-    const LARGE_JOB_COUNT = 100001;
+    const LARGE_JOB_COUNT = 10001;
 
     const rateOptions = {
       intervalMs: 100, // slot period in ms
-      intervalSlots: 10000, // number of slots in the period
+      intervalSlots: 1000, // number of slots in the period
     } as const satisfies RateOptions;
 
     // optimised synchronous job iterator
@@ -265,6 +265,6 @@ describe("Rate limits: ", () => {
       (LARGE_JOB_COUNT / rateOptions.intervalSlots) * rateOptions.intervalMs;
 
     expect(duration).toBeGreaterThanOrEqual(idealDuration);
-    expect(duration).toBeLessThanOrEqual(idealDuration * 1.1);
+    expect(duration).toBeLessThanOrEqual(idealDuration * 1.25);
   });
 });

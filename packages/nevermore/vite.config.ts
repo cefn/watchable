@@ -37,6 +37,11 @@ export default defineConfig({
     // sourcemap: true,
   },
   test: {
+    poolOptions: {
+      threads: {
+        singleThread: true,
+      },
+    },
     snapshotFormat: {},
     typecheck: {
       checker: "tsc",
