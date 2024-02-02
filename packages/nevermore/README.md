@@ -120,10 +120,10 @@ yield () => getStarWars(filmId);
 Add properties with `Object.assign`
 
 ```ts
-yield Object.assign({
+yield Object.assign(
     () => getStarWars(filmId),
     { filmId }
-})
+)
 ```
 
 Then you can get the extra information back from the `job` in the settlement...
