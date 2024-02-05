@@ -1,6 +1,6 @@
 import { createExecutorStrategy } from "@watchable/nevermore";
-import { recordTaskEvent } from "./state/timing";
-import { createTaskId, performTask } from "./task";
+import { createTaskId, promiseAttempt } from "./task";
+import { trackOperation } from "./store";
 
 const TASK_COUNT = 20;
 const TASK_DURATION_MS = 10;
@@ -9,20 +9,34 @@ export async function launchAllSettled() {
   // create a strategy for limiting execution of tasks
   const { createExecutor } = createExecutorStrategy({ concurrency: 1 });
 
-  // create a strategy-limited version of the
-  const performTaskExecutor = createExecutor(performTask);
+  // create a tracked version of promiseAttempt
+  // (wraps promiseAttempt to intercept its promise, write updates to store)
+  const trackedPromiseAttempt: typeof promiseAttempt = (options) =>
+    trackOperation(
+      options.taskId,
+      "attempt",
+      // attempts task
+      promiseAttempt(options)
+    );
 
-  // wrap all tasks in executors and promise executor results
+  // create a strategy-limited version of promiseAttempt
+  const promiseAttemptExecutor = createExecutor(trackedPromiseAttempt);
+
+  // invoke strategy-limited promiseAttempt multiple times
   const promiseList = Array.from({ length: TASK_COUNT }).map((_, index) => {
     const taskId = createTaskId(index);
-    // notify that task was scheduled
-    recordTaskEvent(taskId, "promised");
-    // schedule task (executor may delay task start )
-    performTaskExecutor({
+    // intercept promise for viewer
+    trackOperation(
       taskId,
-      durationMs: TASK_DURATION_MS,
-    });
+      "task",
+      // schedules task (executor may delay task start )
+      promiseAttemptExecutor({
+        taskId,
+        durationMs: TASK_DURATION_MS,
+      })
+    );
   });
 
+  // await all eventual resolutions of promiseAttempt executors
   await Promise.allSettled(promiseList);
 }

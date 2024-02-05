@@ -1,12 +1,13 @@
 import { useSelected } from "@watchable/store-react";
-import { STORE_INSTANCE } from "../state/store";
 import { Task } from "./Task";
 import { TaskId } from "../task";
+import { State } from "../store";
+import { Store } from "@watchable/store";
 
-export function Chart() {
+export function Chart(store: Store<State>) {
   const taskIds = useSelected(
-    STORE_INSTANCE,
-    ({ timings }) => Object.keys(timings) as TaskId[]
+    store,
+    ({ moments }) => Object.keys(moments) as TaskId[]
   );
 
   return (

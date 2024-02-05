@@ -1,5 +1,3 @@
-import { recordTaskEvent } from "./state/timing";
-
 export type TaskId = `task_${number}`;
 
 export function createTaskId(index: number): TaskId {
@@ -12,23 +10,17 @@ export function extractTaskIndex(taskId: TaskId) {
 }
 
 /** A mock async task function (writes transition events to the store). */
-export function performTask(options: {
+export function promiseAttempt(options: {
   taskId: TaskId;
   durationMs: number;
   successful?: boolean;
 }): Promise<void> {
-  const { taskId, durationMs, successful = true } = options;
-  // notify that task was invoked
-  recordTaskEvent(taskId, "executed");
+  const { durationMs, successful = true } = options;
   return new Promise<void>((resolve, reject) =>
     setTimeout(() => {
       if (successful) {
-        // notify finished with success
-        recordTaskEvent(taskId, "fulfilled");
         resolve();
       } else {
-        // notify finished with failure
-        recordTaskEvent(taskId, "rejected");
         reject();
       }
     }, durationMs)
