@@ -56,10 +56,18 @@ function* pipesFromOptions(options: NevermoreOptions): Iterable<Pipe> {
 }
 
 /**
+ * Users of `nevermore` would rarely use this directly.
+ * They should use {@link createExecutorStrategy} 
+ * for the function-wrapper API or {@link createSettlementSequence} for
+ * the just-in-time batch API.
+ * 
+ * Constructs a 'pipe' chaining Strategy instances. 
+ *
  * Combines the option parsing, Pipe creation routines to
- * compose a pipe. The pipe will always have a LauncherStrategy
- * (that triggers and tracks the jobs) but can have arbitrary
- * Strategies layed on top according to the options.
+ * compose a pipe chaining {@link Strategy} instances. The pipe 
+ * will always have a LauncherStrategy (that triggers and tracks 
+ * the jobs) then has arbitrary Strategies layered on top according 
+ * to the provided options.
  *
  * @param options The combined options for all behaviours needed in the pipeline.
  * @returns The combined strategy, ready to accept jobs
