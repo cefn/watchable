@@ -1,7 +1,14 @@
 # Nevermore - Controller for async pipelines
 
-`Nevermore` controls when async tasks are run. It has APIs for ad-hoc async
-functions and for (potentially-infinite) batch async operations.
+`Nevermore` controls when async tasks are run. 
+
+It has a `createExecutorStrategy` API to regulate the execution of ordinary async 
+functions by creating an equivalent function (an executor) that wraps the original
+with scheduling, timeout, retry and other regulating behaviours. 
+
+Alternatively it has the generator-based `createSettlementSequence` to regulate 
+(potentially-infinite) batches of jobs that are yielded just-in-time as capacity
+limits allow.
 
 ## Install
 
@@ -57,9 +64,9 @@ const [episode4, episode5, episode6] = await Promise.allSettled([
 
 ### Batch (generator) API
 
-For batch routines, (or potentially infinite sets), nevermore provides an
-alternative API based on iterable sequences of no-arg functions, with the same
-options available...
+For batch routines, (or potentially infinite sets), `createSettlementSequence` 
+provides an alternative API based on iterable sequences of no-arg functions, 
+with the same options available...
 
 ```ts
 import { createSettlementSequence } from "@watchable/nevermore";
@@ -104,20 +111,20 @@ for await (const settlement of settlementSequence) {
 
 #### Extending Settlement
 
-The type of settlements yielded by `nevermore` aligns with
+The type of settlements yielded from a settlement sequence aligns with
 [Promise.allSettled()](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise/allSettled),
 but with an extra `job` member.
 
 The type of your job `J` is preserved in `JobSettlement<J>`, meaning you can get
 the annotations back at settlement time.
 
-Annotating a job is trivial. Instead of ...
+Annotating a job, and creating an inferrable `J` is trivial. Instead of ...
 
 ```ts
 yield () => getStarWars(filmId);
 ```
 
-Add properties with `Object.assign`
+Add properties to the yielded no-arg function with `Object.assign`
 
 ```ts
 yield Object.assign(
@@ -126,7 +133,8 @@ yield Object.assign(
 )
 ```
 
-Then you can get the extra information back from the `job` in the settlement...
+Then you can get the extra information back from the type-safe `job` in the 
+settlement...
 
 ```ts
 // consume the settlements (like Promise.allSettled())

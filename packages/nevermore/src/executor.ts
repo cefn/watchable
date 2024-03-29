@@ -6,9 +6,12 @@ type ExecutorJob<T> = Job<T> & {
   reject: (error: unknown) => void;
 };
 
-/** Given an existing typed operation, returns an identically-typed operation
- * that schedules its execution within a nevermore pipeline, configured with
- * the provided options.
+/** Factory that constructs a nevermore strategy pipeline from provided options, 
+ * and returns a `createExecutor` function. 
+ *
+ * Given your existing, typed async operation, `createExecutor` will create an 
+ * identically-typed operation that schedules its execution within the capacity 
+ * limits and behaviours of the pipeline.
  *
  * For example...
  * * concurrency, rate-limits: executors will delay if other executors are
@@ -17,8 +20,8 @@ type ExecutorJob<T> = Job<T> & {
  *   throw a timeout error
  * * retry : the underlying operation is retried and the executor only throws
  *   when retries are exhausted
- * @param options
- * @returns
+ * 
+ * See documentation of `options` for more on the available behaviours. 
  */
 export function createExecutorStrategy(options: NevermoreOptions) {
   /** Create a pipeline to limit arbitrary jobs according to the provided options. */
