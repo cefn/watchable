@@ -15,14 +15,14 @@ export function extractTaskIndex(taskId: TaskId) {
 export function performTask(options: {
   taskId: TaskId;
   durationMs: number;
-  successful?: boolean;
+  failure?: number;
 }): Promise<void> {
-  const { taskId, durationMs, successful = true } = options;
+  const { taskId, durationMs, failure = 0 } = options;
   // notify that task was invoked
   recordTaskEvent(taskId, "executed");
   return new Promise<void>((resolve, reject) =>
     setTimeout(() => {
-      if (successful) {
+      if (failure === 0 || Math.random() >= failure) {
         // notify finished with success
         recordTaskEvent(taskId, "fulfilled");
         resolve();

@@ -58,6 +58,9 @@ export function recordTaskEvent(taskId: TaskId, kind: EventKind) {
 
     // 'promised' creates a new current timing record
     if (kind === "promised") {
+      if (prevTimings.length === 1) {
+        console.log(`Adding another timing event to ${taskId}`);
+      }
       // add a new event
       prevTimings.push({
         promised: now(),

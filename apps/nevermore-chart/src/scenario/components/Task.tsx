@@ -3,9 +3,15 @@ import { STORE_INSTANCE } from "../state/store";
 import { normaliseMs, normalizeTask, pc } from "../state/scale";
 import { TaskId } from "../task";
 
+const renders: Partial<Record<TaskId, number>> = {};
+
 export function Task({ id }: { id: TaskId }) {
+  renders[id] = (renders[id] ?? 0) + 1;
+  console.log(JSON.stringify({ renders }));
   const scale = useSelected(STORE_INSTANCE, ({ scale }) => scale);
   const timings = useSelected(STORE_INSTANCE, ({ timings }) => timings[id]);
+
+  console.log(`Timings length: ${timings?.length ?? 0}`);
 
   return typeof timings === "undefined"
     ? null

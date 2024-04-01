@@ -7,7 +7,10 @@ const TASK_DURATION_MS = 10;
 
 export async function launchAllSettled() {
   // create a strategy for limiting execution of tasks
-  const { createExecutor } = createExecutorStrategy({ concurrency: 1 });
+  const { createExecutor } = createExecutorStrategy({
+    concurrency: 1,
+    retries: 3,
+  });
 
   // create a strategy-limited version of the
   const performTaskExecutor = createExecutor(performTask);
@@ -21,6 +24,7 @@ export async function launchAllSettled() {
     performTaskExecutor({
       taskId,
       durationMs: TASK_DURATION_MS,
+      failure: 1,
     });
   });
 
