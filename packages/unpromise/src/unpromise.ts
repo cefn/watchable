@@ -263,14 +263,12 @@ export class Unpromise<T> implements ProxyPromise<T> {
   /** Perform Promise.any() via SubscribedPromises, then unsubscribe them.
    * Equivalent to Promise.any but eliminates memory leaks from long-lived
    * promises accumulating .then() and .catch() subscribers. */
-  static async any<const Promises extends ReadonlyArray<Promise<unknown>>>(
-    promises: Promises
-  ) {
-    const subscribedPromises = promises.map(Unpromise.resolve);
+  static async any<T>(
+    values: Iterable<T | PromiseLike<T>>
+  ): Promise<Awaited<T>> {
+    const subscribedPromises = [...values].map(Unpromise.resolve);
     try {
-      return (await Promise.any(subscribedPromises)) as Promise<
-        Awaited<Promises[number]>
-      >;
+      return await Promise.any(subscribedPromises);
     } finally {
       subscribedPromises.forEach(({ unsubscribe }) => {
         unsubscribe();
