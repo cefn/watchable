@@ -80,10 +80,10 @@ export class Unpromise<T> implements ProxyPromise<T> {
   protected constructor(promise: Promise<T>);
   protected constructor(arg: Promise<T> | PromiseExecutor<T>) {
     // handle either a Promise or a Promise executor function
-    if (arg instanceof Promise) {
-      this.promise = arg;
-    } else {
+    if (typeof arg === "function") {
       this.promise = new Promise(arg);
+    } else {
+      this.promise = arg;
     }
 
     // subscribe for eventual fulfilment and rejection
