@@ -1,5 +1,27 @@
 # @watchable/nevermore
 
+## 0.9.0
+
+### Minor Changes
+
+- 8f3a1e7: Include better README
+- d47fbd9: Add createExecutorStrategy to allow pipelining arbitrary async
+  functions.
+- d47fbd9: Ensure executor changes are included.
+- d47fbd9: Rebuild from source to repopulate dist
+- d47fbd9: Ensure dist files are created and bundled
+
+### Patch Changes
+
+- e3d3c54: First release of nevermore async limiter.
+- 81660b7: Eliminate memory leaks from Promise.race
+- Updated dependencies [6300844]
+- Updated dependencies [6300844]
+- Updated dependencies [d0335b4]
+- Updated dependencies [6300844]
+- Updated dependencies [a574261]
+  - @watchable/queue@1.0.0
+
 ## 0.9.0-alpha.9
 
 ### Patch Changes

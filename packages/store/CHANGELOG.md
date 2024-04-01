@@ -1,5 +1,25 @@
 # @watchable/store
 
+## 1.0.0
+
+### Major Changes
+
+- a574261: Aligning version numbers
+
+### Minor Changes
+
+- d0335b4: Remove Immutable modifier from Selector definition.
+
+### Patch Changes
+
+- 6300844: Ensure 'default' in exports.
+- 6300844: Initial alpha release
+- 0da58e5: Remove Immutable from core interfaces in favour of author explicitly
+  adding it to their Store type if they wish. Adopt Immutable definition
+  directly from Immer Add documentation generation to tasks managed by wireit.
+- 00f1f2a: Loosen RootState type. Add useStateProperty hook.
+- 6300844: Resolve missing API links
+
 ## 1.0.0-alpha.7
 
 ### Patch Changes

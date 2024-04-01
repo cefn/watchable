@@ -1,5 +1,31 @@
 # @watchable/store-react
 
+## 1.0.0
+
+### Minor Changes
+
+- d0335b4: Remove Immutable modifier from Selector definition.
+
+### Patch Changes
+
+- 6300844: Ensure 'default' in exports.
+- 6300844: Initial alpha release
+- 0da58e5: Remove Immutable from core interfaces in favour of author explicitly
+  adding it to their Store type if they wish. Adopt Immutable definition
+  directly from Immer Add documentation generation to tasks managed by wireit.
+- 00f1f2a: Loosen RootState type. Add useStateProperty hook.
+- 32a95a5: Optimise useSelected to detect state change within render.
+- 6300844: Resolve missing API links
+- a574261: Aligning version numbers
+- Updated dependencies [6300844]
+- Updated dependencies [6300844]
+- Updated dependencies [d0335b4]
+- Updated dependencies [0da58e5]
+- Updated dependencies [00f1f2a]
+- Updated dependencies [6300844]
+- Updated dependencies [a574261]
+  - @watchable/store@1.0.0
+
 ## 1.0.0-alpha.8
 
 ### Patch Changes
