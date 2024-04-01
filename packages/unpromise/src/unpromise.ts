@@ -13,7 +13,7 @@ import type {
  * which is retained for the lifetime of the original Promise.
  */
 const subscribableCache = new WeakMap<
-  Promise<unknown>,
+  PromiseLike<unknown>,
   ProxyPromise<unknown>
 >();
 
@@ -59,7 +59,7 @@ export class Unpromise<T> implements ProxyPromise<T> {
   /** INSTANCE IMPLEMENTATION */
 
   /** The promise shadowed by this Unpromise<T>  */
-  protected readonly promise: Promise<T>;
+  protected readonly promise: Promise<T> | PromiseLike<T>;
 
   /** Promises expecting eventual settlement (unless unsubscribed first). This list is deleted
    * after the original promise settles - no further notifications will be issued. */
@@ -76,9 +76,10 @@ export class Unpromise<T> implements ProxyPromise<T> {
    * handlers to the Promise. These handlers pass fulfilment and rejection
    * notifications to downstream subscribers and maintains records of value
    * or error if the Promise ever settles. */
-  protected constructor(executor: PromiseExecutor<T>);
   protected constructor(promise: Promise<T>);
-  protected constructor(arg: Promise<T> | PromiseExecutor<T>) {
+  protected constructor(promise: PromiseLike<T>);
+  protected constructor(executor: PromiseExecutor<T>);
+  protected constructor(arg: Promise<T> | PromiseLike<T> | PromiseExecutor<T>) {
     // handle either a Promise or a Promise executor function
     if (typeof arg === "function") {
       this.promise = new Promise(arg);
@@ -87,21 +88,25 @@ export class Unpromise<T> implements ProxyPromise<T> {
     }
 
     // subscribe for eventual fulfilment and rejection
-    void this.promise
-      .then((value) => {
-        // atomically record fulfilment and detach subscriber list
-        const { subscribers } = this;
-        this.subscribers = null;
-        this.settlement = {
-          status: "fulfilled",
-          value,
-        };
-        // notify fulfilment to subscriber list
-        subscribers?.forEach(({ resolve }) => {
-          resolve(value);
-        });
-      })
-      .catch((reason) => {
+
+    // handle PromiseLike objects (that at least have .then)
+    const thenReturn = this.promise.then((value) => {
+      // atomically record fulfilment and detach subscriber list
+      const { subscribers } = this;
+      this.subscribers = null;
+      this.settlement = {
+        status: "fulfilled",
+        value,
+      };
+      // notify fulfilment to subscriber list
+      subscribers?.forEach(({ resolve }) => {
+        resolve(value);
+      });
+    });
+
+    // handle Promise (that also have a .catch behaviour)
+    if ("catch" in thenReturn) {
+      thenReturn.catch((reason) => {
         // atomically record rejection and detach subscriber list
         const { subscribers } = this;
         this.subscribers = null;
@@ -114,6 +119,7 @@ export class Unpromise<T> implements ProxyPromise<T> {
           reject(reason);
         });
       });
+    }
   }
 
   /** Create a promise that mitigates uncontrolled subscription to a long-lived
@@ -217,7 +223,7 @@ export class Unpromise<T> implements ProxyPromise<T> {
 
   /** Create or Retrieve the proxy Unpromise (a re-used Unpromise for the VM lifetime
    * of the provided Promise reference) */
-  static proxy<T>(promise: Promise<T>): ProxyPromise<T> {
+  static proxy<T>(promise: PromiseLike<T>): ProxyPromise<T> {
     const cached = Unpromise.getSubscribablePromise(promise);
     return typeof cached !== "undefined"
       ? cached
@@ -225,7 +231,7 @@ export class Unpromise<T> implements ProxyPromise<T> {
   }
 
   /** Create and store an Unpromise keyed by an original Promise. */
-  protected static createSubscribablePromise<T>(promise: Promise<T>) {
+  protected static createSubscribablePromise<T>(promise: PromiseLike<T>) {
     const created = new Unpromise<T>(promise);
     subscribableCache.set(promise, created as Unpromise<unknown>); // resolve promise to unpromise
     subscribableCache.set(created, created as Unpromise<unknown>); // resolve the unpromise to itself
@@ -233,7 +239,7 @@ export class Unpromise<T> implements ProxyPromise<T> {
   }
 
   /** Retrieve a previously-created Unpromise keyed by an original Promise. */
-  protected static getSubscribablePromise<T>(promise: Promise<T>) {
+  protected static getSubscribablePromise<T>(promise: PromiseLike<T>) {
     return subscribableCache.get(promise) as ProxyPromise<T> | undefined;
   }
 
@@ -241,8 +247,17 @@ export class Unpromise<T> implements ProxyPromise<T> {
 
   /** Lookup the Unpromise for this promise, and derive a SubscribedPromise from
    * it (that can be later unsubscribed to eliminate Memory leaks) */
-  static resolve<T>(promise: Promise<T>): SubscribedPromise<T> {
-    return Unpromise.proxy(promise).subscribe();
+  static resolve<T>(value: T | PromiseLike<T>) {
+    const promise: PromiseLike<T> =
+      typeof value === "object" &&
+      value !== null &&
+      "then" in value &&
+      typeof value.then === "function"
+        ? value
+        : Promise.resolve(value);
+    return Unpromise.proxy(promise).subscribe() as SubscribedPromise<
+      Awaited<T>
+    >;
   }
 
   /** Perform Promise.any() via SubscribedPromises, then unsubscribe them.
@@ -266,14 +281,12 @@ export class Unpromise<T> implements ProxyPromise<T> {
   /** Perform Promise.race via SubscribedPromises, then unsubscribe them.
    * Equivalent to Promise.race but eliminates memory leaks from long-lived
    * promises accumulating .then() and .catch() subscribers. */
-  static async race<const Promises extends ReadonlyArray<Promise<unknown>>>(
-    promises: Promises
-  ) {
-    const subscribedPromises = promises.map(Unpromise.resolve);
+  static async race<T>(
+    values: Iterable<T | PromiseLike<T>>
+  ): Promise<Awaited<T>> {
+    const subscribedPromises = [...values].map(Unpromise.resolve);
     try {
-      return (await Promise.race(subscribedPromises)) as Promise<
-        Awaited<Promises[number]>
-      >;
+      return await Promise.race(subscribedPromises);
     } finally {
       subscribedPromises.forEach(({ unsubscribe }) => {
         unsubscribe();
