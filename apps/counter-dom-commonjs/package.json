@@ -1,6 +1,6 @@
 {
   "name": "counter-dom-commonjs",
-  "version": "0.9.0-alpha.7",
+  "version": "0.9.0",
   "private": true,
   "description": "",
   "homepage": "https://github.com/cefn/watchable/tree/main/apps/counter-dom-commonjs#readme",
@@ -22,8 +22,8 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@watchable/store": "1.0.0-alpha.7",
-    "@watchable/store-follow": "1.0.0-alpha.7"
+    "@watchable/store": "1.0.0",
+    "@watchable/store-follow": "1.0.0"
   },
   "devDependencies": {
     "@rollup/plugin-commonjs": "^25.0.7",

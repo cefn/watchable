@@ -1,5 +1,19 @@
 # counter-dom-ts
 
+## 0.9.0
+
+### Patch Changes
+
+- Updated dependencies [6300844]
+- Updated dependencies [6300844]
+- Updated dependencies [d0335b4]
+- Updated dependencies [0da58e5]
+- Updated dependencies [00f1f2a]
+- Updated dependencies [6300844]
+- Updated dependencies [a574261]
+  - @watchable/store-follow@1.0.0
+  - @watchable/store@1.0.0
+
 ## 0.9.0-alpha.7
 
 ### Patch Changes

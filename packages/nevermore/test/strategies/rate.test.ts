@@ -4,7 +4,7 @@ import { iterable2array } from "../testutil";
 import type { ConcurrencyOptions, RateOptions } from "../../src/types";
 
 describe("Rate limits: ", () => {
-  const JOB_DURATION = 5;
+  const JOB_DURATION = 10;
   const JOB_COUNT = 4;
 
   type TaskEvent = [string, { pending: number }];
@@ -198,7 +198,10 @@ describe("Rate limits: ", () => {
   });
 
   test("Rate can override concurrency", async () => {
-    const rateOptions: RateOptions = { intervalMs: 10, intervalSlots: 1 };
+    const rateOptions: RateOptions = {
+      intervalMs: JOB_DURATION * 2,
+      intervalSlots: 1,
+    };
     const concurrencyOptions: ConcurrencyOptions = { concurrency: 10 };
     const settlementSequence = createSettlementSequence(
       {
@@ -213,8 +216,8 @@ describe("Rate limits: ", () => {
     const duration = Date.now() - start;
 
     expect(Math.max(...events.map(([, { pending }]) => pending))).toBe(1);
-    expect(duration).toBeGreaterThanOrEqual(40 * 0.8);
-    expect(duration).toBeLessThanOrEqual(40 * 1.5);
+    expect(duration).toBeGreaterThanOrEqual(8 * JOB_DURATION * 0.8);
+    expect(duration).toBeLessThanOrEqual(8 * JOB_DURATION * 1.5);
     expect(settlements.length).toBe(JOB_COUNT);
   });
 

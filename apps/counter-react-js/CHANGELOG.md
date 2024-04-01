@@ -1,5 +1,20 @@
 # counter-react-js
 
+## 0.9.0
+
+### Patch Changes
+
+- Updated dependencies [6300844]
+- Updated dependencies [6300844]
+- Updated dependencies [d0335b4]
+- Updated dependencies [0da58e5]
+- Updated dependencies [00f1f2a]
+- Updated dependencies [32a95a5]
+- Updated dependencies [6300844]
+- Updated dependencies [a574261]
+  - @watchable/store-react@1.0.0
+  - @watchable/store@1.0.0
+
 ## 0.9.0-alpha.8
 
 ### Patch Changes

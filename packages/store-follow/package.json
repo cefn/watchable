@@ -1,6 +1,6 @@
 {
   "name": "@watchable/store-follow",
-  "version": "1.0.0-alpha.7",
+  "version": "1.0.0",
   "description": "Await @watchable/store state changes and trigger business logic",
   "homepage": "https://github.com/cefn/watchable/tree/main/packages/store-follow#readme",
   "bugs": {
@@ -27,8 +27,8 @@
     "test": "wireit"
   },
   "dependencies": {
-    "@watchable/queue": "1.0.0-alpha.5",
-    "@watchable/store": "1.0.0-alpha.7"
+    "@watchable/queue": "1.0.0",
+    "@watchable/store": "1.0.0"
   },
   "devDependencies": {
     "@vitest/coverage-v8": "^1.2.1",
@@ -38,8 +38,8 @@
     "wireit": "^0.9.5"
   },
   "peerDependencies": {
-    "@watchable/queue": "1.0.0-alpha.5",
-    "@watchable/store": "1.0.0-alpha.7"
+    "@watchable/queue": "1.0.0",
+    "@watchable/store": "1.0.0"
   },
   "publishConfig": {
     "access": "public"
