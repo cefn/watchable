@@ -1,5 +1,12 @@
 # @watchable/unpromise
 
+## 1.0.0-alpha.7
+
+### Major Changes
+
+- 9a865b2: Release 1.0.0 of Unpromise
+- Release v1.0.0 of @watchable/unpromise
+
 ## 0.1.0-alpha.6
 
 ### Patch Changes
