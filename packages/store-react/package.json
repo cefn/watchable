@@ -36,10 +36,10 @@
     "@types/react": "^18.0.25",
     "@vitest/coverage-v8": "^1.2.1",
     "jsdom": "^21.1.1",
-    "typescript": "^5.0.4",
+    "typescript": "^5.4.5",
     "vite": "^5.0.12",
-    "vitest": "^1.2.1",
-    "wireit": "^0.9.5"
+    "vitest": "^1.5.0",
+    "wireit": "^0.14.4"
   },
   "peerDependencies": {
     "@watchable/store": "1.0.0",
@@ -81,7 +81,7 @@
       ]
     },
     "lint": {
-      "command": "eslint -c .eslintrc.cjs .",
+      "command": "eslint .",
       "files": [
         "**/*.js",
         "**/*.jsx",

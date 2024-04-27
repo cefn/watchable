@@ -27,9 +27,9 @@
   },
   "devDependencies": {
     "@vitejs/plugin-legacy": "^5.2.0",
-    "typescript": "^5.0.4",
+    "typescript": "^5.4.5",
     "vite": "^5.0.12",
-    "wireit": "^0.9.5"
+    "wireit": "^0.14.4"
   },
   "wireit": {
     "build": {
@@ -48,7 +48,7 @@
       ]
     },
     "lint": {
-      "command": "eslint -c .eslintrc.cjs .",
+      "command": "eslint .",
       "files": [
         "**/*.js",
         "**/*.jsx",

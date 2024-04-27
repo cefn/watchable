@@ -8,6 +8,8 @@ import { getUpstreamBuildDependencies } from "./lib/rules/packages";
 import { getRepoPath } from "./lib/util";
 import type { PackageJsonSpec } from "./types";
 
+const VITEST_VERSION = "^1.5.0";
+
 export const PACKAGE_JSON_RULES = {
   type: byPackageName({ "counter-dom-commonjs": "commonjs" }, "module"),
   sideEffects: byPackageType({ packages: false, apps: undefined }),
@@ -30,10 +32,22 @@ export const PACKAGE_JSON_RULES = {
     };
   },
   "devDependencies.typescript": byPackageLanguage({
-    ts: "^5.0.4",
+    ts: "^5.4.5",
     js: undefined,
   }),
-  "devDependencies.wireit": "^0.9.5",
+  "devDependencies.wireit": "^0.14.4",
+  "devDependencies.vitest": byPackageType({
+    apps: byPackageName(
+      {
+        "counter-preact-ts": VITEST_VERSION,
+        "counter-react-ts": VITEST_VERSION,
+        "counter-react-ts-edit": VITEST_VERSION,
+        "counter-react-ts-edit-context": VITEST_VERSION,
+      },
+      undefined
+    ),
+    packages: VITEST_VERSION,
+  }),
   "scripts.test:unit": byPackageType({
     apps: byPackageName(
       {
@@ -61,7 +75,7 @@ export const PACKAGE_JSON_RULES = {
   "scripts.lint": "wireit",
   "scripts.build": "wireit",
   "wireit.lint": {
-    command: "eslint -c .eslintrc.cjs .",
+    command: "eslint .",
     files: [
       "**/*.js",
       "**/*.jsx",
