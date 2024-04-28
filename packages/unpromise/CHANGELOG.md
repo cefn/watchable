@@ -1,5 +1,11 @@
 # @watchable/unpromise
 
+## 1.0.1
+
+### Patch Changes
+
+- Fix array signature to race and any.
+
 ## 1.0.0
 
 ### Major Changes
