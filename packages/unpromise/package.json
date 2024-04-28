@@ -46,10 +46,10 @@
   "devDependencies": {
     "@types/node": "^20.11.5",
     "expose-gc": "^1.0.0",
-    "typescript": "^5.0.4",
+    "typescript": "^5.4.5",
     "vite": "^5.0.12",
-    "vitest": "^1.2.1",
-    "wireit": "^0.9.5"
+    "vitest": "^1.5.0",
+    "wireit": "^0.14.4"
   },
   "publishConfig": {
     "access": "public"
@@ -84,7 +84,7 @@
       ]
     },
     "lint": {
-      "command": "eslint -c .eslintrc.cjs .",
+      "command": "eslint .",
       "files": [
         "**/*.js",
         "**/*.jsx",

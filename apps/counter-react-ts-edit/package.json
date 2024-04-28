@@ -42,11 +42,11 @@
     "@vitejs/plugin-react": "^4.2.1",
     "npm-run-all": "^4.1.5",
     "playwright-chromium": "^1.32.3",
-    "typescript": "^5.0.4",
+    "typescript": "^5.4.5",
     "vite": "^5.0.12",
-    "vitest": "^0.30.1",
+    "vitest": "^1.5.0",
     "wait-on": "^7.0.1",
-    "wireit": "^0.9.5"
+    "wireit": "^0.14.4"
   },
   "wireit": {
     "build": {
@@ -88,7 +88,7 @@
       ]
     },
     "lint": {
-      "command": "eslint -c .eslintrc.cjs .",
+      "command": "eslint .",
       "files": [
         "**/*.js",
         "**/*.jsx",

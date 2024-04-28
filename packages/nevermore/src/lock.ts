@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-floating-promises */
 /**
  * A Release function issued to a caller when they acquire a [[Lock]] on a
  * particular key. The caller is expected to invoke this function to give up the

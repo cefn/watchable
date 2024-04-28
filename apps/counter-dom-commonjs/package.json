@@ -30,7 +30,7 @@
     "@vitejs/plugin-legacy": "^5.2.0",
     "vite": "^5.0.12",
     "vite-plugin-commonjs": "^0.10.1",
-    "wireit": "^0.9.5"
+    "wireit": "^0.14.4"
   },
   "wireit": {
     "build": {
@@ -48,7 +48,7 @@
       ]
     },
     "lint": {
-      "command": "eslint -c .eslintrc.cjs .",
+      "command": "eslint .",
       "files": [
         "**/*.js",
         "**/*.jsx",

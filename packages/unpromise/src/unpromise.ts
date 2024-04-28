@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/unbound-method */
 /* eslint-disable @typescript-eslint/return-await */
 /* eslint-disable @typescript-eslint/promise-function-async */
 
@@ -263,10 +264,14 @@ export class Unpromise<T> implements ProxyPromise<T> {
   /** Perform Promise.any() via SubscribedPromises, then unsubscribe them.
    * Equivalent to Promise.any but eliminates memory leaks from long-lived
    * promises accumulating .then() and .catch() subscribers. */
+  static async any<T extends readonly unknown[] | []>(
+    values: T
+  ): Promise<Awaited<T[number]>>;
   static async any<T>(
     values: Iterable<T | PromiseLike<T>>
   ): Promise<Awaited<T>> {
-    const subscribedPromises = [...values].map(Unpromise.resolve);
+    const valuesArray = Array.isArray(values) ? values : [...values];
+    const subscribedPromises = valuesArray.map(Unpromise.resolve);
     try {
       return await Promise.any(subscribedPromises);
     } finally {
@@ -279,10 +284,14 @@ export class Unpromise<T> implements ProxyPromise<T> {
   /** Perform Promise.race via SubscribedPromises, then unsubscribe them.
    * Equivalent to Promise.race but eliminates memory leaks from long-lived
    * promises accumulating .then() and .catch() subscribers. */
+  static async race<T extends readonly unknown[] | []>(
+    values: T
+  ): Promise<Awaited<T[number]>>;
   static async race<T>(
     values: Iterable<T | PromiseLike<T>>
   ): Promise<Awaited<T>> {
-    const subscribedPromises = [...values].map(Unpromise.resolve);
+    const valuesArray = Array.isArray(values) ? values : [...values];
+    const subscribedPromises = valuesArray.map(Unpromise.resolve);
     try {
       return await Promise.race(subscribedPromises);
     } finally {
