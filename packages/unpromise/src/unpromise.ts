@@ -247,7 +247,7 @@ export class Unpromise<T> implements ProxyPromise<T> {
 
   /** Lookup the Unpromise for this promise, and derive a SubscribedPromise from
    * it (that can be later unsubscribed to eliminate Memory leaks) */
-  static resolve<T>(value: T | PromiseLike<T>) {
+  static resolve<T>(this: void, value: T | PromiseLike<T>) {
     const promise: PromiseLike<T> =
       typeof value === "object" &&
       value !== null &&
@@ -263,10 +263,15 @@ export class Unpromise<T> implements ProxyPromise<T> {
   /** Perform Promise.any() via SubscribedPromises, then unsubscribe them.
    * Equivalent to Promise.any but eliminates memory leaks from long-lived
    * promises accumulating .then() and .catch() subscribers. */
+  static async any<T extends readonly unknown[] | []>(
+    this: void,
+    values: T
+  ): Promise<Awaited<T[number]>>;
   static async any<T>(
     values: Iterable<T | PromiseLike<T>>
   ): Promise<Awaited<T>> {
-    const subscribedPromises = [...values].map(Unpromise.resolve);
+    const valuesArray = Array.isArray(values) ? values : [...values];
+    const subscribedPromises = valuesArray.map(Unpromise.resolve);
     try {
       return await Promise.any(subscribedPromises);
     } finally {
@@ -279,10 +284,15 @@ export class Unpromise<T> implements ProxyPromise<T> {
   /** Perform Promise.race via SubscribedPromises, then unsubscribe them.
    * Equivalent to Promise.race but eliminates memory leaks from long-lived
    * promises accumulating .then() and .catch() subscribers. */
+  static async race<T extends readonly unknown[] | []>(
+    this: void,
+    values: T
+  ): Promise<Awaited<T[number]>>;
   static async race<T>(
     values: Iterable<T | PromiseLike<T>>
   ): Promise<Awaited<T>> {
-    const subscribedPromises = [...values].map(Unpromise.resolve);
+    const valuesArray = Array.isArray(values) ? values : [...values];
+    const subscribedPromises = valuesArray.map(Unpromise.resolve);
     try {
       return await Promise.race(subscribedPromises);
     } finally {
@@ -297,7 +307,7 @@ export class Unpromise<T> implements ProxyPromise<T> {
    * .then() and .catch() subscribers. */
   static async raceSingletons<
     const Promises extends ReadonlyArray<Promise<unknown>>
-  >(promises: Promises) {
+  >(this: void, promises: Promises) {
     // a Singleton is a 1-Tuple containing just one of the Promises
     type Singleton = readonly [MemberOf<Promises>];
 
