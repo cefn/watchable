@@ -1,14 +1,74 @@
-# Nevermore - Controller for async pipelines
+# nevermore - a controller for async pipelines
 
-`Nevermore` controls when async tasks are run. 
+## What is nevermore?
 
-It has a `createExecutorStrategy` API to regulate the execution of ordinary async 
-functions by creating an equivalent function (an executor) that wraps the original
-with scheduling, timeout, retry and other regulating behaviours. 
+The `nevermore` scheduler limits the execution of Jobs through composable
+scheduling primitives known as strategies. Concurrency, interval, timeout and
+retry strategies are already implemented as individual composable blocks which
+can be freely combined together. You can further extend nevermore by writing
+your own strategies.
 
-Alternatively it has the generator-based `createSettlementSequence` to regulate 
-(potentially-infinite) batches of jobs that are yielded just-in-time as capacity
-limits allow.
+You typically select strategies by passing option values to the nevermore API...
+
+```ts
+import { createExecutorStrategy } from "@watchable/nevermore";
+const { createExecutor } = createExecutorStrategy({
+  concurrency: 1,
+  intervalMs: 100,
+  timeoutMs: 3000,
+  retries: 3,
+});
+```
+
+`nevermore` has two core APIs which accept the same strategy options...
+
+- `createExecutorStrategy` - wraps async functions without changing your code
+- `createSettlementSequence` - pulls from generators creating jobs just-in-time
+
+See `Usage` later for more detail about the two API signatures.
+
+## Available strategies
+
+A _**concurrency**_ `Strategy` accepts another job only when the number of
+pending jobs goes below `concurrency`. When there is a free slot (previously
+pending jobs have settled as resolved or rejected), the strategy will accept a
+new pending job. To activate this strategy, provide a `concurrency` number in
+the options.
+
+A _**rate**_ `Strategy` implements rate limiting by launching the next job only
+when there is a free slot within the `intervalMs`. Every execution of a job uses
+up one slot in the interval. When an interval's slots are exhausted, the
+strategy calculates when the next slot will become free, and sleeps for that
+duration before accepting the next job. To activate this strategy, provide an
+`intervalMs` number in the options. The default value of `intervalLaunches` is
+`1` launch per interval.
+
+A _**timeout**_ `Strategy` always accepts jobs, wraps them in a timeout job
+(that throws an error if the job hasn't settled before `timeoutMs`) before
+passing the job to downstream strategies. On receiving a settlement (fulfilment,
+rejection or timeout) it unwraps the timeout job, yielding a `JobSettlement`
+pointing to the original job, not the substitute. To activate this strategy,
+provide a `timeoutMs` number in the options and remember your wrapped function
+may now throw a nevermore `TimeoutError`.
+
+A _**retry**_ `Strategy` repeatedly calls failing jobs until the number of
+failures equals `retries`. It wraps jobs in a retry job before launching them,
+storing the count of retries attempted. `JobResolved` settlements are unwrapped
+yielding a `JobResolved` pointing to the original job. By contrast,
+`JobRejected` events trigger further retries until reaching the maximum number
+of retries for that job, and the last failure is passed back as the job's
+settlement. To activate this strategy, provide a `retries` number in the
+options. To get backpressure from `createSettlementSequence` pulling
+just-in-time, you need to set a `concurrency` option to prevent
+indefinitely-many jobs being queued.
+
+A _**backoffRetry**_ `Strategy` repeatedly calls failing jobs with a increasing
+backoff delay (based on an exponential function). See the section on 'retry' for
+more detail of the approach. To activate this strategy, provide a `backoffMs`
+number in the options. To get eventual feedback from continually failing jobs,
+you need to set a `retries` option. To get backpressure from
+`createSettlementSequence` pulling just-in-time, you need to set a `concurrency`
+option to prevent indefinitely-many jobs being queued.
 
 ## Install
 
@@ -64,9 +124,33 @@ const [episode4, episode5, episode6] = await Promise.allSettled([
 
 ### Batch (generator) API
 
-For batch routines, (or potentially infinite sets), `createSettlementSequence` 
-provides an alternative API based on iterable sequences of no-arg functions, 
-with the same options available...
+For batch routines, (or potentially infinite sets), `createSettlementSequence`
+provides an alternative API based on iterable sequences of callbacks of a
+generic type you define.
+
+Exactly the same scheduling options (`concurrency`, `retry` etc.) are supported
+as in the `createExecutorStrategy` API.
+
+#### Explanation
+
+If you eventually need to satisfy a million requests, you don't want to spawn
+them all as pending promises in memory as they are slowly processed at 100 per
+second.
+
+The `createExecutor` approach described above is very convenient for adding
+seamless scheduling of hundreds of parallel tasks without having to change your
+code. Unfortunately this makes the scheduling opaque and there is therefore no
+mechanism to provide backpressure when jobs aren't completing quickly.
+
+By contrast the `createSettlementSequence` allows developers to respect
+'backpressure' from a pipeline's limited capacity. Each `Job` is yielded from
+the iterator you provide just-in-time as capacity becomes available. Between
+yields your iterator is halted, holding only its stack in memory. An iteration
+procedure for 1 million requests will therefore only progress as fast as the
+pipeline allows, and the only promises in memory are those which have been
+scheduled.
+
+An example of a sequence yielding `Job` callbacks one-by-one is shown below.
 
 ```ts
 import { createSettlementSequence } from "@watchable/nevermore";
@@ -127,13 +211,10 @@ yield () => getStarWars(filmId);
 Add properties to the yielded no-arg function with `Object.assign`
 
 ```ts
-yield Object.assign(
-    () => getStarWars(filmId),
-    { filmId }
-)
+yield Object.assign(() => getStarWars(filmId), { filmId });
 ```
 
-Then you can get the extra information back from the type-safe `job` in the 
+Then you can get the extra information back from the type-safe `job` in the
 settlement...
 
 ```ts
@@ -150,43 +231,43 @@ for await (const settlement of settlementSequence) {
 }
 ```
 
-## Under the hood
+## Writing your own `nevermore` strategies
 
-The `nevermore` implementation accepts arbitrary pipeline stages known as
-strategies. The concurrency, interval, timeout, retry strategies are already
-implemented as individual composable blocks which are piped together. You can
-see the available options through intellisense when invoking `createExecutor` or
-`nevermore`.
+Developers can add e.g. a CircuitBreaker strategy of their own to extend the
+richness of their nevermore pipeline. You can pass your piped strategies in the
+`pipes` option to be placed upstream of strategies specified in the other
+options.
 
-The `createExecutor` primitive is built on top of `nevermore` pipelines, but
-provides a simple API in which you can transparently wrap your own typed
-functions to have them constrained by the pipeline.
+For reference a _**passthru**_ `Strategy` is included in source. This is a no-op
+strategy that is suitable as a starting point for your own strategies. Its
+implementation is shown in full below to illustrate the `Strategy` formalism.
 
-A _**concurrency-limiting**_ `Strategy` accepts another job only when the number
-of pending jobs goes below a threshold (because pending jobs have settled as
-resolved or rejected). Once there is a slot for a pending job, it will accept a
-new job and attempt to pass it on to the next layer.
+- `launchJob()` asks to schedule a `Job`, returning a promise that resolves once
+  the job has been first invoked.
+- `launchesDone()` is a signal called on your strategy when no further launches
+  will take place, allowing it to track remaining pending jobs, and finally
+  clean up resources.
+- `next(): Promise<IteratorResult<JobSettlement<J>>>` implements an
+  `AsyncIterator` allowing your strategy to pass back the eventual settlements
+  of launched jobs (when they are eventually fulfilled or rejected).
 
-A _**rate-limiting**_ `Strategy` accepts another job only when there is still a
-slot within this interval (until the number of launches within the interval
-matches `intervalLaunches`). When the limit is hit, it can work out when the
-next slot will become free, and sleeps for that duration before yielding and
-accepting the next job.
-
-A _**timeout**_ `Strategy` always accepts jobs, wraps them in a timeout job that
-throws an error if it hasn't settled in time before passing the task downstream.
-On receiving a settlement it unwraps the timeout job, so the `JobSettlement`
-points to the original job, rather than the modified one.
-
-A _**retry**_ `Strategy` always accepts jobs, wraps them in a retry job, storing
-extra metadata describing the count of retries attempted. `JobResolved`
-settlements are unwrapped to create a `JobResolved` for the original job.
-However `JobRejected` events are re-attempted until reaching the maximum number
-of retries for that job, and then the failure is passed back down the chain.
-
-If you wish to add e.g. a BackoffRetry or a CircuitBreaker strategy, this can
-extend the richness of your pipeline. Pass your piped strategies in the `pipes`
-option and they will be wired after the others specified in your options.
+```ts
+export function createPassthruStrategy<J extends Job<unknown>>(
+  downstream: Strategy<J>
+) {
+  return {
+    launchJob(job) {
+      return downstream.launchJob(job);
+    },
+    launchesDone() {
+      downstream.launchesDone();
+    },
+    next() {
+      return downstream.next();
+    },
+  } satisfies Strategy<J>;
+}
+```
 
 ## See also
 

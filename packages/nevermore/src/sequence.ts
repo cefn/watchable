@@ -1,3 +1,4 @@
+import { createBackoffRetryPipe, isBackoffOptions } from "./strategies/backoff";
 import {
   createConcurrencyPipe,
   isConcurrencyOptions,
@@ -19,18 +20,25 @@ function isPipeOptions(options: NevermoreOptions): options is PipeOptions {
   return typeof options.pipes !== "undefined";
 }
 
-/** Create strategies from the provided options. For each behaviour this curries
- * the behaviour-specific options into a generic Pipe interface. The Pipe
- * composition pattern allows the Job of the downstream factory to be dynamically
- * decided. For example a `TimeoutStrategy` needs a downstream strategy that
- * accepts `TimeoutJob<J>` not just `J`. And if you compose a RetryStrategy
- * before that in the sequence, then downstream it should be
- * `RetryJob<TimeoutJob<J>>`.
+/** Create strategies from the provided options.
  *
- * @param options The combined options for all behaviours needed in the pipeline.
- * @returns an Iterable that defines the sequence of pipes opted into by the caller.
+ * This procedure curries the each specific strategy's options into a Pipe
+ * interface. The generic Pipe interface is a factory pattern allowing the Job
+ * type of each subsequent factory to be dynamically decided based on the
+ * earlier factories.
+ *
+ * For example a `TimeoutStrategy` needs a downstream strategy that accepts
+ * `TimeoutJob<J>` not just `J`. And if you compose a RetryStrategy before that
+ * in the sequence, then downstream it should be `RetryJob<TimeoutJob<J>>`.
+ *
+ * @param options The combined options for all behaviours needed in the
+ * pipeline.
+ * @returns an Iterable that defines the sequence of pipes opted into by the
+ * caller.
  */
 function* pipesFromOptions(options: NevermoreOptions): Iterable<Pipe> {
+  // first piped strategies are 'downstream' (see jobs last)
+  // last piped strategies are 'upstream' (see jobs first)
   if (isTimeoutOptions(options)) {
     // give up on slow jobs
     yield createTimeoutPipe(options);
@@ -43,13 +51,21 @@ function* pipesFromOptions(options: NevermoreOptions): Iterable<Pipe> {
     // constrain jobs launched within an interval
     yield createRatePipe(options);
   }
-  // order ensures also re-inserted retry jobs
+  // backoff and retry being upstream ensures re-inserted backoff and retry jobs
   // are limited by concurrency, rate, timeout
-  if (isRetryOptions(options)) {
+
+  // currently retry strategy used if only retries is set, or backoff strategy
+  // if backoffMs is set but never both. In a followup, we can refactor for
+  // all retry cases to be handled by backoff (skipping the timing code)
+  if (isBackoffOptions(options)) {
+    // repeat failing jobs with exponentially-increasing delay
+    yield createBackoffRetryPipe(options);
+  } else if (isRetryOptions(options)) {
     // repeat failing jobs a certain number of times
     yield createRetryPipe(options);
   }
-  // wire pipes passed by caller
+
+  // add custom pipes provided by the caller
   if (isPipeOptions(options)) {
     yield* options.pipes;
   }
@@ -57,16 +73,16 @@ function* pipesFromOptions(options: NevermoreOptions): Iterable<Pipe> {
 
 /**
  * Users of `nevermore` would rarely use this directly.
- * They should use {@link createExecutorStrategy} 
+ * They should use {@link createExecutorStrategy}
  * for the function-wrapper API or {@link createSettlementSequence} for
  * the just-in-time batch API.
- * 
- * Constructs a 'pipe' chaining Strategy instances. 
+ *
+ * Constructs a 'pipe' chaining Strategy instances.
  *
  * Combines the option parsing, Pipe creation routines to
- * compose a pipe chaining {@link Strategy} instances. The pipe 
- * will always have a LauncherStrategy (that triggers and tracks 
- * the jobs) then has arbitrary Strategies layered on top according 
+ * compose a pipe chaining {@link Strategy} instances. The pipe
+ * will always have a LauncherStrategy (that triggers and tracks
+ * the jobs) then has arbitrary Strategies layered on top according
  * to the provided options.
  *
  * @param options The combined options for all behaviours needed in the pipeline.
@@ -84,12 +100,12 @@ export function createStrategyFromOptions<J extends Job<unknown>>(
   let createStrategy = <J extends Job<unknown>>() =>
     createLauncherStrategy<J>(cancelPromise);
 
-  // wrap each factory in further factories specified by caller
+  // wrap each factory in further factories as specified by the options provided
   for (const pipe of pipesFromOptions(options)) {
     createStrategy = pipe(createStrategy);
   }
 
-  // execute final factory, creating a composed strategy
+  // execute the resulting final factory, therefore creating a composed strategy
   return createStrategy<J>();
 }
 

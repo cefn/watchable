@@ -10,6 +10,13 @@ See the `Typical Problem Case` below for reference.
 
 The Memory leaks are fixed by using @watchable/unpromise.
 
+In general the `Promise` API doesn't allow for an unsubscription model. The
+`@watchable/unpromise` package wraps individual promises to provide an
+unsubscribe method. It uses this approach to provide safe implementations of
+`Unpromise.race` and `Unpromise.any`. However, the ability to unsubscribe
+Promises may be useful for other cases where the Promise reference chains (and
+therefore memory leaks) are otherwise out of your control.
+
 # Usage
 
 Substitute `Unpromise.race` or `Unpromise.any` in place of `Promise.race` and
