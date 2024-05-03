@@ -26,6 +26,7 @@ import { myFn } from "./myFn.ts";
 const { createExecutor } = createExecutorStrategy({
   concurrency: 1,
   intervalMs: 100,
+  backoffMs: 1000,
   timeoutMs: 3000,
   retries: 3,
 });

@@ -19,14 +19,14 @@ export type JobArgs =
  */
 export type Job<T> = (...args: JobArgs) => Promise<T>;
 
-/** A record that a `Job` execution succeeded, returned a `value`. */
+/** A record yielded by a settlement sequence when a `Job` execution succeeded and returned a `value`. */
 export interface JobFulfilment<J extends Job<unknown>> {
   job: J;
   status: "fulfilled";
   value: Awaited<ReturnType<J>>;
 }
 
-/** A record that a `Job` execution failed, threw a `reason`. */
+/** A record yielded by a settlement sequence when a `Job` execution failed, threw a `reason`. */
 export interface JobRejection<J extends Job<unknown>> {
   job: J;
   status: "rejected";
@@ -38,7 +38,8 @@ export type JobSettlement<J extends Job<unknown>> =
   | JobFulfilment<J>
   | JobRejection<J>;
 
-/** Limit pending promises (launched but not yet settled) */
+/** A limit on the number of pending promises (jobs launched but not yet
+ * fulfilled or rejected). */
 export interface ConcurrencyOptions {
   /** The maximum number of pending promises allowed by the strategy.
    * `Job` execution is halted when the pending number reaches `concurrency`.
@@ -46,26 +47,32 @@ export interface ConcurrencyOptions {
   concurrency: number;
 }
 
-/** Patience before abandoning pending promises (launched but not yet settled) */
+/** Sets a time to wait before abandoning promises that are pending
+ * (launched but not yet settled). */
 export interface TimeoutOptions {
   /** The number of milliseconds to wait before considering a Job to be failed. */
   timeoutMs: number;
 }
 
-/** A limit on job launches made within each second, (or chosen interval) */
+/** Limit to a specified number of jobs launched within each `intervalMs`. */
 export interface RateOptions {
   /** The length of each scheduling interval. */
   intervalMs: number;
   /** The number of jobs which can be carried out in one scheduling interval (default is 1). */
-  intervalSlots?: number; // assume one job per interval
+  intervalSlots?: number;
 }
 
-interface RetryOptions {
+/** Options controlling the number of retries attempted after a job fails and
+ * selecting which errors are retried. If `backoffMs` or `retries` are set then
+ * jobs are retried. Else failures are immediately passed back to the caller.
+ * See also `BackoffOptions`. */
+export interface RetryOptions {
   /** The number of attempts before considering a Job to be rejected. */
-  retries?: number;
+  retries: number;
 
-  /** A predicate to determine if a thrown error should allow a retry.
-   * If omitted then jobs are retried for all errors.
+  /** Predicate to determine if a thrown error allows a retry. If `retries` or
+   * `backoffMs` is set, but `retryAllowed` is omitted then jobs are retried
+   * after all errors.
    */
   retryAllowed?: (error: unknown) => boolean;
 }
@@ -77,9 +84,9 @@ interface RetryOptions {
  *
  * Delay is calculated to be approximately `backoffMs *
  * Math.pow(backoffFactorGrowth, n)`. This delay is optionally randomised by a
- * jitter factor and/or limited by an exponent ceiling.
+ * jitter factor and/or limited by `backoffMaxExponent`.
  */
-interface BackoffOptions {
+export interface BackoffOptions {
   /** The delay before the first retry. Subsequent retries are scheduled by
    * multiplying this millisecond delay by a constant factor.
    *
@@ -89,7 +96,7 @@ interface BackoffOptions {
    */
   backoffMs: number;
 
-  /** The initial multiplying factor (1.0) grows by this proportion each time.
+  /** The initial delay grows by this proportion after each failure.
    * By default `backoffGrowth` is 2.0 meaning the first delay is `1.0 x
    * backoffMs`, the second is `2.0 x backoffMs`, the third is `4.0 x backoffMs`
    * Set to 1.0 to eliminate exponential growth in the delay.
@@ -113,9 +120,16 @@ interface BackoffOptions {
    * synchronizing their retries even when the initial failures were
    * synchronized. Set to 0 for no jitter. */
   backoffJitter?: number;
+
+  /** Predicate to determine if a thrown error allows a retry. If `retries` or
+   * `backoffMs` is set, but `retryAllowed` is omitted then jobs are retried
+   * after all errors.
+   */
+  retryAllowed?: (error: unknown) => boolean;
 }
 
-type NothingFrom<T> = {
+/** Utility type defining all properties of a given type as absent. */
+export type NothingFrom<T> = {
   [k in keyof Required<T>]?: never;
 };
 
@@ -125,20 +139,21 @@ export type BackoffRetryOptions =
   | (RetryOptions & NothingFrom<BackoffOptions>)
   | (BackoffOptions & NothingFrom<RetryOptions>);
 
-/** Allows custom strategies to be chained after built-in strategies. */
+/** Pass this option to chain custom strategies after the built-in strategies. */
 export interface PipeOptions {
   /** Pipes to be wired in after all other strategies. The pipe's launchJob()
    * implementation should wait on the downstream strategy's launchJob(). This
    * has the effect of respecting the constraints of concurrency, rate-limits
    * and other strategies configured by built-in `NevermoreOptions`. However,
    * it means that your pipe can add its own additional scheduling, job behaviours
-   * or annotations.
+   * or annotations. See `createPassthruPipe` for a reference code to build your
+   * own strategies.
    */
   pipes: Pipe[];
 }
 
-/** Provides a 'control-plane' Promise that downstream strategies and jobs can
- * await to know when and if they should terminate themselves. */
+/** An API for aborting strategies and jobs. Operations which are passed a cancelPromise
+ * during initialisation should await it and abort their task when it resolves. */
 export interface CancelOptions {
   cancelPromise: Promise<unknown>;
 }
@@ -165,14 +180,6 @@ export type Strategy<J extends Job<unknown>> = AsyncIterator<
   launchJob: (job: J) => Promise<void>;
   launchesDone: () => void;
 };
-
-/** A record of a launch, combining the Job (async function) and the
- * resulting Promise.
- */
-export interface Launch<J extends Job<unknown>> {
-  job: J;
-  promise: Promise<Awaited<ReturnType<J>>>;
-}
 
 /** A generic factory signature binding a Job type to a Strategy. */
 export type StrategyFactory = <J extends Job<unknown>>() => Strategy<J>;
