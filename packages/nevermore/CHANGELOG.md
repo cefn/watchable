@@ -1,5 +1,11 @@
 # @watchable/nevermore
 
+## 0.10.0
+
+### Minor Changes
+
+- Implement backoff and retryAllowed predicate.
+
 ## 0.9.0
 
 ### Minor Changes
