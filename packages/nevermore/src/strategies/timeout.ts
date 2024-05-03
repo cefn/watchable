@@ -10,7 +10,7 @@ import type {
   StrategyFactory,
   TimeoutOptions,
 } from "../types";
-import { createBiddablePromise, serializeError } from "../util";
+import { createBiddablePromise } from "../util";
 
 export class TimeoutError extends Error {
   constructor(timeoutMs: number) {
@@ -78,13 +78,9 @@ function createTimeoutJob<J extends Job<unknown>>(
         // Not a settlement. Must be early termination (timeout or upstreamCancel)
         // trigger a downstream cancel
         downstreamCancelBiddable.fulfil();
-        // handle eventual errors from (now-ignored) job
+        // catch eventual errors from (now-ignored) job
         jobPromise.catch((error) => {
-          console.log(
-            `Ignoring eventual error ${serializeError(
-              error
-            )}. Job already timed out`
-          );
+          void error;
         });
       }
       if (winner === "timeout") {

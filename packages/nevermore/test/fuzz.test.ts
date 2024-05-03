@@ -29,7 +29,7 @@ function createRandomOptions(): NevermoreOptions {
   return options;
 }
 
-function createRandomJob() {
+function createRandomJob(index: number) {
   const delayMs = 0 + Math.floor(Math.random() * 20);
   const failureProbability = Math.random() * 0.5;
   const job = Object.assign(
@@ -42,7 +42,7 @@ function createRandomJob() {
       }
       return "Succeeded";
     },
-    { config: { delayMs, failureProbability } }
+    { index, config: { delayMs, failureProbability } }
   );
   return job;
 }
@@ -51,10 +51,13 @@ describe("Fuzz testing", () => {
   test("Create random combinations of options, tasks to nevermore. Always expect eventual settlement", async () => {
     for (let testId = 0; testId < 64; testId++) {
       const length = 1 + Math.floor(Math.random() * 9);
-      const randomJobs = Array.from({ length }, createRandomJob);
+      const randomJobs = Array.from({ length }, (_, index) =>
+        createRandomJob(index)
+      );
       const randomOptions = createRandomOptions();
 
       const randomJobConfigs = randomJobs.map(({ config }) => config);
+      const randomJobIndexes = randomJobs.map(({ index }) => index);
 
       const settlementSequence = createSettlementSequence(
         randomOptions,
@@ -75,7 +78,13 @@ describe("Fuzz testing", () => {
       }
 
       const settlements = await settlementsPromise;
+      // expect the correct amount of settlements
       expect(settlements.length).toBe(length);
+
+      // expect each job to be represented by exactly one settlement
+      expect(settlements.map(({ job }) => job.index).sort()).toEqual(
+        randomJobIndexes
+      );
     }
   });
 
