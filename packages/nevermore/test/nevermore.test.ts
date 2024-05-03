@@ -5,7 +5,7 @@ import { createFlag } from "../src/util";
 import type { NevermoreOptions } from "../src/types";
 import { createSettlementSequence } from "../src/sequence";
 import { createConcurrencyPipe } from "../src/strategies/concurrency";
-import { createRetryPipe } from "../src/strategies/retry";
+import { createRetryPipe } from "../src/strategies/backoff";
 
 const NOOP_OPTIONS: NevermoreOptions = {};
 

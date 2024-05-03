@@ -1,11 +1,10 @@
-import { createBackoffRetryPipe, isBackoffOptions } from "./strategies/backoff";
 import {
   createConcurrencyPipe,
   isConcurrencyOptions,
 } from "./strategies/concurrency";
 import { createLauncherStrategy } from "./strategies/launcher";
 import { createRatePipe, isRateOptions } from "./strategies/rate";
-import { createRetryPipe, isRetryOptions } from "./strategies/retry";
+import { createRetryPipe, isRetryOptions } from "./strategies/backoff";
 import { createTimeoutPipe, isTimeoutOptions } from "./strategies/timeout";
 import type {
   Job,
@@ -53,15 +52,8 @@ function* pipesFromOptions(options: NevermoreOptions): Iterable<Pipe> {
   }
   // backoff and retry being upstream ensures re-inserted backoff and retry jobs
   // are limited by concurrency, rate, timeout
-
-  // currently retry strategy used if only retries is set, or backoff strategy
-  // if backoffMs is set but never both. In a followup, we can refactor for
-  // all retry cases to be handled by backoff (skipping the timing code)
-  if (isBackoffOptions(options)) {
-    // repeat failing jobs with exponentially-increasing delay
-    yield createBackoffRetryPipe(options);
-  } else if (isRetryOptions(options)) {
-    // repeat failing jobs a certain number of times
+  if (isRetryOptions(options)) {
+    // repeat failing jobs optionally with limit on repetition, and/or exponentially-increasing delay
     yield createRetryPipe(options);
   }
 

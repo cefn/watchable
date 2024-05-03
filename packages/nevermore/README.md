@@ -1,23 +1,36 @@
-# nevermore - a controller for async pipelines
+# nevermore - limit the execution of async functions
 
 ## What is nevermore?
 
-The `nevermore` scheduler limits the execution of Jobs through composable
-scheduling primitives known as strategies. Concurrency, interval, timeout and
-retry strategies are already implemented as individual composable blocks which
-can be freely combined together. You can further extend nevermore by writing
-your own strategies.
+The `nevermore` scheduler can wraps your async functions to impose
+rate-limiting, concurrency control, retry, backoff, timeout without changing
+their signature.
 
-You typically select strategies by passing option values to the nevermore API...
+It can also regulate tasks as part of potentially infinite batch processes with
+backpressure to limit the growth of memory in your app.
+
+The execution of Jobs is controlled through composable scheduling primitives
+known as strategies. Multiple strategies are already implemented as individual
+composable blocks which can be freely combined. You can further extend nevermore
+by writing your own strategies.
+
+## Usage
+
+You can select strategies by passing option values to one of the two core
+nevermore APIs...
 
 ```ts
 import { createExecutorStrategy } from "@watchable/nevermore";
+import { myFn } from "./myFn.ts";
+
 const { createExecutor } = createExecutorStrategy({
   concurrency: 1,
   intervalMs: 100,
   timeoutMs: 3000,
   retries: 3,
 });
+
+const myLimitedFn = createExecutor(myFn);
 ```
 
 `nevermore` has two core APIs which accept the same strategy options...
@@ -25,7 +38,8 @@ const { createExecutor } = createExecutorStrategy({
 - `createExecutorStrategy` - wraps async functions without changing your code
 - `createSettlementSequence` - pulls from generators creating jobs just-in-time
 
-See `Usage` later for more detail about the two API signatures.
+See more detail about the two API signatures in the `APIs` section later in this
+document.
 
 ## Available strategies
 
@@ -58,11 +72,9 @@ yielding a `JobResolved` pointing to the original job. By contrast,
 `JobRejected` events trigger further retries until reaching the maximum number
 of retries for that job, and the last failure is passed back as the job's
 settlement. To activate this strategy, provide a `retries` number in the
-options. To get backpressure from `createSettlementSequence` pulling
-just-in-time, you need to set a `concurrency` option to prevent
-indefinitely-many jobs being queued.
+options.
 
-A _**backoffRetry**_ `Strategy` repeatedly calls failing jobs with a increasing
+A _**backoff**_ `Strategy` repeatedly calls failing jobs with a increasing
 backoff delay (based on an exponential function). See the section on 'retry' for
 more detail of the approach. To activate this strategy, provide a `backoffMs`
 number in the options. To get eventual feedback from continually failing jobs,
@@ -76,7 +88,7 @@ option to prevent indefinitely-many jobs being queued.
 npm install @watchable/nevermore
 ```
 
-## Usage
+## APIs
 
 ### Ad Hoc (async function) API
 
@@ -84,8 +96,8 @@ An `ExecutorStrategy` can transform a normal async function into a function that
 is regulated by a `nevermore` pipeline.
 
 Create a strategy and get back a `createExecutor()` function. The strategy shown
-below exercises most of the options - concurrency-limits, rate-limits, timeouts
-and retries...
+below exercises most of the options - concurrency-limits, rate-limits, backoff,
+timeouts and retries...
 
 ```ts
 import { createExecutorStrategy } from "@watchable/nevermore";
@@ -93,6 +105,7 @@ const { createExecutor } = createExecutorStrategy({
   concurrency: 1,
   intervalMs: 100,
   timeoutMs: 3000,
+  backoffMs: 1000,
   retries: 3,
 });
 ```
@@ -134,8 +147,9 @@ as in the `createExecutorStrategy` API.
 #### Explanation
 
 If you eventually need to satisfy a million requests, you don't want to spawn
-them all as pending promises in memory as they are slowly processed at 100 per
-second.
+them all as pending promises in memory while they are slowly processed at 100
+per second. The resources dedicated to pending jobs should be allocated
+just-in-time.
 
 The `createExecutor` approach described above is very convenient for adding
 seamless scheduling of hundreds of parallel tasks without having to change your
@@ -144,11 +158,10 @@ mechanism to provide backpressure when jobs aren't completing quickly.
 
 By contrast the `createSettlementSequence` allows developers to respect
 'backpressure' from a pipeline's limited capacity. Each `Job` is yielded from
-the iterator you provide just-in-time as capacity becomes available. Between
-yields your iterator is halted, holding only its stack in memory. An iteration
-procedure for 1 million requests will therefore only progress as fast as the
-pipeline allows, and the only promises in memory are those which have been
-scheduled.
+your iterator just-in-time as capacity becomes available. Between yields your
+iterator is halted, holding only its stack in memory. An iteration procedure for
+1 million requests will therefore only progress as fast as the pipeline allows,
+and the only promises in memory are those which have been scheduled.
 
 An example of a sequence yielding `Job` callbacks one-by-one is shown below.
 
@@ -234,9 +247,7 @@ for await (const settlement of settlementSequence) {
 ## Writing your own `nevermore` strategies
 
 Developers can add e.g. a CircuitBreaker strategy of their own to extend the
-richness of their nevermore pipeline. You can pass your piped strategies in the
-`pipes` option to be placed upstream of strategies specified in the other
-options.
+richness of their nevermore pipeline.
 
 For reference a _**passthru**_ `Strategy` is included in source. This is a no-op
 strategy that is suitable as a starting point for your own strategies. Its
@@ -268,6 +279,21 @@ export function createPassthruStrategy<J extends Job<unknown>>(
   } satisfies Strategy<J>;
 }
 ```
+
+## Changing strategy sequence
+
+You can pass piped strategies in the `pipes` option to be placed upstream of
+strategies specified in the other options. If there are no other options, it
+will simply sequence the pipes you choose. `nevermore` exports factories for
+core pipes using e.g. as `createConcurrencyPipe()` and `createTimeoutPipe()`.
+
+This would be needed if you want to sequence your own strategies differently
+than the default sequence (found in the core `sequence.ts` file). For example,
+in the default sequence backoff is placed before concurrency. This ensures that
+backed off tasks don't consuming a slot except when they are re-executing, and
+avoids blocking other tasks from executing. If you want a concurrency slot to be
+dedicated to a task during its whole backoff lifecycle, you can place
+concurrency before backoff.
 
 ## See also
 
