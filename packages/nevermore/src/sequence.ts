@@ -117,6 +117,8 @@ export function createStrategyFromOptions<J extends Job<unknown>>(
  * is being settled. You can add arbitrary annotations to your jobs that will
  * help you when consuming settlements.
  *
+ * See documentation of {@link NevermoreOptions} for more on the available behaviours.
+ *
  * @param jobSequence An array, generator or other Iterable. Nevermore will pull
  * jobs from it just-in-time.
  * @param options The combined options for all behaviours needed in the

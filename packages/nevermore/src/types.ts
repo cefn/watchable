@@ -1,7 +1,7 @@
-/** Job functions are called with no args, or an options object containing a
- * `cancelPromise`. If the underlying async operation doesn't support
- * cancellation, the cancelPromise argument can be ignored. If the job is
- * cancellable, (such as a fetch which has support for AbortSignal) the
+/** Job functions are called with no args, or a single  options object
+ * containing a `cancelPromise`. If the underlying async operation doesn't
+ * support cancellation, the cancelPromise argument can be ignored. If the job
+ * is cancellable, (such as a fetch which has support for AbortSignal) the
  * underlying operation should be aborted when the cancelPromise resolves. In
  * normal operation, the cancelPromise will remain permanently unsettled.
  */
@@ -14,8 +14,8 @@ export type JobArgs =
     ];
 
 /** A operation that returns T. Strategies may repeat a failed operation by
- * calling it multiple times, or cancel it by allowing the cancelPromise in
- * `JobArgs` to resolve.
+ * calling it multiple times, or cancel an executing operation by resolving
+ *  the cancelPromise passed in {@link JobArgs}.
  */
 export type Job<T> = (...args: JobArgs) => Promise<T>;
 
