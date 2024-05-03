@@ -60,10 +60,14 @@ export interface RateOptions {
   intervalSlots?: number; // assume one job per interval
 }
 
-/** A strategy to retry each job multiple times. */
-export interface RetryOptions {
+interface RetryOptions {
   /** The number of attempts before considering a Job to be rejected. */
-  retries: number;
+  retries?: number;
+
+  /** A predicate to determine if a thrown error should allow a retry.
+   * If omitted then jobs are retried for all errors.
+   */
+  retryAllowed?: (error: unknown) => boolean;
 }
 
 /** Options to enable and control a BackoffStrategy.
@@ -75,13 +79,13 @@ export interface RetryOptions {
  * Math.pow(backoffFactorGrowth, n)`. This delay is optionally randomised by a
  * jitter factor and/or limited by an exponent ceiling.
  */
-export interface BackoffOptions {
+interface BackoffOptions {
   /** The delay before the first retry. Subsequent retries are scheduled by
    * multiplying this millisecond delay by a constant factor.
    *
    * There is no default value. Setting a backoffMs activates the backoff
    * strategy. If `backoffMs` is not present, no backoff strategy will be launched
-   * and all other `BackoffOptions` should be omitted.
+   * and all other `backoffXXX` options should be omitted.
    */
   backoffMs: number;
 
@@ -109,10 +113,17 @@ export interface BackoffOptions {
    * synchronizing their retries even when the initial failures were
    * synchronized. Set to 0 for no jitter. */
   backoffJitter?: number;
-
-  /** The number of attempts before considering a Job to be rejected. */
-  retries?: number;
 }
+
+type NothingFrom<T> = {
+  [k in keyof Required<T>]?: never;
+};
+
+/** Combined options now backoff strategy also handles simple retry. */
+export type BackoffRetryOptions =
+  | (RetryOptions & BackoffOptions)
+  | (RetryOptions & NothingFrom<BackoffOptions>)
+  | (BackoffOptions & NothingFrom<RetryOptions>);
 
 /** Allows custom strategies to be chained after built-in strategies. */
 export interface PipeOptions {
@@ -139,8 +150,7 @@ export type NevermoreOptions = Partial<
   ConcurrencyOptions &
     RateOptions &
     TimeoutOptions &
-    RetryOptions &
-    BackoffOptions &
+    BackoffRetryOptions &
     CancelOptions &
     PipeOptions
 >;

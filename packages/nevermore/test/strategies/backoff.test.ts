@@ -5,7 +5,8 @@ import {
   createSettlementSequence,
   sleep,
 } from "../../src/index";
-import { Job, JobSettlement } from "../../src/types";
+import { Job, JobSettlement, NevermoreOptions } from "../../src/types";
+import { createFailingJob, iterable2array } from "../testutil";
 
 /** Creates an expected sequence of backoff delays for given
  * options (after `backoffCeiling` repetitions the delay is constant) */
@@ -94,6 +95,126 @@ function calculateOffsets(records: { timestamp: number }[]) {
     return offset;
   });
 }
+
+describe("Retry behaviour", () => {
+  test("Can retry failed tasks", async () => {
+    const settlementSequence = createSettlementSequence(
+      { retries: 1 },
+      function* () {
+        yield Object.assign(createFailingJob({ failures: 1 }), { taskId: 0 });
+        yield Object.assign(createFailingJob({ failures: 1 }), { taskId: 1 });
+        yield Object.assign(createFailingJob({ failures: 1 }), { taskId: 2 });
+      }
+    );
+
+    const settlements = await iterable2array(settlementSequence);
+
+    expect(settlements.every(({ status }) => status === "fulfilled"));
+    expect(settlements.length).toBe(3);
+  });
+
+  test("Tasks exhausting retries settle as failed", async () => {
+    const settlementSequence = createSettlementSequence(
+      { retries: 1 },
+      function* () {
+        yield Object.assign(createFailingJob({ failures: 2 }), { taskId: 0 }); // fails all retries
+        yield Object.assign(createFailingJob({ failures: 1 }), { taskId: 1 });
+        yield Object.assign(createFailingJob({ failures: 1 }), { taskId: 2 });
+      }
+    );
+
+    const settlements = await iterable2array(settlementSequence);
+
+    expect(settlements.map(({ status }) => status)).toMatchObject([
+      "rejected",
+      "fulfilled",
+      "fulfilled",
+    ]);
+    expect(settlements.length).toBe(3);
+  });
+
+  test("Retries are also limited by concurrency", async () => {
+    const nevermoreOptions: NevermoreOptions = {
+      retries: 1,
+      concurrency: 1,
+    };
+    const failureOptions = {
+      failures: 1,
+      delayMs: 10,
+    };
+
+    const settlementSequence = createSettlementSequence(
+      nevermoreOptions,
+      function* () {
+        yield Object.assign(createFailingJob(failureOptions), {
+          taskId: 0,
+        });
+        yield Object.assign(createFailingJob(failureOptions), {
+          taskId: 1,
+        });
+        yield Object.assign(createFailingJob(failureOptions), {
+          taskId: 2,
+        });
+      }
+    );
+
+    const start = Date.now();
+    const settlements = await iterable2array(settlementSequence);
+    const duration = Date.now() - start;
+
+    expect(duration).toBeGreaterThanOrEqual(6 * failureOptions.delayMs);
+
+    expect(settlements.map(({ status }) => status)).toMatchObject([
+      "fulfilled",
+      "fulfilled",
+      "fulfilled",
+    ]);
+    expect(settlements.length).toBe(3);
+  });
+
+  test("Retries are also limited by rate limit", async () => {
+    const nevermoreOptions = {
+      retries: 1,
+      intervalMs: 10,
+      intervalSlots: 1,
+    } satisfies NevermoreOptions;
+
+    const failureOptions = {
+      failures: 1,
+      delayMs: 1,
+    };
+
+    const settlementSequence = createSettlementSequence(
+      nevermoreOptions,
+      function* () {
+        yield Object.assign(createFailingJob(failureOptions), {
+          taskId: 0,
+        });
+        yield Object.assign(createFailingJob(failureOptions), {
+          taskId: 1,
+        });
+        yield Object.assign(createFailingJob(failureOptions), {
+          taskId: 2,
+        });
+      }
+    );
+
+    const start = Date.now();
+    const settlements = await iterable2array(settlementSequence);
+    const duration = Date.now() - start;
+
+    // Final job completes at beginning of 6th 10ms interval (e.g. ~50 ms)
+    expect(duration).toBeGreaterThanOrEqual(5 * nevermoreOptions.intervalMs);
+    expect(duration).toBeLessThanOrEqual(7 * nevermoreOptions.intervalMs);
+
+    expect(settlements.map(({ status }) => status)).toMatchObject([
+      "fulfilled",
+      "fulfilled",
+      "fulfilled",
+    ]);
+    expect(settlements.length).toBe(3);
+  });
+});
 
 describe("Backoff retry behaviour", () => {
   beforeEach(() => {
@@ -481,7 +602,7 @@ describe("Backoff retry behaviour", () => {
       test("job fails if retries are exhausted", async () => {
         const backoffMs = 10;
         const backoffJitter = 0;
-        const retries = 4;
+        const retries = 3;
         const { operation, getAttempts } = createTestModel({
           emulateFailures: Number.POSITIVE_INFINITY,
         });
@@ -505,7 +626,7 @@ describe("Backoff retry behaviour", () => {
           NaN, // first had no previous to calculate offset
           10, // second was executed after backoff
           20, // third was executed after backoff * 2
-          40, // third was executed after backoff * 4
+          40, // fourth was executed after backoff * 4
         ]);
       });
 
@@ -536,6 +657,47 @@ describe("Backoff retry behaviour", () => {
           40,
           80, // eventually successful
         ]);
+      });
+
+      test("if retryAllowed error predicate set, retry is prevented for disallowed errors", async () => {
+        let allowedCount = 0;
+        async function throwAllowedError() {
+          allowedCount++;
+          throw new Error("I am allowed");
+        }
+
+        let disallowedCount = 0;
+        async function throwDisallowedError() {
+          disallowedCount++;
+          throw new Error("I am disallowed");
+        }
+
+        const { createExecutor } = createExecutorStrategy({
+          retries: 3,
+          retryAllowed: (error) =>
+            error instanceof Error && error.message === "I am allowed",
+        });
+
+        const executorAllowed = createExecutor(throwAllowedError);
+        const executorDisallowed = createExecutor(throwDisallowedError);
+
+        // both throw an error after giving up
+        try {
+          await executorAllowed();
+        } catch (error) {
+          expect(error).toEqual(new Error("I am allowed"));
+        }
+
+        try {
+          await executorDisallowed();
+        } catch (error) {
+          expect(error).toEqual(new Error("I am disallowed"));
+        }
+
+        // expect function with allowed error to be run multiple times
+        expect(allowedCount).toBe(4);
+        // expect function throwing disallowed error to only be run once
+        expect(disallowedCount).toBe(1);
       });
     });
 
@@ -629,12 +791,11 @@ describe("Backoff retry behaviour", () => {
         "backoffMaxExponent",
         "backoffJitter",
       ]) {
-        expect(() => createExecutorStrategy({ [optionName]: 42 }))
-          .toThrowErrorMatchingInlineSnapshot(`
-          [Error: Invalid BackoffOptions: [
-          ${optionName} is not valid without backoffMs
-          ]]
-        `);
+        expect(() => createExecutorStrategy({ [optionName]: 42 })).toThrowError(
+          new Error(
+            `The ${optionName} option must be accompanied by 'backoffMs'`
+          )
+        );
       }
     });
 

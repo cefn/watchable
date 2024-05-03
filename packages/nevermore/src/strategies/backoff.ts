@@ -5,42 +5,43 @@ import type {
   Strategy,
   StrategyFactory,
   Pipe,
-  BackoffOptions,
+  BackoffRetryOptions,
 } from "../types";
 import { createLock } from "../lock";
 import { createBiddablePromise, sleep } from "../util";
-
-export class SkipRetryError extends Error {
-  constructor(message: string, readonly originalError?: Error) {
-    super(message);
-    Object.setPrototypeOf(this, new.target.prototype);
-  }
-}
 
 function typedKeys<T extends object>(obj: T) {
   return Object.keys(obj) as Array<keyof T>;
 }
 
-const OPTION_MINIMUMS = {
+const BACKOFF_OPTION_MINIMUMS = {
   backoffGrowth: 1,
   backoffMaxExponent: 1,
   backoffJitter: 0,
 } as const;
 
-export function isBackoffOptions(
+export function isRetryOptions(
   options: NevermoreOptions
-): options is BackoffOptions {
-  // check if the core option is set
-  if (typeof options.backoffMs === "number") {
+): options is BackoffRetryOptions {
+  // check if a core option is set
+  if (
+    typeof options.backoffMs === "number" ||
+    typeof options.retries === "number"
+  ) {
     // Ensure other number options are within valid range.
-    const invalidKeys = typedKeys(OPTION_MINIMUMS).filter((key) => {
+    const invalidKeys = typedKeys(BACKOFF_OPTION_MINIMUMS).filter((key) => {
       const option = options[key];
-      return typeof option === "number" && option < OPTION_MINIMUMS[key];
+      return (
+        typeof option === "number" && option < BACKOFF_OPTION_MINIMUMS[key]
+      );
     });
     if (invalidKeys.length > 0) {
       throw new Error(
         `Invalid BackoffOptions: [\n${invalidKeys
-          .map((key) => `Option ${key} cannot be below ${OPTION_MINIMUMS[key]}`)
+          .map(
+            (key) =>
+              `Option ${key} cannot be below ${BACKOFF_OPTION_MINIMUMS[key]}`
+          )
           .join("\n")}\n]`
       );
     }
@@ -53,16 +54,31 @@ export function isBackoffOptions(
     // BackoffOptions is valid
     return true;
   }
-  // Ensure no backoff options are provided (they are invalid without the core options)
-  const surplusKeys = typedKeys(OPTION_MINIMUMS).filter(
-    (name) => name in options
-  );
-  if (surplusKeys.length > 0) {
-    throw new Error(
-      `Invalid BackoffOptions: [\n${surplusKeys
-        .map((surplusKey) => `${surplusKey} is not valid without backoffMs`)
-        .join("\n")}\n]`
-    );
+
+  // Ensure no surplus options are provided (they are invalid and ignored without the core options)
+  // the simplified definition of NevermoreOptions means all options are considered partial
+  if (
+    typeof options.retries !== "number" &&
+    typeof options.backoffMs !== "number"
+  ) {
+    if (typeof options.retryAllowed !== "undefined") {
+      throw new Error(
+        "The 'retryAllowed' parameter must be accompanied by 'retries' or 'backoffMs"
+      );
+    }
+  }
+  if (typeof options.backoffMs !== "number") {
+    for (const surplusOption of [
+      "backoffGrowth",
+      "backoffJitter",
+      "backoffMaxExponent",
+    ] as const) {
+      if (typeof options[surplusOption] !== "undefined") {
+        throw new Error(
+          `The ${surplusOption} option must be accompanied by 'backoffMs'`
+        );
+      }
+    }
   }
   return false;
 }
@@ -94,15 +110,16 @@ function withJitter(delayMs: number, backoffJitter: number) {
 }
 
 export function createBackoffStrategy<J extends Job<unknown>>(
-  options: BackoffOptions,
+  options: BackoffRetryOptions,
   downstream: Strategy<BackoffJob<J>>
 ) {
   const {
-    backoffMs,
+    backoffMs = null,
     backoffGrowth = 2,
     backoffMaxExponent = 10,
     backoffJitter = 0.1,
-    retries,
+    retries = null,
+    retryAllowed = null,
   } = options;
 
   let sequentialFailures = 0;
@@ -113,22 +130,28 @@ export function createBackoffStrategy<J extends Job<unknown>>(
   let activeJobs = 0;
   let upstreamLaunchesDone = false;
 
-  function adjustForSuccess() {
-    // send fulfilment downstream
-    sequentialFailures = 0;
-    delayMs = 0;
-  }
+  const adjustForSuccess =
+    backoffMs !== null
+      ? () => {
+          // send fulfilment downstream
+          sequentialFailures = 0;
+          delayMs = 0;
+        }
+      : null;
 
-  function adjustForFailure() {
-    // don't sent rejection downstream
-    // record failure for backoff calculation
-    sequentialFailures++;
-    if (sequentialFailures === 1) {
-      delayMs = backoffMs;
-    } else if (sequentialFailures <= backoffMaxExponent + 1) {
-      delayMs = delayMs * backoffGrowth;
-    }
-  }
+  const adjustForFailure =
+    backoffMs !== null
+      ? () => {
+          // don't sent rejection downstream
+          // record failure for backoff calculation
+          sequentialFailures++;
+          if (sequentialFailures === 1) {
+            delayMs = backoffMs;
+          } else if (sequentialFailures <= backoffMaxExponent + 1) {
+            delayMs = delayMs * backoffGrowth;
+          }
+        }
+      : null;
 
   async function launchBackoffRetryJob(retryJob: BackoffJob<J>) {
     const release = await retryLock.acquire();
@@ -177,14 +200,14 @@ export function createBackoffStrategy<J extends Job<unknown>>(
         const { jobToRetry } = retryJob;
 
         if (status === "fulfilled") {
-          adjustForSuccess();
+          adjustForSuccess?.();
         } else {
-          adjustForFailure();
+          adjustForFailure?.();
           retryJob.jobFailures++;
+          // retry attempted if error kind is allowed and retry count not reached
           if (
-            typeof retries !== "number" ||
-            (retryJob.jobFailures < retries &&
-              !(settlement.reason instanceof SkipRetryError))
+            (retryAllowed !== null ? retryAllowed(settlement.reason) : true) &&
+            (typeof retries !== "number" || retryJob.jobFailures <= retries)
           ) {
             // retry job
             void launchBackoffRetryJob(retryJob);
@@ -211,7 +234,7 @@ export function createBackoffStrategy<J extends Job<unknown>>(
   } satisfies Strategy<J>;
 }
 
-export function createBackoffRetryPipe(options: BackoffOptions): Pipe {
+export function createRetryPipe(options: BackoffRetryOptions): Pipe {
   return (createStrategy: StrategyFactory) =>
     <J extends Job<unknown>>() =>
       createBackoffStrategy<J>(options, createStrategy());
