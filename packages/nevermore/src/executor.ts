@@ -6,12 +6,28 @@ type ExecutorJob<T> = Job<T> & {
   reject: (error: unknown) => void;
 };
 
-/** Factory that constructs a nevermore strategy pipeline from provided options, 
- * and returns a `createExecutor` function. 
+/** Factory that constructs a nevermore strategy pipeline from provided options,
+ * and returns a `createExecutor` function. Create a limited version of your
+ * function like...
  *
- * Given your existing, typed async operation, `createExecutor` will create an 
- * identically-typed operation that schedules its execution within the capacity 
+ * ```typescript
+ * import { createExecutorStrategy } from "@watchable/nevermore";
+ *
+ * const { createExecutor } = createExecutorStrategy({
+ *   concurrency: 1,
+ *   intervalMs: 100,
+ *   backoffMs: 1000,
+ *   timeoutMs: 3000,
+ *   retries: 3,
+ * })
+ *
+ * const limitedMyFn = createExecutor(myFn);
+ * ```
+ *
+ * Given your existing, typed async operation, `createExecutor` creates an
+ * identically-typed operation that schedules its execution within the capacity
  * limits and behaviours of the pipeline.
+ *
  *
  * For example...
  * * concurrency, rate-limits: executors will delay if other executors are
@@ -20,8 +36,8 @@ type ExecutorJob<T> = Job<T> & {
  *   throw a timeout error
  * * retry : the underlying operation is retried and the executor only throws
  *   when retries are exhausted
- * 
- * See documentation of `options` for more on the available behaviours. 
+ *
+ * See documentation of `options` for more on the available behaviours.
  */
 export function createExecutorStrategy(options: NevermoreOptions) {
   /** Create a pipeline to limit arbitrary jobs according to the provided options. */

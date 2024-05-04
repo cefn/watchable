@@ -1,2 +1,7 @@
 export { Unpromise } from "./unpromise";
-export type { ProxyPromise, SubscribedPromise } from "./types";
+export type {
+  ProxyPromise,
+  SubscribedPromise,
+  PromiseExecutor,
+  PromiseWithResolvers,
+} from "./types";

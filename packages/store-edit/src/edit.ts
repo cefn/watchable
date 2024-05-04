@@ -5,7 +5,7 @@ import { produce } from "immer";
 /** Accepts an {@link Editor} function which will be passed a `draft` of the
  * current state. The function can manipulate the draft state using normal
  * javascript assignments and operations as if it didn't need to be treated as
- * immutable. When it returns, {@link @watchable/store.Store#write} will be
+ * immutable. When it returns, {@link @watchable/store!Store#write} will be
  * called on your behalf with a newly constructed data structure, equivalent to
  * the original plus your edits, but without changing your original.
  * @param editor A function to draft the next state
