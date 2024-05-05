@@ -1,5 +1,11 @@
 # @watchable/nevermore
 
+## 0.10.1
+
+### Patch Changes
+
+- Update documentation
+
 ## 0.10.0
 
 ### Minor Changes
