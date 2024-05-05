@@ -1,13 +1,14 @@
-# nevermore - limit the execution of async functions
+# nevermore - seamless scheduling and retry for async operations
 
 ## What is nevermore?
 
-The `nevermore` scheduler can wraps your async functions to impose
-rate-limiting, concurrency control, retry, backoff, timeout without changing
-their signature.
+The `nevermore` scheduler can wrap your async functions introducing
+rate-limiting, concurrency control, timeout, retry, backoff, without changing
+their signature or implementation.
 
-It can also regulate tasks as part of potentially infinite batch processes with
-backpressure to limit the growth of memory in your app.
+It also provides a batch API with backpressure to regulate the flow of tasks in
+potentially infinite offline processes, limiting the growth of memory in your
+app.
 
 The execution of Jobs is controlled through composable scheduling primitives
 known as strategies. Multiple strategies are already implemented as individual
