@@ -1,6 +1,7 @@
 /** A strategy that ensures jobs taking more than a specified timeout settle as "rejected". */
 
-import { namedRace } from "..";
+import { Unpromise } from "@watchable/unpromise";
+
 import type {
   Job,
   JobArgs,
@@ -67,14 +68,14 @@ function createTimeoutJob<J extends Job<unknown>>(
         }, timeoutMs);
       });
 
-      const winner = await namedRace({
-        settle: jobPromise,
-        timeout: timeoutPromise,
+      const [winner] = await Unpromise.raceReferences([
+        jobPromise,
+        timeoutPromise,
         ...(typeof upstreamCancelPromise !== "undefined"
-          ? { upstreamCancel: upstreamCancelPromise }
-          : null),
-      });
-      if (winner !== "settle") {
+          ? [upstreamCancelPromise]
+          : []),
+      ]);
+      if (winner !== jobPromise) {
         // Not a settlement. Must be early termination (timeout or upstreamCancel)
         // trigger a downstream cancel
         downstreamCancelBiddable.fulfil();
@@ -83,7 +84,7 @@ function createTimeoutJob<J extends Job<unknown>>(
           void error;
         });
       }
-      if (winner === "timeout") {
+      if (winner === timeoutPromise) {
         throw new TimeoutError(timeoutMs);
       }
       // resolve to job settlement or job cancel behaviour

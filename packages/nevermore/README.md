@@ -1,4 +1,4 @@
-# nevermore - seamless scheduling and retry for async operations
+# @watchable/nevermore - async scheduling and retry
 
 ## What is nevermore?
 
@@ -173,7 +173,7 @@ import { createSettlementSequence } from "@watchable/nevermore";
 // define a sequence of zero-arg functions
 async function* createJobSequence() {
   for (;;) {
-    yield () => {
+    yield async () => {
       const result = await fetch(
         `https://timeapi.io/api/TimeZone/zone?timeZone=Europe/London`
       );

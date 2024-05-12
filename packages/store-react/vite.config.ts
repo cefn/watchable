@@ -40,5 +40,8 @@ export default defineConfig({
   },
   test: {
     environment: "jsdom",
+    coverage: {
+      provider: "istanbul", // or 'v8'
+    },
   },
 });

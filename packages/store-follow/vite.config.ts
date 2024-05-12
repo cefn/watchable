@@ -1,5 +1,6 @@
 import { resolve } from "path";
 import { defineConfig } from "vite";
+import {} from "vitest";
 // import nodeResolve from "@rollup/plugin-node-resolve";
 
 import packageJson from "./package.json";
@@ -35,5 +36,10 @@ export default defineConfig({
       external,
     },
     // sourcemap: true,
+  },
+  test: {
+    coverage: {
+      provider: "istanbul", // or 'v8'
+    },
   },
 });

@@ -1,5 +1,5 @@
 import { type Immutable, createStore } from "@watchable/store";
-import { withSelectorQueue } from "@watchable/store-follow";
+import { withSelectorQueue } from "../src";
 
 import { manyTicks } from "./util";
 

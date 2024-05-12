@@ -34,12 +34,13 @@
     "@testing-library/react": "^14.0.0",
     "@testing-library/user-event": "^14.4.3",
     "@types/react": "^18.0.25",
+    "@vitest/coverage-istanbul": "^1.6.0",
     "@vitest/coverage-v8": "^1.2.1",
     "jsdom": "^21.1.1",
     "typescript": "^5.4.5",
-    "wireit": "^0.14.4",
     "vite": "^5.2.11",
-    "vitest": "^1.6.0"
+    "vitest": "^1.6.0",
+    "wireit": "^0.14.4"
   },
   "peerDependencies": {
     "@watchable/store": "1.0.0",

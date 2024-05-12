@@ -3,7 +3,6 @@
 /* eslint-disable @typescript-eslint/promise-function-async */
 
 import type {
-  MemberOf,
   PromiseExecutor,
   PromiseWithResolvers,
   ProxyPromise,
@@ -301,32 +300,46 @@ export class Unpromise<T> implements ProxyPromise<T> {
     }
   }
 
-  /** Race promises as SubscribedPromises that fulfil to 1-tuples referencing
-   * the promise. Eliminates memory leaks from long-lived promises accumulating
-   * .then() and .catch() subscribers. */
-  static async raceSingletons<
-    const Promises extends ReadonlyArray<Promise<unknown>>
-  >(promises: Promises) {
-    // a Singleton is a 1-Tuple containing just one of the Promises
-    type Singleton = readonly [MemberOf<Promises>];
+  /** Create a race of SubscribedPromises that will fulfil to a single winning
+   * Promise (in a 1-Tuple). Eliminates memory leaks from long-lived promises
+   * accumulating .then() and .catch() subscribers. Allows simple logic to
+   * consume the result, like...
+   * ```ts
+   * const [ winner ] = await Unpromise.race([ promiseA, promiseB ]);
+   * if(winner === promiseB){
+   *   const result = await promiseB;
+   *   // do the thing
+   * }
+   * ```
+   * */
+  static async raceReferences<P extends Promise<unknown>>(
+    promises: readonly P[]
+  ) {
+    // map each promise to an eventual 1-tuple containing itself
+    const selfPromises = promises.map(resolveSelfTuple);
 
-    // for each promise, create a SubscribedPromise for the 1-tuple of that
-    // promise. The SubscribedPromise resolves when the promise resolves, and
-    // can be unsubscribed after the race
-    const singletons: Array<SubscribedPromise<Singleton>> = promises.map(
-      (promise) => Unpromise.proxy(promise).then(() => [promise] as const)
-    );
-
-    // now race the resulting promises, (will fulfil to some Singleton or reject)
-    // and unsubscribe them when the race is over, to mitigate memory leaks
+    // now race them. They will fulfil to a readonly [P] or reject.
     try {
-      return await Promise.race(singletons);
+      return await Promise.race(selfPromises);
     } finally {
-      for (const singleton of singletons) {
-        singleton.unsubscribe();
+      for (const promise of selfPromises) {
+        // unsubscribe proxy promises when the race is over to mitigate memory leaks
+        promise.unsubscribe();
       }
     }
   }
+}
+
+/** Promises a 1-tuple containing the original promise when it resolves. Allows
+ * awaiting the eventual Promise ***reference*** (easy to destructure and
+ * exactly compare with ===). Avoids resolving to the Promise ***value*** (which
+ * may be ambiguous and therefore hard to identify as the winner of a race).
+ * You can call unsubscribe on the Promise to mitigate memory leaks.
+ * */
+export function resolveSelfTuple<P extends Promise<unknown>>(
+  promise: P
+): SubscribedPromise<readonly [P]> {
+  return Unpromise.proxy(promise).then(() => [promise] as const);
 }
 
 /** VENDORED (Future) PROMISE UTILITIES */

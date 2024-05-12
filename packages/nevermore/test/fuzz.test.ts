@@ -4,10 +4,10 @@ import {
   type NevermoreOptions,
   sleep,
   createSettlementSequence,
-  namedRace,
   createExecutorStrategy,
 } from "../src";
 import { iterable2array } from "./testutil";
+import { Unpromise } from "@watchable/unpromise";
 
 function createRandomOptions(): NevermoreOptions {
   const options: NevermoreOptions = {};
@@ -66,8 +66,11 @@ describe("Fuzz testing", () => {
       const settlementsPromise = iterable2array(settlementSequence);
 
       const impatientPromise = sleep(4000);
-      const winner = await namedRace({ settlementsPromise, impatientPromise });
-      if (winner === "impatientPromise") {
+      const [winner] = await Unpromise.raceReferences([
+        settlementsPromise,
+        impatientPromise,
+      ]);
+      if (winner === impatientPromise) {
         console.log(
           `${JSON.stringify({
             randomOptions,
@@ -104,8 +107,11 @@ describe("Fuzz testing", () => {
       );
 
       const impatientPromise = sleep(4000);
-      const winner = await namedRace({ settlementsPromise, impatientPromise });
-      if (winner === "impatientPromise") {
+      const [winner] = await Unpromise.raceReferences([
+        settlementsPromise,
+        impatientPromise,
+      ]);
+      if (winner === impatientPromise) {
         console.log(
           `${JSON.stringify({
             randomOptions,

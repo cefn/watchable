@@ -4,4 +4,4 @@ export {
   createSettlementSequence,
   createStrategyFromOptions,
 } from "./sequence";
-export { namedRace, sleep } from "./util";
+export { sleep } from "./util";
