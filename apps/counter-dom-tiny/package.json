@@ -25,7 +25,7 @@
     "@watchable/store": "1.0.0"
   },
   "devDependencies": {
-    "vite": "^5.0.12",
+    "vite": "^5.2.11",
     "wireit": "^0.14.4"
   },
   "wireit": {

@@ -8,7 +8,15 @@ import { getUpstreamBuildDependencies } from "./lib/rules/packages";
 import { getRepoPath } from "./lib/util";
 import type { PackageJsonSpec } from "./types";
 
-const VITEST_VERSION = "^1.5.0";
+import rootPackageJson from "../../package.json";
+
+const {
+  devDependencies: {
+    vite: VITE_VERSION,
+    vitest: VITEST_VERSION,
+    wireit: WIREIT_VERSION,
+  },
+} = rootPackageJson;
 
 export const PACKAGE_JSON_RULES = {
   type: byPackageName({ "counter-dom-commonjs": "commonjs" }, "module"),
@@ -35,12 +43,25 @@ export const PACKAGE_JSON_RULES = {
     ts: "^5.4.5",
     js: undefined,
   }),
-  "devDependencies.wireit": "^0.14.4",
+  "devDependencies.vite": byPackageType({
+    apps: byPackageName(
+      {
+        "counter-preact-ts": VITE_VERSION,
+        "counter-react-ts": VITE_VERSION,
+        "counter-react-js": VITE_VERSION,
+        "counter-react-ts-edit": VITE_VERSION,
+        "counter-react-ts-edit-context": VITE_VERSION,
+      },
+      null
+    ),
+    packages: VITE_VERSION,
+  }),
   "devDependencies.vitest": byPackageType({
     apps: byPackageName(
       {
         "counter-preact-ts": VITEST_VERSION,
         "counter-react-ts": VITEST_VERSION,
+        "counter-react-js": VITEST_VERSION,
         "counter-react-ts-edit": VITEST_VERSION,
         "counter-react-ts-edit-context": VITEST_VERSION,
       },
@@ -48,6 +69,7 @@ export const PACKAGE_JSON_RULES = {
     ),
     packages: VITEST_VERSION,
   }),
+  "devDependencies.wireit": WIREIT_VERSION,
   "scripts.test:unit": byPackageType({
     apps: byPackageName(
       {
