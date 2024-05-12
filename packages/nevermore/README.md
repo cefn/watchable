@@ -2,18 +2,21 @@
 
 ## What is nevermore?
 
-The `nevermore` scheduler can wrap your async functions introducing
-rate-limiting, concurrency control, timeout, retry, backoff, without changing
-their signature or implementation.
+The `nevermore` module wraps your async functions introducing rate-limiting,
+concurrency control, timeout, retry, backoff, without changing their signature
+or implementation.
 
-It also provides a batch API with backpressure to regulate the flow of tasks in
-potentially infinite offline processes, limiting the growth of memory in your
-app.
+Behind the scenes it manages the lifecycle of jobs created from your function,
+creating a job from each invocation, and silently reinvoking the same job in the
+background when an execution of the job fails or times out.
 
 The execution of Jobs is controlled through composable scheduling primitives
 known as strategies. Multiple strategies are already implemented as individual
-composable blocks which can be freely combined. You can further extend nevermore
-by writing your own strategies.
+composable blocks which can be freely combined. You can further extend
+`nevermore` by writing your own strategies.
+
+Finally it provides an alternative batch API, with backpressure, to regulate the
+creation of jobs just-in-time in potentially infinite offline processes.
 
 ## Usage
 
@@ -40,32 +43,32 @@ const myLimitedFn = createExecutor(myFn);
 - `createExecutorStrategy` - wraps async functions without changing your code
 - `createSettlementSequence` - pulls from generators creating jobs just-in-time
 
-See more detail about the two API signatures in the `APIs` section later in this
-document.
+Read more about these signatures under `APIs` later in this document or by
+visiting the online
+[API documentation](https://watchable.dev/api/modules/_watchable_nevermore.html)
 
 ## Available strategies
 
-A _**concurrency**_ `Strategy` accepts another job only when the number of
-pending jobs goes below `concurrency`. When there is a free slot (previously
-pending jobs have settled as resolved or rejected), the strategy will accept a
-new pending job. To activate this strategy, provide a `concurrency` number in
+A _**concurrency**_ `Strategy` launches a job only when the number of pending
+executions goes below `concurrency`. When there is a free slot (previously
+pending executions have settled as resolved or rejected), the strategy will
+accept a new job. To activate this strategy, provide a `concurrency` number in
 the options.
 
-A _**rate**_ `Strategy` implements rate limiting by launching the next job only
-when there is a free slot within the `intervalMs`. Every execution of a job uses
-up one slot in the interval. When an interval's slots are exhausted, the
-strategy calculates when the next slot will become free, and sleeps for that
-duration before accepting the next job. To activate this strategy, provide an
-`intervalMs` number in the options. The default value of `intervalLaunches` is
-`1` launch per interval.
+A _**rate**_ `Strategy` implements rate limiting by launching a job only when
+there is a free slot within the `intervalMs`. Every execution uses up one slot
+in the interval. When an interval's slots are exhausted, the strategy calculates
+when the next slot will become free, and sleeps for that duration before the
+next launch. To activate this strategy, provide an `intervalMs` number in the
+options. The default value of `intervalLaunches` is `1` per interval.
 
-A _**timeout**_ `Strategy` always accepts jobs, wraps them in a timeout job
-(that throws an error if the job hasn't settled before `timeoutMs`) before
-passing the job to downstream strategies. On receiving a settlement (fulfilment,
-rejection or timeout) it unwraps the timeout job, yielding a `JobSettlement`
-pointing to the original job, not the substitute. To activate this strategy,
-provide a `timeoutMs` number in the options and remember your wrapped function
-may now throw a nevermore `TimeoutError`.
+A _**timeout**_ `Strategy` wraps your jobs in a substitute timeout job (that
+throws an error if the job hasn't settled before `timeoutMs`) before passing the
+job to downstream strategies. On receiving a settlement (fulfilment, rejection
+or timeout) it unwraps the timeout job, yielding a `JobSettlement` pointing to
+the original job, not the substitute. To activate this strategy, provide a
+`timeoutMs` number in the options and remember your wrapped function may now
+throw a nevermore `TimeoutError`.
 
 A _**retry**_ `Strategy` repeatedly calls failing jobs until the number of
 failures equals `retries`. It wraps jobs in a retry job before launching them,
@@ -79,10 +82,10 @@ options.
 A _**backoff**_ `Strategy` repeatedly calls failing jobs with a increasing
 backoff delay (based on an exponential function). See the section on 'retry' for
 more detail of the approach. To activate this strategy, provide a `backoffMs`
-number in the options. To get eventual feedback from continually failing jobs,
-you need to set a `retries` option. To get backpressure from
-`createSettlementSequence` pulling just-in-time, you need to set a `concurrency`
-option to prevent indefinitely-many jobs being queued.
+number in the options. To get eventual feedback from jobs which are continually
+failing, you should set a number of `retries` else they will be tried forever.
+If relying on `createSettlementSequence` pulling just-in-time, you need to set a
+`concurrency` option to prevent indefinitely-many jobs being queued.
 
 ## Install
 
