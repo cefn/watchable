@@ -27,7 +27,7 @@
   "devDependencies": {
     "@rollup/plugin-commonjs": "^25.0.7",
     "@vitejs/plugin-react": "^4.2.1",
-    "vite": "^5.0.12",
+    "vite": "^5.2.11",
     "wireit": "^0.14.4"
   },
   "wireit": {
