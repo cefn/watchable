@@ -6,6 +6,8 @@
 analice.html
 # CH don't commit typedoc output
 /api
+# CH skip test-result folders
+apps/*/test-results
 
 # Logs
 logs

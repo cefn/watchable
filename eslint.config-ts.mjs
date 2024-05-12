@@ -59,6 +59,7 @@ export default [
     ignores: [
       "eslint.config.mjs",
       "vite.config.ts",
+      "vite.config.ts*",
       "test/examples/*.js",
       "**/*.test.ts",
       "dist",
