@@ -34,11 +34,12 @@
     "test": "wireit"
   },
   "devDependencies": {
+    "@vitest/coverage-istanbul": "^1.6.0",
     "@vitest/coverage-v8": "^1.2.1",
     "typescript": "^5.4.5",
-    "wireit": "^0.14.4",
     "vite": "^5.2.11",
-    "vitest": "^1.6.0"
+    "vitest": "^1.6.0",
+    "wireit": "^0.14.4"
   },
   "publishConfig": {
     "access": "public"

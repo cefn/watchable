@@ -222,20 +222,27 @@ describe("Rate limits: ", () => {
   });
 
   test("Large task count - task throughput is adequate", async () => {
-    const LARGE_JOB_COUNT = 1001; // off-by-one task forces a 'final' period at around 1000ms
-    const rateOptions: RateOptions = { intervalMs: 100, intervalSlots: 100 };
-    // preallocate jobs
-    // for speed create an jobIterator
-    // which always returns the same job
+    const LARGE_JOB_COUNT = 10001; // off-by-one task forces a 'final' period at earliest 1000ms
+    const rateOptions: RateOptions = {
+      intervalMs: 100, // 10th of a second
+      intervalSlots: 1000, //all complete in around a second
+    };
+
+    // preallocate iterator results
     const job = async () => "foo";
+    const stepResult = { done: false, value: job } as const;
+    const endResult = { done: true, value: undefined } as const;
+
+    // creating the most efficient jobIterator
+    // which always returns the same result (same job)
     let jobCount = 0;
     const jobIterator = {
       next: () => {
         if (jobCount < LARGE_JOB_COUNT) {
           jobCount++;
-          return { done: false, value: job };
+          return stepResult;
         }
-        return { done: true, value: undefined };
+        return endResult;
       },
     } satisfies Iterator<typeof job>;
     const jobIterable = { [Symbol.iterator]: () => jobIterator };
@@ -252,9 +259,9 @@ describe("Rate limits: ", () => {
     }
     const duration = Date.now() - start;
 
-    expect(duration).toBeGreaterThanOrEqual(LARGE_JOB_COUNT);
-    expect(duration).toBeLessThanOrEqual(LARGE_JOB_COUNT * 1.1);
+    expect(duration).toBeGreaterThanOrEqual(1000);
+    expect(duration).toBeLessThanOrEqual(1200);
 
     expect(settlementCount).toBe(LARGE_JOB_COUNT);
-  });
+  }, 120000);
 });

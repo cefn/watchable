@@ -1,4 +1,4 @@
-import type { PartitionableState, Selector, Store, Watcher } from "../types";
+import type { PartitionableState, Store, Watcher } from "../types";
 import { DefaultWatchable } from "./watchable";
 
 /** Utility class for partitioning of a Store. See {@link createStorePartition}. */
@@ -42,10 +42,6 @@ class DefaultStorePartition<
       [this.key]: state,
     });
     return state;
-  };
-
-  select = <Selected>(selector: Selector<ParentState[Key], Selected>) => {
-    return selector(this.read());
   };
 }
 

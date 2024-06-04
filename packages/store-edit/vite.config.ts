@@ -36,4 +36,9 @@ export default defineConfig({
     },
     // sourcemap: true,
   },
+  test: {
+    coverage: {
+      provider: "istanbul", // or 'v8'
+    },
+  },
 });

@@ -1,21 +1,7 @@
-import safeRace from "race-as-promised";
-
 /* eslint-disable @typescript-eslint/no-base-to-string */
 /* eslint-disable @typescript-eslint/promise-function-async */
 
-export function namedRace<
-  const NamedPromises extends Record<string, Promise<unknown>>
->(namedPromises: NamedPromises) {
-  type Racer = Required<{
-    [Name in keyof NamedPromises]: Promise<Name>;
-  }>[keyof NamedPromises];
-
-  const racers: Racer[] = Object.entries(namedPromises).map(([name, promise]) =>
-    promise.then(() => name)
-  );
-
-  return safeRace(racers);
-}
+import { Unpromise } from "@watchable/unpromise";
 
 export interface Biddable<Args extends unknown[]> {
   promise: Promise<Args>;
@@ -66,26 +52,26 @@ export function createFlag() {
  */
 export async function pull<T>(
   iterator: AsyncIterator<T>,
-  cancelPromise?: Promise<unknown>
+  cancelPromise: Promise<unknown> | null = null
 ) {
-  const cancelRacer =
-    cancelPromise !== undefined
-      ? promiseMessage(cancelPromise, "cancel")
-      : null;
-
   // loop awaits every iteration until cancelled or done
   for (;;) {
     const iteratorPromise = iterator.next();
-    let iteratorResult: IteratorResult<T> | "cancel";
-    if (cancelRacer === null) {
-      iteratorResult = await iteratorPromise;
-    } else {
-      iteratorResult = await safeRace([iteratorPromise, cancelRacer] as const);
-      if (iteratorResult === "cancel") {
-        // cancelled
+
+    if (cancelPromise !== null) {
+      // watch both next value AND cancelPromise
+      const [winner] = await Unpromise.raceReferences([
+        iteratorPromise,
+        cancelPromise,
+      ]);
+      if (winner === cancelPromise) {
+        // pull loop is cancelled
         return;
       }
     }
+
+    // resolve next value
+    const iteratorResult = await iteratorPromise;
     if (iteratorResult.done === true) {
       // done
       return;
@@ -95,13 +81,6 @@ export async function pull<T>(
 
 export function asyncIterable<T>(iterator: AsyncIterator<T>): AsyncIterable<T> {
   return { [Symbol.asyncIterator]: () => iterator };
-}
-
-export function promiseMessage<Message extends string>(
-  promise: Promise<unknown>,
-  message: Message
-): Promise<Message> {
-  return promise.then(() => message);
 }
 
 export function serializeError(err: unknown) {
