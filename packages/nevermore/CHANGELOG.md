@@ -1,5 +1,13 @@
 # @watchable/nevermore
 
+## 0.10.2
+
+### Patch Changes
+
+- Switch to unpromise instead of race-as-promised
+- Updated dependencies
+  - @watchable/unpromise@1.0.2
+
 ## 0.10.1
 
 ### Patch Changes

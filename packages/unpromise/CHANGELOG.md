@@ -1,5 +1,11 @@
 # @watchable/unpromise
 
+## 1.0.2
+
+### Patch Changes
+
+- Switch to unpromise instead of race-as-promised
+
 ## 1.0.1
 
 ### Patch Changes
