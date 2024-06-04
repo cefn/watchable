@@ -287,15 +287,15 @@ export function createPassthruStrategy<J extends Job<unknown>>(
 You can pass piped strategies in the `pipes` option to be placed upstream of
 strategies specified in the other options. If there are no other options, it
 will simply sequence the pipes you choose. `nevermore` exports factories for
-core pipes using e.g. as `createConcurrencyPipe()` and `createTimeoutPipe()`.
+core pipes to be able to interleave them with your own e.g.
+`createConcurrencyPipe()` and `createTimeoutPipe()`.
 
 This would be needed if you want to sequence your own strategies differently
 than the default sequence (found in the core `sequence.ts` file). For example,
 in the default sequence backoff is placed before concurrency. This ensures that
-backed off tasks don't consuming a slot except when they are re-executing, and
-avoids blocking other tasks from executing. If you want a concurrency slot to be
-dedicated to a task during its whole backoff lifecycle, you can place
-concurrency before backoff.
+backed off tasks don't consume a slot, meaning concurrency only limits
+`executing` jobs. Placing concurrency before backoff means a slot is used by a
+scheduled task during its whole lifecycle (including between retries).
 
 ## See also
 
