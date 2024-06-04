@@ -37,7 +37,7 @@ type ExecutorJob<T> = Job<T> & {
  * * retry : the underlying operation is retried and the executor only throws
  *   when retries are exhausted
  *
- * See documentation of `options` for more on the available behaviours.
+ * See documentation of {@link NevermoreOptions} for more on the available behaviours.
  */
 export function createExecutorStrategy(options: NevermoreOptions) {
   /** Create a pipeline to limit arbitrary jobs according to the provided options. */

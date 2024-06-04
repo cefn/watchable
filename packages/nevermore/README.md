@@ -18,7 +18,8 @@ by writing your own strategies.
 ## Usage
 
 You can select strategies by passing option values to one of the two core
-nevermore APIs...
+nevermore APIs. The example below uses the executor API to wrap a vanilla async
+function...
 
 ```ts
 import { createExecutorStrategy } from "@watchable/nevermore";
@@ -33,6 +34,7 @@ const { createExecutor } = createExecutorStrategy({
 });
 
 const myLimitedFn = createExecutor(myFn);
+const myResult = await myLimitedFn();
 ```
 
 `nevermore` has two core APIs which accept the same strategy options...
@@ -59,13 +61,13 @@ duration before accepting the next job. To activate this strategy, provide an
 `intervalMs` number in the options. The default value of `intervalLaunches` is
 `1` launch per interval.
 
-A _**timeout**_ `Strategy` always accepts jobs, wraps them in a timeout job
-(that throws an error if the job hasn't settled before `timeoutMs`) before
-passing the job to downstream strategies. On receiving a settlement (fulfilment,
-rejection or timeout) it unwraps the timeout job, yielding a `JobSettlement`
-pointing to the original job, not the substitute. To activate this strategy,
-provide a `timeoutMs` number in the options and remember your wrapped function
-may now throw a nevermore `TimeoutError`.
+A _**timeout**_ `Strategy` wraps jobs in a timeout job (throwing an error if the
+job hasn't settled before `timeoutMs`) then passes the job to downstream
+strategies. On receiving a settlement (fulfilment, rejection or timeout) it
+unwraps the timeout job, yielding a `JobSettlement` pointing to the original
+job, not the substitute. To activate this strategy, provide a `timeoutMs` number
+in the options and remember your wrapped function may now throw a nevermore
+`TimeoutError`.
 
 A _**retry**_ `Strategy` repeatedly calls failing jobs until the number of
 failures equals `retries`. It wraps jobs in a retry job before launching them,
