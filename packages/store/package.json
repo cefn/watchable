@@ -1,6 +1,6 @@
 {
   "name": "@watchable/store",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Store with compile-time-immutable state.",
   "keywords": [
     "react",

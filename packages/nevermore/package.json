@@ -1,6 +1,6 @@
 {
   "name": "@watchable/nevermore",
-  "version": "0.10.2",
+  "version": "1.0.0",
   "description": "Rate limits and concurrency using generators of promiseFactories",
   "keywords": [
     "limit",

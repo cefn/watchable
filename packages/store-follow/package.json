@@ -1,6 +1,6 @@
 {
   "name": "@watchable/store-follow",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Await @watchable/store state changes and trigger business logic",
   "keywords": [
     "@watchable/store",
@@ -49,7 +49,7 @@
   },
   "dependencies": {
     "@watchable/queue": "1.0.0",
-    "@watchable/store": "1.0.0"
+    "@watchable/store": "1.0.1"
   },
   "devDependencies": {
     "@vitest/coverage-istanbul": "^1.6.0",
@@ -61,7 +61,7 @@
   },
   "peerDependencies": {
     "@watchable/queue": "1.0.0",
-    "@watchable/store": "1.0.0"
+    "@watchable/store": "1.0.1"
   },
   "publishConfig": {
     "access": "public"

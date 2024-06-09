@@ -1,6 +1,6 @@
 {
   "name": "@watchable/store-edit",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Intuitive editing of @watchable/store state, (using Immer drafts)",
   "homepage": "https://github.com/cefn/watchable/tree/main/packages/store-edit#readme",
   "keywords": [
@@ -34,7 +34,7 @@
     "test": "wireit"
   },
   "dependencies": {
-    "@watchable/store": "1.0.0",
+    "@watchable/store": "1.0.1",
     "immer": "^9.0.16 || ^10.0.1"
   },
   "devDependencies": {
@@ -46,7 +46,7 @@
     "wireit": "^0.14.4"
   },
   "peerDependencies": {
-    "@watchable/store": "1.0.0",
+    "@watchable/store": "1.0.1",
     "immer": "^9.0.16 || ^10.0.1"
   },
   "publishConfig": {
