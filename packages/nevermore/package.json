@@ -2,6 +2,23 @@
   "name": "@watchable/nevermore",
   "version": "0.10.2",
   "description": "Rate limits and concurrency using generators of promiseFactories",
+  "keywords": [
+    "limit",
+    "throttle",
+    "concurrency",
+    "rate-limit",
+    "retry",
+    "backoff",
+    "scheduler",
+    "queue",
+    "async",
+    "Promise",
+    "task",
+    "job",
+    "batch processing",
+    "watchable",
+    "nevermore"
+  ],
   "homepage": "https://github.com/cefn/watchable/tree/main/packages/nevermore#readme",
   "bugs": {
     "url": "https://github.com/cefn/watchable/issues?q=is%3Aissue+is%3Aopen+label%3Anevermore",
