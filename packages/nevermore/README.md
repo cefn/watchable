@@ -2,23 +2,18 @@
 
 ## What is nevermore?
 
-The `nevermore` scheduler can wrap your async functions introducing
-rate-limiting, concurrency control, timeout, retry, backoff, without changing
-their signature or implementation.
+The `nevermore` scheduler adds rate-limiting, concurrency control, timeout,
+retry and backoff to your async functions without changing their signature or
+implementation.
 
-It also provides a batch API with backpressure to regulate the flow of tasks in
-potentially infinite offline processes, limiting the growth of memory in your
-app.
-
-The execution of Jobs is controlled through composable scheduling primitives
-known as strategies. Multiple strategies are already implemented as individual
-composable blocks which can be freely combined. You can further extend nevermore
-by writing your own strategies.
+For an introduction read
+[the Medium article](https://levelup.gitconnected.com/handling-quota-limits-and-server-failures-in-typescript-e4d1f576c6ee)
+describing the problem space and the design approach of the package.
 
 ## Usage
 
-You can select strategies by passing option values to one of the two core
-nevermore APIs. The example below uses the executor API to wrap a vanilla async
+Define limits by passing option values to one of the two core nevermore APIs.
+The example below uses the executor API to wrap your own vanilla async
 function...
 
 ```ts
@@ -28,19 +23,24 @@ import { myFn } from "./myFn.ts";
 const { createExecutor } = createExecutorStrategy({
   concurrency: 1,
   intervalMs: 100,
-  backoffMs: 1000,
+  backoffMs: 50,
   timeoutMs: 3000,
   retries: 3,
 });
 
 const myLimitedFn = createExecutor(myFn);
-const myResult = await myLimitedFn();
+const myResult = await myLimitedFn("my", "typed", "arguments");
 ```
 
 `nevermore` has two core APIs which accept the same strategy options...
 
 - `createExecutorStrategy` - wraps async functions without changing your code
 - `createSettlementSequence` - pulls from generators creating jobs just-in-time
+
+The execution of Jobs is controlled through composable scheduling primitives
+known as strategies. Multiple strategies are already implemented as individual
+composable blocks which can be freely combined. You can further extend nevermore
+by writing your own strategies.
 
 See more detail about the two API signatures in the `APIs` section later in this
 document.
@@ -61,12 +61,11 @@ duration before accepting the next job. To activate this strategy, provide an
 `intervalMs` number in the options. The default value of `intervalLaunches` is
 `1` launch per interval.
 
-A _**timeout**_ `Strategy` wraps jobs in a timeout job (throwing an error if the
-job hasn't settled before `timeoutMs`) then passes the job to downstream
-strategies. On receiving a settlement (fulfilment, rejection or timeout) it
-unwraps the timeout job, yielding a `JobSettlement` pointing to the original
-job, not the substitute. To activate this strategy, provide a `timeoutMs` number
-in the options and remember your wrapped function may now throw a nevermore
+A _**timeout**_ `Strategy` wraps jobs in a timeout job (to throw an error if the
+job hasn't settled before `timeoutMs`). On receiving a settlement (fulfilment,
+rejection or timeout) it unwraps the timeout job, yielding a `JobSettlement`
+pointing to the original job. To activate this strategy, provide a `timeoutMs`
+number in the options. Remember your wrapped function may now throw a nevermore
 `TimeoutError`.
 
 A _**retry**_ `Strategy` repeatedly calls failing jobs until the number of
@@ -142,8 +141,11 @@ const [episode4, episode5, episode6] = await Promise.allSettled([
 ### Batch (generator) API
 
 For batch routines, (or potentially infinite sets), `createSettlementSequence`
-provides an alternative API based on iterable sequences of callbacks of a
-generic type you define.
+provides an alternative API based on iterable sequences of async functions that
+are created on-the-fly as they are needed.
+
+This backpressure limits the growth of memory in your app by limiting the
+creation of new tasks according to downstream rate and concurrency limits.
 
 Exactly the same scheduling options (`concurrency`, `retry` etc.) are supported
 as in the `createExecutorStrategy` API.

@@ -1,5 +1,20 @@
 # @watchable/store-react
 
+## 1.0.2
+
+### Patch Changes
+
+- Updated dependencies
+  - @watchable/store@1.0.2
+
+## 1.0.1
+
+### Patch Changes
+
+- Update keywords and documentation.
+- Updated dependencies
+  - @watchable/store@1.0.1
+
 ## 1.0.0
 
 ### Minor Changes
