@@ -1,11 +1,114 @@
-# A minimal pattern for watchable state
+# Minimal watchable state for your app
 
-[513 gzipped bytes](https://bundlephobia.com/package/@watchable/store) of
-powerful state-management!
+## Install
+
+```zsh
+npm install @watchable/store
+
+# for optional features
+npm install @watchable/store-react # React binding
+npm install @watchable/store-follow # Business-logic binding
+npm install @watchable/store-edit # Immer drafts
+```
+
+## Summary
 
 A `@watchable/store`
 [Store](https://watchable.dev/api/interfaces/_watchable_store.Store.html)
-maintains a protected reference to an immutably-typed array or object `state`.
+maintains a immutably-typed reference to an (array or object) `state` with
+intuitive utilities for wiring up ui components and business logic.
+
+See the
+[Medium article](https://medium.com/codex/dumping-redux-wasnt-so-hard-578a0e0bf946)
+
+## Import OR Require
+
+```javascript
+import { createStore } from "@watchable/store"; // esm
+const { createStore } = require("@watchable/store"); //commonjs
+```
+
+## Create a Store (Javascript)
+
+```javascript
+const store = createStore({ counter: 0 });
+```
+
+See below for runtime Immutable state in Typescript!
+
+## Track State
+
+In React...
+
+```typescript
+import { useSelected } from "@watchable/store-react";
+const counter = useSelected(store, (state) => state.counter);
+
+// get and set keyed property, like React useState
+const [counter, setCounter] = useStateProperty(store, "counter");
+```
+
+In pure business logic...
+
+```typescript
+// watching the store
+store.watch((state) => console.log(`Counter is ${state.counter}`));
+
+// follow a selector (called back any time the selected value changes)
+import { followSelector } from "@watchable/store-follow";
+followSelector(
+  store,
+  (state) => state.counter,
+  (counter) => {
+    console.log(`Counter is ${counter}`);
+  }
+);
+```
+
+## Read and Write State
+
+Using a draft...
+
+```typescript
+// create the next immutable state by editing a draft
+import { edit } from "@watchable/store-edit";
+edit(store, (draft) => (draft.counter += 1));
+```
+
+Using pure immutable patterns...
+
+```typescript
+// read state
+const state = store.read();
+
+// write state using immutable patterns
+store.write({
+  ...state,
+  counter: state.counter + 1,
+});
+```
+
+## Create an Immutable Store (Typescript)
+
+```typescript
+import { createStore, type Immutable } from "@watchable/store";
+
+// `Immutable` is recommended to block inadvertent edits of state
+type CounterState = Immutable<{
+  counter: number;
+}>;
+
+const INITIAL_STATE: CounterState = {
+  counter: 0,
+} as const;
+
+const store = createStore(INITIAL_STATE);
+```
+
+# Description
+
+[472 gzipped bytes](https://bundlephobia.com/package/@watchable/store) of
+powerful state-management!
 
 When a new state is passed to
 [store.write()](https://watchable.dev/api/interfaces/_watchable_store.Store.html#write),
@@ -21,96 +124,6 @@ Read the
 [API Reference](https://watchable.dev/api/modules/_watchable_store.html),
 examine the example code below, or
 [browse the source on Github](https://github.com/cefn/watchable/tree/main/packages/store).
-There is also a
-[Medium article describing the approach](https://medium.com/codex/dumping-redux-wasnt-so-hard-578a0e0bf946)
-
-# Usage
-
-## Create a Store - Javascript
-
-```javascript
-const store = createStore({ counter: 0 });
-```
-
-## Create a Store - Typescript
-
-```typescript
-import { createStore, type Immutable } from "@watchable/store";
-
-// `Immutable` blocks inadvertent state edits - recommended but optional.
-type CounterState = Immutable<{
-  counter: number;
-}>;
-
-const INITIAL_STATE: CounterState = {
-  counter: 0,
-} as const;
-
-const store = createStore(INITIAL_STATE);
-```
-
-## Read and Write State
-
-```typescript
-// read state
-const state = store.read();
-
-// write state using immutable patterns
-store.write({
-  ...state,
-  counter: state.counter + 1,
-});
-
-// create the next immutable state by
-// editing a draft (backed by Immer)
-import { edit } from "@watchable/store-edit";
-edit(store, (draft) => (draft.counter += 1));
-```
-
-## Track State
-
-```typescript
-/* REACT-BASED */
-
-// using selector and memoized Hook (React framework)
-// re-renders after the selected value changes
-import { useSelected } from "@watchable/store-react";
-const counter = useSelected(store, (state) => state.counter);
-
-// get and set keyed property, (like React useState), with intellisense for valid keys
-const [counter, setCounter] = useStateProperty(store, "counter");
-
-/* FRAMEWORK AGNOSTIC */
-
-// using a watcher
-store.watch((state) => console.log(`Counter is ${state.counter}`));
-
-// using selector and memoized callback (Framework independent)
-// invoked each time the selected value changes
-import { followSelector } from "@watchable/store-follow";
-followSelector(
-  store,
-  (state) => state.counter,
-  (counter) => {
-    console.log(`Counter is ${counter}`);
-  }
-);
-```
-
-## Import OR Require
-
-```javascript
-import { createStore } from "@watchable/store"; // gets esm build
-const { createStore } = require("@watchable/store"); // gets commonjs build
-```
-
-# Getting Started
-
-## Install
-
-```zsh
-npm install @watchable/store
-```
 
 ## Demonstration Apps
 
