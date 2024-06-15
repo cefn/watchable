@@ -1,7 +1,30 @@
 {
   "name": "@watchable/store-react",
-  "version": "1.0.0",
+  "version": "1.0.2",
   "description": "Update React components when @watchable/store state changes",
+  "keywords": [
+    "@watchable/store",
+    "react",
+    "reactive",
+    "typescript",
+    "lightweight",
+    "minimal",
+    "store",
+    "state",
+    "data store",
+    "state management",
+    "immutable",
+    "in memory",
+    "redux alternative",
+    "mobx alternative",
+    "standalone",
+    "frontend",
+    "backend",
+    "mvc",
+    "mvvm",
+    "performance",
+    "simple"
+  ],
   "homepage": "https://github.com/cefn/watchable/tree/main/packages/store-react#readme",
   "bugs": {
     "url": "https://github.com/cefn/watchable/issues?q=is%3Aissue+is%3Aopen+label%3Astore-react",
@@ -27,7 +50,7 @@
     "test": "wireit"
   },
   "dependencies": {
-    "@watchable/store": "1.0.0"
+    "@watchable/store": "1.0.2"
   },
   "devDependencies": {
     "@testing-library/dom": "^9.2.0",
@@ -43,7 +66,7 @@
     "wireit": "^0.14.4"
   },
   "peerDependencies": {
-    "@watchable/store": "1.0.0",
+    "@watchable/store": "1.0.2",
     "react": "^18.2.0"
   },
   "publishConfig": {

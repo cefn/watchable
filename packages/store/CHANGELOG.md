@@ -1,5 +1,17 @@
 # @watchable/store
 
+## 1.0.2
+
+### Patch Changes
+
+- Improve READMEs
+
+## 1.0.1
+
+### Patch Changes
+
+- Update keywords and documentation.
+
 ## 1.0.0
 
 ### Major Changes

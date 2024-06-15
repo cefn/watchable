@@ -1,76 +1,60 @@
-# A minimal pattern for watchable state
+# Minimal watchable state for your app
 
-[513 gzipped bytes](https://bundlephobia.com/package/@watchable/store) of powerful state-management!
+## Install
 
-A [Store](https://watchable.dev/api/interfaces/_watchable_store.Store.html) maintains a protected reference to an array or object `state` that is treated as immutable. When a new state is passed to {@link Store#write | store.write()}, user interfaces and business logic are notified of changes to state matching their {@link Selector | Selectors}.
+```zsh
+npm install @watchable/store
 
-@watchable/store is incredibly simple, lightweight and framework-independent, and therefore suited to manage state within almost any server-side or client-side Typescript or Javascript project.
+# for optional features
+npm install @watchable/store-react # React binding
+npm install @watchable/store-follow # Business-logic binding
+npm install @watchable/store-edit # Immer drafts
+```
 
-Read the [API Reference](https://watchable.dev/api/modules/_watchable_store.html), examine the example code below, or [browse the source on Github](https://github.com/cefn/watchable/tree/main/packages/store). There is also a [Medium article describing the approach](https://medium.com/codex/dumping-redux-wasnt-so-hard-578a0e0bf946)
+## Summary
 
-# Usage
+A `@watchable/store`
+[Store](https://watchable.dev/api/interfaces/_watchable_store.Store.html)
+maintains a immutably-typed reference to an (array or object) `state` with
+intuitive utilities for wiring up ui components and business logic.
 
-## Create a Store - Javascript
+See the
+[Medium article](https://medium.com/codex/dumping-redux-wasnt-so-hard-578a0e0bf946)
+
+## Import OR Require
+
+```javascript
+import { createStore } from "@watchable/store"; // esm
+const { createStore } = require("@watchable/store"); //commonjs
+```
+
+## Create a Store (Javascript)
 
 ```javascript
 const store = createStore({ counter: 0 });
 ```
 
-## Create a Store - Typescript
-
-```typescript
-import { createStore, type Immutable} from "@watchable/store"
-
-// `Immutable` blocks inadvertent state edits - recommended but optional.
-type CounterState = Immutable<{
-  counter: number;
-}>
-
-const INITIAL_STATE : CounterState = {
-  counter: 0,
-} as const;
-
-const store = createStore(INITIAL_STATE);
-```
-
-## Read and Write State
-
-```typescript
-// read state
-const state = store.read();
-
-// write state using immutable patterns
-store.write({
-  ...state,
-  counter: state.counter + 1,
-});
-
-// create the next immutable state by
-// editing a draft (backed by Immer)
-import { edit } from "@watchable/store-edit";
-edit(store, (draft) => (draft.counter += 1));
-```
+See below for compile-time Immutable state in Typescript!
 
 ## Track State
 
-```typescript
-/* REACT-BASED */
+In React...
 
-// using selector and memoized Hook (React framework)
-// re-renders after the selected value changes
+```typescript
 import { useSelected } from "@watchable/store-react";
 const counter = useSelected(store, (state) => state.counter);
 
-// get and set keyed property, (like React useState), with intellisense for valid keys 
+// get and set keyed property, like React useState
 const [counter, setCounter] = useStateProperty(store, "counter");
+```
 
-/* FRAMEWORK AGNOSTIC */
+In pure business logic...
 
-// using a watcher
+```typescript
+// watching the store
 store.watch((state) => console.log(`Counter is ${state.counter}`));
 
-// using selector and memoized callback (Framework independent)
-// invoked each time the selected value changes
+// follow a selector (called back any time the selected value changes)
 import { followSelector } from "@watchable/store-follow";
 followSelector(
   store,
@@ -79,38 +63,116 @@ followSelector(
     console.log(`Counter is ${counter}`);
   }
 );
-
 ```
 
-## Import OR Require
+## Read and Write State
 
-```javascript
-import { createStore } from "@watchable/store"; // gets esm build
-const { createStore } = require("@watchable/store"); // gets commonjs build
+Using a draft...
+
+```typescript
+import { edit } from "@watchable/store-edit";
+edit(store, (draft) => (draft.counter += 1));
 ```
 
-# Getting Started
+Using an immutable pattern...
 
-## Install
-
-```zsh
-npm install @watchable/store
+```typescript
+// read state
+const state = store.read();
+store.write({
+  ...state,
+  counter: state.counter + 1,
+});
 ```
+
+## A type-safe Store (Typescript)
+
+`Immutable` makes state recursively readonly to prevent inadvertent edits of
+retrieved store state!
+
+```typescript
+import { createStore, type Immutable } from "@watchable/store";
+
+type CounterState = Immutable<{
+  counter: number;
+}>;
+
+const store = createStore<CounterState>({
+  counter: 0,
+});
+```
+
+Declare functions to consume readonly data like this...
+
+```typescript
+function processData(list: Immutable<number[]>) {}
+```
+
+If legacy code has compile errors, `Draft<Immutable<T>>` recursively removes the
+readonly modifier turning `Immutable<T>` back into `T`...
+
+```typescript
+const { list } = store.read();
+legacyOperation(list as Draft<typeof list>);
+```
+
+> N.B. If you bypass the compiler with `Draft<T>` check that `legacyOperation()`
+> doesn't actually modify store data. This would bypass `store.write()` and
+> watchers won't be notified of the modification, leading to bugs.
+
+# Description
+
+[472 gzipped bytes](https://bundlephobia.com/package/@watchable/store) of
+powerful state-management!
+
+When a new state is passed to
+[store.write()](https://watchable.dev/api/interfaces/_watchable_store.Store.html#write),
+user interfaces and business logic are notified of changes to state matching
+their
+[Selectors](https://watchable.dev/api/types/_watchable_store.Selector.html).
+
+@watchable/store is incredibly simple, lightweight and framework-independent,
+and therefore suited to manage state within almost any server-side or
+client-side Typescript or Javascript project.
+
+Read the
+[API Reference](https://watchable.dev/api/modules/_watchable_store.html),
+examine the example code below, or
+[browse the source on Github](https://github.com/cefn/watchable/tree/main/packages/store).
 
 ## Demonstration Apps
 
-The Example Counter [Apps](https://github.com/cefn/watchable/tree/main/apps#readme) offer minimal demonstrations of `@watchable/store`
+The Example Counter
+[Apps](https://github.com/cefn/watchable/tree/main/apps#readme) offer minimal
+demonstrations of `@watchable/store`
 
 - Counter Apps using various **_Web Frameworks_**:
-  - [with React](https://github.com/cefn/watchable/tree/main/apps/counter-react-ts) (using [@watchable/store-react](https://github.com/cefn/watchable/tree/main/packages/store-react#readme))
-  - [with no framework](https://github.com/cefn/watchable/tree/main/apps/counter-dom-ts#readme) (using [@watchable/store-follow](https://github.com/cefn/watchable/tree/main/packages/store-follow#readme))
-  - [with Preact](https://github.com/cefn/watchable/tree/main/apps/counter-preact-ts#readme) (using [@watchable/store-react](https://github.com/cefn/watchable/tree/main/packages/store-react#readme)) and aliased React
+  - [with React](https://github.com/cefn/watchable/tree/main/apps/counter-react-ts)
+    (using
+    [@watchable/store-react](https://github.com/cefn/watchable/tree/main/packages/store-react#readme))
+  - [with no framework](https://github.com/cefn/watchable/tree/main/apps/counter-dom-ts#readme)
+    (using
+    [@watchable/store-follow](https://github.com/cefn/watchable/tree/main/packages/store-follow#readme))
+  - [with Preact](https://github.com/cefn/watchable/tree/main/apps/counter-preact-ts#readme)
+    (using
+    [@watchable/store-react](https://github.com/cefn/watchable/tree/main/packages/store-react#readme))
+    and aliased React
 - Counter Apps using various **_Bundling approaches_**:
   - [via Commonjs](https://github.com/cefn/watchable/tree/main/apps/counter-dom-commonjs#readme)
   - [via ESM](https://github.com/cefn/watchable/tree/main/apps/counter-dom-esm#readme)
-  - [for tiniest bundle](https://github.com/cefn/watchable/tree/main/apps/counter-dom-tiny#readme) (a tree-shaken counter app in just 406 bytes!)
+  - [for tiniest bundle](https://github.com/cefn/watchable/tree/main/apps/counter-dom-tiny#readme)
+    (a tree-shaken counter app in just 406 bytes!)
 - Counter Apps demonstrating **_Tips and Tricks_**:
-  - Manage Immutability using [editable drafts](https://github.com/cefn/watchable/tree/main/apps/counter-react-ts-edit#readme) - eliminates [Immutable update patterns](https://redux.js.org/usage/structuring-reducers/immutable-update-patterns)
-  - Share a store with multiple components using [React Context API](https://github.com/cefn/watchable/tree/main/apps/counter-react-ts-edit-context#readme) - eliminates [prop drilling](https://kentcdodds.com/blog/prop-drilling)
-  - The [fastest possible](https://github.com/cefn/watchable/tree/main/apps/fast) app using @watchable/store (32000 updates per second)
-  - The [smallest possible](https://github.com/cefn/watchable/tree/main/apps/tiny) app using @watchable/store-react (316 bytes)
+  - Manage Immutability using
+    [editable drafts](https://github.com/cefn/watchable/tree/main/apps/counter-react-ts-edit#readme) -
+    eliminates
+    [Immutable update patterns](https://redux.js.org/usage/structuring-reducers/immutable-update-patterns)
+  - Share a store with multiple components using
+    [React Context API](https://github.com/cefn/watchable/tree/main/apps/counter-react-ts-edit-context#readme) -
+    eliminates [prop drilling](https://kentcdodds.com/blog/prop-drilling)
+  - The
+    [fastest possible](https://github.com/cefn/watchable/tree/main/apps/fast)
+    app using @watchable/store (32000 updates per second)
+  - The
+    [smallest possible](https://github.com/cefn/watchable/tree/main/apps/tiny)
+    app using @watchable/store-react (316 bytes)

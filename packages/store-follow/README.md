@@ -1,10 +1,15 @@
 ## Track selected changes to state
 
-Promise-oriented tracking to monitor selected parts of a @watchable/store {@link Store}.
-Re-runs a Selector after each change to store state, and notifies when the
-value returned by the Selector changes.
+Monitors selected parts of a @watchable/store {@link Store}, triggering async
+callbacks.
 
-Read the [API Reference](https://watchable.dev/api/modules/_watchable_store_follow.html) or the reference usages below, or [browse the source on Github](https://github.com/cefn/watchable/tree/main/packages/store-follow).
+`@watchable/store-follow` re-runs a `Selector` after each change to store state,
+notifying the follower callback whenever a different value is returned.
+
+Read the
+[API Reference](https://watchable.dev/api/modules/_watchable_store_follow.html)
+or the reference usages below, or
+[browse the source on Github](https://github.com/cefn/watchable/tree/main/packages/store-follow).
 
 ## Usage
 
@@ -17,7 +22,7 @@ const gameStore = createStore({
   direction: null,
 });
 
-// queue any changes to `steps` to be passed to a callback
+// queue any changes to `steps` to be passed to the follower callback
 followSelector(
   gameStore,
   (state) => state.steps,
@@ -32,7 +37,7 @@ followSelector(
 ### Install
 
 ```zsh
-npm install @watchable/store-edit
+npm install @watchable/store-follow
 ```
 
 ## Advanced Usage
@@ -43,22 +48,24 @@ For complex examples needing access to underlying queue logic, use
 `withSelectorQueue`. It's what `followSelector` uses under the hood.
 
 Sometimes you can't afford the syntactic sugar of `followSelector` which
-subscribes your callback automatically and hides the `queue.receive()` API
-that is notified of changes to your selection.
+subscribes your callback automatically and hides the `queue.receive()` API that
+is notified of changes to your selection.
 
 Like `followSelector`, `withSelectorQueue` also creates and subscribes a Queue
 to be notified every time a new value is returned, but it passes this Queue
-direct to your handler along with the initial selected value. It unsubscribes and
-disposes the queue only when your handler returns.
+direct to your handler along with the initial selected value. It unsubscribes
+and disposes the queue only when your handler returns.
 
 #### Example
 
-The `withSelectorQueue` example below needs direct access to `queue.receive()` as it waits for the first event of either...
+The `withSelectorQueue` example below needs direct access to `queue.receive()`
+as it waits for the first event of either...
 
 1. game character direction changed (from users keyboard input)
 2. timer expired (the character steps every 300ms)
 
-It therefore has to use `Promise.race()` to handle either the receive or the timeout, whichever comes first.
+It therefore has to use `Promise.race()` to handle either the receive or the
+timeout, whichever comes first.
 
 ```typescript
 // given this example store
