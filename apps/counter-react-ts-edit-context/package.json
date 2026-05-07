@@ -30,23 +30,23 @@
     "@watchable/store": "1.0.2",
     "@watchable/store-edit": "1.0.2",
     "@watchable/store-react": "1.0.2",
-    "immer": "^10.0.1",
-    "react": "^18.2.0",
-    "react-dom": "^18.2.0"
+    "immer": "^11.1.7",
+    "react": "^19.2.6",
+    "react-dom": "^19.2.6"
   },
   "devDependencies": {
-    "@playwright/test": "^1.32.3",
-    "@types/react": "^18.0.34",
-    "@types/react-dom": "^18.0.11",
-    "@vitejs/plugin-legacy": "^5.4.0",
-    "@vitejs/plugin-react": "^4.2.1",
+    "@playwright/test": "^1.59.1",
+    "@types/react": "^19.2.14",
+    "@types/react-dom": "^19.2.3",
+    "@vitejs/plugin-legacy": "^8.0.1",
+    "@vitejs/plugin-react": "^6.0.1",
     "npm-run-all": "^4.1.5",
-    "playwright-chromium": "^1.32.3",
-    "typescript": "^5.4.5",
-    "vite": "^5.2.11",
-    "vitest": "^1.6.0",
-    "wait-on": "^7.0.1",
-    "wireit": "^0.14.4"
+    "playwright-chromium": "^1.59.1",
+    "typescript": "^6.0.3",
+    "vite": "^8.0.11",
+    "vitest": "^4.1.5",
+    "wait-on": "^9.0.5",
+    "wireit": "^0.14.12"
   },
   "wireit": {
     "build": {
